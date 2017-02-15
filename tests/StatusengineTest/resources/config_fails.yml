@@ -1,0 +1,116 @@
+############
+# Statusengine Worker Configuration
+############
+
+# Every node in the cluster needs a name
+# IT IS REQUIRED THAT THE NAME IS UNIQUE IN THE CLUSTER!
+# The name is required to route external commands
+# And to know which node executed a check
+# So please change the default value, if you have more than one nodes!!
+node_name: Crowbar
+
+# Configuration of your gearman-job-server
+# The Statusengine Broker Module exports all data as json encoded objects
+# to the a gearman-job-server
+gearman:
+  address: 127.0.0.1
+  port: 4730
+  timeout: 1000
+
+# If Statusengine should save status data to Redis
+use_redis: 1
+
+# Configuration of your redis server
+redis:
+  address: 127.0.0.1
+  port: 6379
+
+# If this is 1, Statusengine will save the current host and service status also in your historical storage backend
+# For example in MySQL or CrateDB
+store_live_data_in_archive_backend: 1
+
+# If Statusengine should save historical data to MySQL
+# WARNING: Do not set use_mysql and use_crate to 1 at the same time!
+use_mysql: 1
+
+mysql:
+    host: 127.0.0.1
+    port: 3306
+    username: root
+    password: password
+    database: statusengine_data
+
+# If Statusengine should save historical data to CrateDB
+# WARNING: Do not set use_crate and use_mysql to 1 at the same time!
+use_crate: 1
+
+# Configuration of your CrateDB Cluster
+# This is an array of cluster nodes.
+crate:
+  nodes:
+   - 127.0.0.1:4200
+
+# Performance Settings
+# How many records get inserted in one statement
+number_of_bulk_records: 1000
+# Timeout in seconds Statusengine will wait that number_of_bulk_records is reached until a flush get forced
+max_bulk_delay: 15
+
+# Number of worker processes for service status records
+# Target: Redis
+number_servicestatus_worker: abc
+
+# Number of worker processes for host status records
+# Target: Redis
+number_hoststatus_worker: def
+
+# Number of worker processes for logentry records
+# Target: MySQL|CrateDB
+number_logentry_worker: ghi
+
+# Number of worker processes for host and service
+# state change records
+# Target: MySQL|CrateDB
+number_statechange_worker: jkl
+
+# Number of worker processes for host check results 
+# Target: MySQL|CrateDB
+number_hostcheck_worker: mno
+
+# Number of worker processes for service check results 
+# Target: MySQL|CrateDB
+number_servicecheck_worker: pqrs
+
+
+############
+# PERFDATA DATA CONFIGURATION
+############
+
+# If statusengine should process performance data or not
+# 1 = yes
+# 0 = no
+process_perfdata: 1
+
+# Uncomment to enable
+# You can enable as much backends as you want
+perfdata_backend:
+ - crate
+ - rrdtool
+# - graphite
+
+# Number of worker processes for service check results
+# Target: You selected this at 'perfdata_backend' option
+number_perfdata_worker: asd
+
+############
+# COMMAND ROUTER CONFIGURATION
+############
+check_for_commands: 0
+
+# Interval to check for new commands in seconds
+# Every check will fire a SQL query, to choose wisely
+command_check_interval: -15
+
+# Path to Nagios/Naemon query handler.
+# This is where Statusengine will pass external commands to the monitoring backend
+query_hander: bert

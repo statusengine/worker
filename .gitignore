@@ -1,0 +1,12 @@
+phpunit.phar
+etc/config.yml
+tests/StatusengineTest/Results/*.html
+tests/StatusengineTest/Results/css
+tests/StatusengineTest/Results/img
+tests/StatusengineTest/Results/js
+.idea/tasks.xml
+.idea/workspace.xml
+nbproject
+vendor
+composer.lock
+

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<phpunit
+        bootstrap="./bootstrap.php"
+        colors="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        verbose="true"
+        stopOnFailure="false"
+        processIsolation="false"
+        backupGlobals="false"
+        syntaxCheck="true"
+>
+    <testsuite name="Statusengine unit tests">
+        <directory>./tests/StatusengineTest</directory>
+    </testsuite>
+    <testsuite name="Statusengine integration tests">
+        <directory>./tests/StatusengineIntegrationTest</directory>
+    </testsuite>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-html" target="./tests/StatusengineTest/Results" lowUpperBound="35"
+             highLowerBound="70"/>
+    </logging>
+
+</phpunit>

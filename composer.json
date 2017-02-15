@@ -1,0 +1,30 @@
+{
+  "name": "Statusengine Redis Worker",
+  "description": "The missing event broker + responsive web frontend for Nagios and Naemon",
+  "version": "2",
+  "homepage": "https://statusengine.org/",
+  "license": "GPLv2",
+  "authors": [
+    {
+      "name": "Daniel Ziegler (nook24)",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/statusengine/worker/issues",
+    "source": "https://github.com/statusengine/worker"
+  },
+
+  "require": {
+    "php": ">=5.5.9",
+    "ext-redis": "*",
+    "symfony/yaml": "2.8",
+    "symfony/console": "2.8",
+    "crate/crate-dbal":"*",
+    "crate/crate-pdo":"~0.6.0"
+  },
+
+  "autoload": {
+    "classmap": ["src/"]
+  }
+}
