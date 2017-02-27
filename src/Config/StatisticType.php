@@ -96,6 +96,11 @@ class StatisticType {
         return $this->type;
     }
 
+    public function isMiscStatistic() {
+        $this->type = 1 << 8;
+        return $this->type;
+    }
+
     /**
      * @return int
      */

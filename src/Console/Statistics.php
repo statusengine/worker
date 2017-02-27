@@ -106,7 +106,8 @@ class Statistics extends Command {
             $StatisticsMatcher->getProcessedPerfdataRecords()->getValue() +
             $StatisticsMatcher->getProcessedHostcheckRecords()->getValue() +
             $StatisticsMatcher->getProcessedServicecheckRecords()->getValue() +
-            $StatisticsMatcher->getProcessedLogentryRecords()->getValue();
+            $StatisticsMatcher->getProcessedLogentryRecords()->getValue() +
+            $StatisticsMatcher->getProcessedMiscRecords()->getValue();
     }
 
     /**
@@ -120,7 +121,8 @@ class Statistics extends Command {
             $StatisticsMatcher->getProcessedPerfdataRecordsLastMinute()->getValue() +
             $StatisticsMatcher->getProcessedHostcheckRecordsLastMinute()->getValue() +
             $StatisticsMatcher->getProcessedServicecheckRecordsLastMinute()->getValue() +
-            $StatisticsMatcher->getProcessedLogentryRecordsLastMinute()->getValue();
+            $StatisticsMatcher->getProcessedLogentryRecordsLastMinute()->getValue() +
+            $StatisticsMatcher->getProcessedMiscRecordsLastMinute()->getValue();
     }
 
     /**
@@ -132,7 +134,7 @@ class Statistics extends Command {
 
 
         $output->writeln([
-            '<comment>Statusengine statistics @'.date('H:i:s').':</comment>',
+            '<comment>Statusengine statistics @'.date('H:i:s').'</comment>',
             'Cluster node: <info>'.$this->Config->getNodeName().'</info>',
             '',
             '<info>Live data hold in Redis:</info>',
@@ -178,6 +180,17 @@ class Statistics extends Command {
         $output->writeln(sprintf(': <comment>%s</comment>', $this->format($StatisticsMatcher->getProcessedPerfdataRecords()->getValue())));
         $output->write($StatisticsMatcher->getProcessedPerfdataRecordsLastMinute()->getDescription());
         $output->writeln(sprintf(': <comment>%s</comment>', $this->format($StatisticsMatcher->getProcessedPerfdataRecordsLastMinute()->getValue())));
+
+        $output->writeln([
+            '',
+            '<info>Processed Misc data:</info>',
+            '==================================='
+        ]);
+        $output->write($StatisticsMatcher->getProcessedMiscRecords()->getDescription());
+        $output->writeln(sprintf(': <comment>%s</comment>', $this->format($StatisticsMatcher->getProcessedMiscRecords()->getValue())));
+        $output->write($StatisticsMatcher->getProcessedMiscRecordsLastMinute()->getDescription());
+        $output->writeln(sprintf(': <comment>%s</comment>', $this->format($StatisticsMatcher->getProcessedMiscRecordsLastMinute()->getValue())));
+
 
         $output->writeln([
             '',

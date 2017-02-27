@@ -135,6 +135,22 @@ if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
         $servicecheckChildPid = $ServicecheckChild->fork();
         $pids[] = $servicecheckChildPid;
     }
+
+    for ($i = 0; $i < $Config->getNumberOfMiscWorkers(); $i++) {
+        $NotificationConfig = new Statusengine\Config\Notification();
+        $MiscSignalHandler = new \Statusengine\ChildSignalHandler();
+        $MiscStatistics = new \Statusengine\Redis\Statistics($Config);
+        $MiscChild = new Statusengine\MiscChild(
+            $MiscSignalHandler,
+            $Config,
+            $NotificationConfig,
+            $ParentPid,
+            $MiscStatistics,
+            $StorageBackend
+        );
+        $miscChildPid = $MiscChild->fork();
+        $pids[] = $miscChildPid;
+    }
 }
 
 if ($Config->isProcessPerfdataEnabled() && $Config->isOnePerfdataBackendEnabled()) {
@@ -173,7 +189,7 @@ $StatisticCollector = new Statusengine\Redis\StatisticCollector(
 $QueryHandler = new \Statusengine\QueryHandler($Config);
 $TaskManager = new \Statusengine\TaskManager($Config, $StorageBackend, $QueryHandler);
 $ParentProcess = new \Statusengine\ParentProcess($StatisticCollector, $Config, $TaskManager);
-foreach($pids as $Pid){
+foreach ($pids as $Pid) {
     $ParentProcess->addChildPid($Pid);
 }
 

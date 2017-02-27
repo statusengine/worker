@@ -20,6 +20,7 @@
 namespace Statusengine\Redis;
 
 use Statusengine\Config\StatisticType;
+use Statusengine\StatisticsMatcher;
 
 class StatisticCollector {
     /**
@@ -90,6 +91,8 @@ class StatisticCollector {
         $totalProcessedServicecheckRecordsLastMinute = 0;
         $totalProcessedPerfdataRecords = 0;
         $totalProcessedPerfdataRecordsLastMinute = 0;
+        $totalProcessedMiscRecords = 0;
+        $totalProcessedMiscRecordsLastMinute = 0;
 
         foreach ($this->pids as $pid) {
             $result = $this->Redis->getHash(
@@ -165,8 +168,21 @@ class StatisticCollector {
                         $totalProcessedPerfdataRecordsLastMinute += (int)$result['total_processed_records_last_minute'];
                     }
                 }
+
+                if ($result['statistic_type'] == $this->StatisticType->isMiscStatistic()) {
+                    if (isset($result['total_processed_records_last_minute'])) {
+                        $totalProcessedMiscRecords += (int)$result['total_processed_records_last_minute'];
+                    }
+
+                    if (isset($result['total_processed_records_last_minute'])) {
+                        $totalProcessedMiscRecordsLastMinute += (int)$result['total_processed_records_last_minute'];
+                    }
+                }
             }
 
+            /**
+             * @see StatisticsMatcher::$keys
+             */
             $this->Redis->save('statusengine_statistics', [
                 'total_processed_hoststatus_records' => $totalProcessedHoststatusRecords,
                 'total_processed_hoststatus_records_last_minute' => $totalProcessedHoststatusRecordsLastMinute,
@@ -188,6 +204,9 @@ class StatisticCollector {
 
                 'total_processed_perfdata_records' => $totalProcessedPerfdataRecords,
                 'total_processed_perfdata_records_last_minute' => $totalProcessedPerfdataRecordsLastMinute,
+
+                'total_processed_misc_records' => $totalProcessedMiscRecords,
+                'total_processed_misc_records_last_minute' => $totalProcessedMiscRecordsLastMinute,
 
                 'number_of_workers' => sizeof($this->pids),
                 'total_number_of_processes' => sizeof($this->pids) + 1, //+1 is the parent itself

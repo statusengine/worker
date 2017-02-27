@@ -180,3 +180,32 @@ create table statusengine_tasks (
     type string,
     payload string
 ) CLUSTERED INTO 4 shards with (number_of_replicas = '1');
+
+create table statusengine_host_notifications (
+    hostname string,
+    contact_name string,
+    command_name string,
+    command_args string,
+    state int,
+    start_time timestamp,
+    end_time timestamp,
+    reason_type int,
+    output string,
+    ack_author string,
+    ack_data string
+) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+
+create table statusengine_service_notifications (
+    hostname string,
+    service_description string,
+    contact_name string,
+    command_name string,
+    command_args string,
+    state int,
+    start_time timestamp,
+    end_time timestamp,
+    reason_type int,
+    output string,
+    ack_author string,
+    ack_data string
+) CLUSTERED INTO 4 shards with (number_of_replicas = '0');

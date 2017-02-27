@@ -22,6 +22,7 @@ namespace Statusengine\Mysql;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Exception\UnknownTypeException;
 use Statusengine\Mysql\SqlObjects\MysqlHoststatus;
+use Statusengine\Mysql\SqlObjects\MysqlNotification;
 use Statusengine\Mysql\SqlObjects\MysqlServicestatus;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
 use Statusengine\Mysql\SqlObjects\MysqlLogentry;
@@ -143,6 +144,10 @@ class MySQL implements \Statusengine\StorageBackend {
 
                     case 'Statusengine\ValueObjects\Hoststatus':
                         $MySQLSqlObject = new  MysqlHoststatus($this, $this->BulkInsertObjectStore, $this->nodeName);
+                        break;
+
+                    case 'Statusengine\ValueObjects\Notification':
+                        $MySQLSqlObject = new  MysqlNotification($this, $this->BulkInsertObjectStore);
                         break;
                 }
                 $MySQLSqlObject->insert();
@@ -267,5 +272,12 @@ class MySQL implements \Statusengine\StorageBackend {
      */
     public function saveHoststatus(\Statusengine\ValueObjects\Hoststatus $Hoststatus){
         $this->BulkInsertObjectStore->addObject($Hoststatus);
+    }
+
+    /**
+     * @param \Statusengine\ValueObjects\Notification $Notification
+     */
+    public function saveNotification(\Statusengine\ValueObjects\Notification $Notification) {
+        $this->BulkInsertObjectStore->addObject($Notification);
     }
 }

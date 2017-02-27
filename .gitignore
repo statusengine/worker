@@ -9,4 +9,4 @@ tests/StatusengineTest/Results/js
 nbproject
 vendor
 composer.lock
-
+.idea/

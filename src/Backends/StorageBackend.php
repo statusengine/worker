@@ -19,6 +19,7 @@
 
 namespace Statusengine;
 
+
 interface StorageBackend {
 
     public function connect();
@@ -38,6 +39,8 @@ interface StorageBackend {
     public function saveHoststatus(\Statusengine\ValueObjects\Hoststatus $Hoststatus);
 
     public function saveServicestatus(\Statusengine\ValueObjects\Servicestatus $Servicestatus);
+
+    public function saveNotification(\Statusengine\ValueObjects\Notification $Notification);
 
     /**
      * @return array

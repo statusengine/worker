@@ -316,6 +316,19 @@ class Config {
     }
 
     /**
+     * @return int
+     */
+    public function getNumberOfMiscWorkers() {
+        $default = 1;
+        if (isset($this->config['number_misc_worker'])) {
+            if (is_numeric($this->config['number_misc_worker'])) {
+                return (int)$this->config['number_misc_worker'];
+            }
+        }
+        return $default;
+    }
+
+    /**
      * @return array
      */
     public function getBulkSettings() {
@@ -349,9 +362,9 @@ class Config {
     /**
      * @return bool
      */
-    public function checkForCommands(){
+    public function checkForCommands() {
         $default = false;
-        if(isset($this->config['check_for_commands'])){
+        if (isset($this->config['check_for_commands'])) {
             return (bool)$this->config['check_for_commands'];
         }
         return $default;
@@ -360,11 +373,11 @@ class Config {
     /**
      * @return int
      */
-    public function getCommandCheckInterval(){
+    public function getCommandCheckInterval() {
         $default = 10;
-        if(isset($this->config['command_check_interval'])){
+        if (isset($this->config['command_check_interval'])) {
             $interval = (int)$this->config['command_check_interval'];
-            if($interval <= 0){
+            if ($interval <= 0) {
                 $interval = $default;
             }
             return $interval;
@@ -372,9 +385,9 @@ class Config {
         return $default;
     }
 
-    public function getQueryHandler(){
+    public function getQueryHandler() {
         $default = '/opt/naemon/var/naemon.qh';
-        if(isset($this->config['query_hander'])){
+        if (isset($this->config['query_hander'])) {
             return $this->config['query_hander'];
         }
         return $default;

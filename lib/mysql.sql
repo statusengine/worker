@@ -193,3 +193,40 @@ CREATE TABLE `statusengine_tasks` (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_general_ci;
+
+CREATE TABLE `statusengine_host_notifications` (
+  `hostname`     VARCHAR(255),
+  `contact_name` VARCHAR(1024),
+  `command_name` VARCHAR(1024),
+  `command_args` VARCHAR(1024),
+  `state`        TINYINT(1) UNSIGNED DEFAULT 0,
+  `start_time`   DATETIME            DEFAULT '1970-01-01 00:00:00',
+  `end_time`     DATETIME            DEFAULT '1970-01-01 00:00:00',
+  `reason_type`  TINYINT(1) UNSIGNED DEFAULT 0,
+  `output`       VARCHAR(1024),
+  `ack_author`   VARCHAR(255),
+  `ack_data`     VARCHAR(1024)
+
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_general_ci;
+
+CREATE TABLE `statusengine_service_notifications` (
+  `hostname`            VARCHAR(255),
+  `service_description` VARCHAR(255),
+  `contact_name`        VARCHAR(1024),
+  `command_name`        VARCHAR(1024),
+  `command_args`        VARCHAR(1024),
+  `state`               TINYINT(1) UNSIGNED DEFAULT 0,
+  `start_time`          DATETIME            DEFAULT '1970-01-01 00:00:00',
+  `end_time`            DATETIME            DEFAULT '1970-01-01 00:00:00',
+  `reason_type`         TINYINT(1) UNSIGNED DEFAULT 0,
+  `output`              VARCHAR(1024),
+  `ack_author`          VARCHAR(255),
+  `ack_data`            VARCHAR(1024)
+
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_general_ci;

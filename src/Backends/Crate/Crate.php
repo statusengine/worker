@@ -32,6 +32,7 @@ use Statusengine\Crate\SqlObjects\CrateServicestatus;
 use Statusengine\Crate\SqlObjects\CrateTask;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
 use Statusengine\Exception\UnknownTypeException;
+use Statusengine\Mysql\SqlObjects\CrateNotification;
 use Statusengine\ValueObjects\Gauge;
 use Statusengine\ValueObjects\Servicestatus;
 
@@ -77,6 +78,7 @@ class Crate implements \Statusengine\StorageBackend {
         $query->bindValue(2, STATUSENGINE_WORKER_VERSION);
         $query->bindValue(3, time());
         $query->execute();
+
         $this->disconnect();
     }
 
@@ -92,7 +94,7 @@ class Crate implements \Statusengine\StorageBackend {
      * @return \Crate\PDO\PDO
      */
     public function connect() {
-        $this->Connection = new PDO($this->getDsn(), null, null, null);
+        $this->Connection = new PDO($this->getDsn(), null, null, [PDO::ATTR_TIMEOUT => 1]);
         $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $this->Connection;
     }
@@ -186,6 +188,10 @@ class Crate implements \Statusengine\StorageBackend {
                     case 'Statusengine\ValueObjects\Hoststatus':
                         $CrateSqlObject = new  CrateHoststatus($this, $this->BulkInsertObjectStore, $this->nodeName);
                         break;
+
+                    case 'Statusengine\ValueObjects\Notification':
+                        $CrateSqlObject = new  CrateNotification($this, $this->BulkInsertObjectStore);
+                        break;
                 }
                 $CrateSqlObject->insert();
                 $this->BulkInsertObjectStore->reset();
@@ -238,6 +244,10 @@ class Crate implements \Statusengine\StorageBackend {
      */
     public function saveHoststatus(\Statusengine\ValueObjects\Hoststatus $Hoststatus) {
         $this->BulkInsertObjectStore->addObject($Hoststatus);
+    }
+
+    public function saveNotification(\Statusengine\ValueObjects\Notification $Notification) {
+        $this->BulkInsertObjectStore->addObject($Notification);
     }
 
     /**
