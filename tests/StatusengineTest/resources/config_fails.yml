@@ -81,6 +81,10 @@ number_hostcheck_worker: mno
 # Target: MySQL|CrateDB
 number_servicecheck_worker: pqrs
 
+# Number of worker other queues like notifications, downtimes and acknowledgements
+# Target: MySQL|CrateDB
+number_misc_worker: asd
+
 
 ############
 # PERFDATA DATA CONFIGURATION

@@ -211,6 +211,18 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($emptyConfig->isProcessPerfdataEnabled());
     }
 
+    public function testGetNumberOfMiscWorkers() {
+        $Config = $this->getConfig();
+
+        $this->assertEquals(2, $Config->getNumberOfMiscWorkers());
+
+        $emptyConfig = $this->getEmptyConfig();
+        $this->assertEquals(1, $emptyConfig->getNumberOfMiscWorkers());
+
+        $configFails = $this->getConfigFails();
+        $this->assertEquals(1, $configFails->getNumberOfMiscWorkers());
+    }
+
     public function testGetBulkConfig() {
         $Config = $this->getConfig();
         $EmptyConfig = $this->getEmptyConfig();
