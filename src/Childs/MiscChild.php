@@ -20,6 +20,7 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\ValueObjects\Acknowledgement;
 use Statusengine\ValueObjects\Notification;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
@@ -32,9 +33,19 @@ class MiscChild extends Child {
     private $NotificationGearmanWorker;
 
     /**
+     * @var GearmanWorker
+     */
+    private $AcknowledgementGearmanWorker;
+
+    /**
      * @var WorkerConfig
      */
     private $NotificationConfig;
+
+    /**
+     * @var WorkerConfig
+     */
+    private $AcknowledgementConfig;
 
     /**
      * @var Config
@@ -66,10 +77,21 @@ class MiscChild extends Child {
      * @param Statistics $Statistics
      * @param $StorageBackend
      */
-    public function __construct(ChildSignalHandler $SignalHandler, Config $Config, $NotificationConfig, Pid $Pid, Statistics $Statistics, $StorageBackend) {
+    public function __construct(
+        ChildSignalHandler $SignalHandler,
+        Config $Config,
+        $NotificationConfig,
+        $AcknowledgementConfig,
+        Pid $Pid,
+        Statistics $Statistics,
+        $StorageBackend
+    ) {
         $this->SignalHandler = $SignalHandler;
         $this->Config = $Config;
+
         $this->NotificationConfig = $NotificationConfig;
+        $this->AcknowledgementConfig = $AcknowledgementConfig;
+
         $this->parentPid = $Pid->getPid();
         $this->Statistics = $Statistics;
         $this->StorageBackend = $StorageBackend;
@@ -78,6 +100,9 @@ class MiscChild extends Child {
 
         $this->NotificationGearmanWorker = new GearmanWorker($this->NotificationConfig, $Config);
         $this->NotificationGearmanWorker->connect();
+
+        $this->AcknowledgementGearmanWorker = new GearmanWorker($this->AcknowledgementConfig, $Config);
+        $this->AcknowledgementGearmanWorker->connect();
     }
 
 
@@ -92,6 +117,7 @@ class MiscChild extends Child {
 
         while (true) {
             $this->handleNotifications();
+            $this->handleAcknowledgements();
 
             $this->StorageBackend->dispatch();
 
@@ -106,12 +132,23 @@ class MiscChild extends Child {
         $jobData = $this->NotificationGearmanWorker->getJob();
         if ($jobData !== null) {
             $Notification = new Notification($jobData);
-            if($Notification->isValidNotification()){
+            if ($Notification->isValidNotification()) {
                 $this->StorageBackend->saveNotification(
                     $Notification
                 );
                 $this->Statistics->increase();
             }
+        }
+    }
+
+    private function handleAcknowledgements() {
+        $jobData = $this->AcknowledgementGearmanWorker->getJob();
+        if ($jobData !== null) {
+            $Acknowledgement = new Acknowledgement($jobData);
+            $this->StorageBackend->saveAcknowledgement(
+                $Acknowledgement
+            );
+            $this->Statistics->increase();
         }
     }
 }

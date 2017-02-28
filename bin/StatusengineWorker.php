@@ -138,12 +138,15 @@ if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
 
     for ($i = 0; $i < $Config->getNumberOfMiscWorkers(); $i++) {
         $NotificationConfig = new Statusengine\Config\Notification();
+        $AcknowledgementConfig = new \Statusengine\Config\Acknowledgement();
+
         $MiscSignalHandler = new \Statusengine\ChildSignalHandler();
         $MiscStatistics = new \Statusengine\Redis\Statistics($Config);
         $MiscChild = new Statusengine\MiscChild(
             $MiscSignalHandler,
             $Config,
             $NotificationConfig,
+            $AcknowledgementConfig,
             $ParentPid,
             $MiscStatistics,
             $StorageBackend

@@ -21,8 +21,10 @@ namespace Statusengine\Mysql;
 
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Exception\UnknownTypeException;
+use Statusengine\Mysql\SqlObjects\MysqlHostAcknowledgement;
 use Statusengine\Mysql\SqlObjects\MysqlHoststatus;
 use Statusengine\Mysql\SqlObjects\MysqlNotification;
+use Statusengine\Mysql\SqlObjects\MysqlServiceAcknowledgement;
 use Statusengine\Mysql\SqlObjects\MysqlServicestatus;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
 use Statusengine\Mysql\SqlObjects\MysqlLogentry;
@@ -280,4 +282,18 @@ class MySQL implements \Statusengine\StorageBackend {
     public function saveNotification(\Statusengine\ValueObjects\Notification $Notification) {
         $this->BulkInsertObjectStore->addObject($Notification);
     }
+
+    /**
+     * @param \Statusengine\ValueObjects\Acknowledgement $Acknowledgement
+     */
+    public function saveAcknowledgement(\Statusengine\ValueObjects\Acknowledgement $Acknowledgement) {
+        if($Acknowledgement->isHostAcknowledgement()){
+            $MysqlAcknowledgement = new MysqlHostAcknowledgement($this, $Acknowledgement);
+        }else{
+            $MysqlAcknowledgement = new MysqlServiceAcknowledgement($this, $Acknowledgement);
+        }
+        $MysqlAcknowledgement->insert();
+    }
+
+
 }

@@ -230,3 +230,36 @@ CREATE TABLE `statusengine_service_notifications` (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_general_ci;
+
+CREATE TABLE `statusengine_host_acknowledgements` (
+  `hostname`             VARCHAR(255),
+  `state`                TINYINT(1) UNSIGNED DEFAULT 0,
+  `author_name`          VARCHAR(255),
+  `comment_data`         VARCHAR(1024),
+  `entry_time`           DATETIME            DEFAULT '1970-01-01 00:00:00',
+  `acknowledgement_type` TINYINT(1) UNSIGNED DEFAULT 0,
+  `is_sticky`            TINYINT(1) UNSIGNED DEFAULT 0,
+  `persistent_comment`   TINYINT(1) UNSIGNED DEFAULT 0,
+  `notify_contacts`      TINYINT(1) UNSIGNED DEFAULT 0
+
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_general_ci;
+
+CREATE TABLE `statusengine_service_acknowledgements` (
+  `hostname`             VARCHAR(255),
+  `service_description`  VARCHAR(255),
+  `state`                TINYINT(1) UNSIGNED DEFAULT 0,
+  `author_name`          VARCHAR(255),
+  `comment_data`         VARCHAR(1024),
+  `entry_time`           DATETIME            DEFAULT '1970-01-01 00:00:00',
+  `acknowledgement_type` TINYINT(1) UNSIGNED DEFAULT 0,
+  `is_sticky`            TINYINT(1) UNSIGNED DEFAULT 0,
+  `persistent_comment`   TINYINT(1) UNSIGNED DEFAULT 0,
+  `notify_contacts`      TINYINT(1) UNSIGNED DEFAULT 0
+
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_general_ci;

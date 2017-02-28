@@ -250,6 +250,10 @@ class Crate implements \Statusengine\StorageBackend {
         $this->BulkInsertObjectStore->addObject($Notification);
     }
 
+    public function saveAcknowledgement(\Statusengine\ValueObjects\Acknowledgement $Acknowledgement) {
+        // TODO: Implement saveAcknowledgement() method.
+    }
+
     /**
      * @param Gauge $Gauge
      */
