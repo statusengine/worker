@@ -23,9 +23,11 @@ use Statusengine\BulkInsertObjectStore;
 use Statusengine\Config;
 use Crate\PDO\PDO as PDO;
 use Crate\PDO\PDOStatement;
+use Statusengine\Crate\SqlObjects\CrateHostAcknowledgement;
 use Statusengine\Crate\SqlObjects\CrateHostcheck;
 use Statusengine\Crate\SqlObjects\CrateHoststatus;
 use Statusengine\Crate\SqlObjects\CratePerfdata;
+use Statusengine\Crate\SqlObjects\CrateServiceAcknowledgement;
 use Statusengine\Crate\SqlObjects\CrateServicecheck;
 use Statusengine\Crate\SqlObjects\CrateStatechange;
 use Statusengine\Crate\SqlObjects\CrateServicestatus;
@@ -251,7 +253,12 @@ class Crate implements \Statusengine\StorageBackend {
     }
 
     public function saveAcknowledgement(\Statusengine\ValueObjects\Acknowledgement $Acknowledgement) {
-        // TODO: Implement saveAcknowledgement() method.
+        if ($Acknowledgement->isHostAcknowledgement()) {
+            $CrateHostAcknowledgementSaver = new CrateHostAcknowledgement($this, $Acknowledgement);
+        } else {
+            $CrateHostAcknowledgementSaver = new CrateServiceAcknowledgement($this, $Acknowledgement);
+        }
+        $CrateHostAcknowledgementSaver->insert();
     }
 
     /**

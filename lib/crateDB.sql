@@ -209,3 +209,30 @@ create table statusengine_service_notifications (
     ack_author string,
     ack_data string
 ) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+
+
+create table statusengine_host_acknowledgements (
+    hostname string,
+    state int,
+    author_name string,
+    comment_data string,
+    entry_time timestamp,
+    acknowledgement_type int,
+    is_sticky boolean,
+    persistent_comment boolean,
+    notify_contacts boolean
+) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+
+create table statusengine_service_acknowledgements (
+    hostname string,
+    service_description string,
+    state int,
+    author_name string,
+    comment_data string,
+    entry_time timestamp,
+    acknowledgement_type int,
+    is_sticky boolean,
+    persistent_comment boolean,
+    notify_contacts boolean
+) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+

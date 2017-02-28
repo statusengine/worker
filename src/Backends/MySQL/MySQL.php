@@ -288,11 +288,11 @@ class MySQL implements \Statusengine\StorageBackend {
      */
     public function saveAcknowledgement(\Statusengine\ValueObjects\Acknowledgement $Acknowledgement) {
         if($Acknowledgement->isHostAcknowledgement()){
-            $MysqlAcknowledgement = new MysqlHostAcknowledgement($this, $Acknowledgement);
+            $MysqlAcknowledgementSaver = new MysqlHostAcknowledgement($this, $Acknowledgement);
         }else{
-            $MysqlAcknowledgement = new MysqlServiceAcknowledgement($this, $Acknowledgement);
+            $MysqlAcknowledgementSaver = new MysqlServiceAcknowledgement($this, $Acknowledgement);
         }
-        $MysqlAcknowledgement->insert();
+        $MysqlAcknowledgementSaver->insert();
     }
 
 
