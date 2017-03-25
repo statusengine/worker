@@ -18,6 +18,7 @@
   "require": {
     "php": ">=5.5.9",
     "ext-redis": "*",
+    "ext-gearman": "*",
     "symfony/yaml": "2.8",
     "symfony/console": "2.8",
     "crate/crate-dbal":"*",
