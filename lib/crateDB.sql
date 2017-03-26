@@ -236,3 +236,7 @@ create table statusengine_service_acknowledgements (
     notify_contacts boolean
 ) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
 
+create table statusengine_users (
+    username string,
+    password string
+) CLUSTERED INTO 4 shards with (number_of_replicas = '1-all');

@@ -263,3 +263,11 @@ CREATE TABLE `statusengine_service_acknowledgements` (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_general_ci;
+
+CREATE TABLE `statusengine_users` (
+  `username` VARCHAR(255),
+  `password` VARCHAR(255)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_general_ci;
