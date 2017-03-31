@@ -24,26 +24,26 @@ chmod +x worker/bin/*
 composer install
 ````
 
-#Config
+# Config
 ````
 cp worker/etc/config.yml.example worker/etc/config.yml
 ````
 Change `node_name` to a unique name in your monitoring cluster!
 
-#Usage
+# Usage
 ````
 /opt/statusengine/worker/bin/StatusengineWorker.php
 ````
 
-#Proxy warnign
+# Proxy warnign
 If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/environment`!
 
-#Statusengine statistics
+# Statusengine statistics
 ````
 /opt/statusengine/worker/bin/bin/Console.php statistics --watch 5
 ````
 
-#ToDos
+# ToDos
 * [ ] Add Downtimes
 * [X] Add Acknowledgements
 * [x] Add Notifications
@@ -56,7 +56,7 @@ If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/envi
 
 
 
-#License
+# License
 GNU General Public License v3.0
 ````
 Statusengine UI
