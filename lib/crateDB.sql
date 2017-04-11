@@ -56,7 +56,7 @@ CREATE TABLE statusengine_hostchecks (
     command string,
     current_check_attempt int,
     max_check_attempts int,
-    long_output string,
+    long_output string
 ) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
 
 CREATE TABLE statusengine_servicechecks (
