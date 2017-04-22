@@ -47,8 +47,7 @@ If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/envi
 * [ ] Add Downtimes
 * [X] Add Acknowledgements
 * [x] Add Notifications
-* [ ] Add Graphite
-* [ ] Add RRDtool?
+* [x] Add Graphite
 * [ ] Implement Query Error handling
 * [ ] Add Syslog support
 * [ ] More tests

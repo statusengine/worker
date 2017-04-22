@@ -129,7 +129,18 @@ class Config {
             return false;
         }
 
-        return in_array('crate', $this->config['perfdata_backend']);
+        return in_array('crate', $this->config['perfdata_backend'], true);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isGraphitePerfdataBackend() {
+        if (!isset($this->config['perfdata_backend']) || !is_array($this->config['perfdata_backend'])) {
+            return false;
+        }
+
+        return in_array('graphite', $this->config['perfdata_backend'], true);
     }
 
     /**
@@ -139,6 +150,11 @@ class Config {
         if ($this->isCratePerfdataBackend()) {
             return true;
         }
+
+        if ($this->isGraphitePerfdataBackend()) {
+            return true;
+        }
+
         //todo add more perfdata backends
         return false;
     }
@@ -389,6 +405,51 @@ class Config {
         $default = '/opt/naemon/var/naemon.qh';
         if (isset($this->config['query_hander'])) {
             return $this->config['query_hander'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGraphiteAddress() {
+        $default = "localhost";
+        if (isset($this->config['graphite_address'])) {
+            return (string)$this->config['graphite_address'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getGraphitePort() {
+        $default = 2003;
+        if (isset($this->config['graphite_port'])) {
+            return (int)$this->config['graphite_port'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGraphiteIllegalCharacters() {
+        $default = "/[^a-zA-Z^0-9\-\.]/";
+        if (isset($this->config['graphite_illegal_characters'])) {
+            return (string)$this->config['graphite_illegal_characters'];
+        }
+        return $default;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getGraphitePrefix() {
+        $default = "statusengine";
+        if (isset($this->config['graphite_prefix'])) {
+            return (string)$this->config['graphite_prefix'];
         }
         return $default;
     }

@@ -107,16 +107,34 @@ number_misc_worker: 1
 # 0 = no
 process_perfdata: 1
 
+# Number of worker processes for service check results
+# Target: You selected this at 'perfdata_backend' option
+number_perfdata_worker: 2
+
 # Uncomment to enable
 # You can enable as much backends as you want
 perfdata_backend:
  - crate
-# - rrdtool  #//todo
-# - graphite #//todo
+# - graphite
 
-# Number of worker processes for service check results
-# Target: You selected this at 'perfdata_backend' option
-number_perfdata_worker: 2
+############
+# GRAPHITE CONFIGURATION
+############
+
+# Every record in Graphite will be prefixed with the given key
+# so multiple systems are able to read/write to the same system
+graphite_prefix: statusengine
+
+# Set the ip address or hostname for your Graphite system
+# Statusengine Worker use the TCP plaintext protocol to store data
+graphite_address: localhost
+
+# Port where your Graphite server is listening to
+graphite_port: 2003
+
+# Every characters in the key which not match the given regex
+# will be replace with an underscore _
+graphite_illegal_characters: /[^a-zA-Z^0-9\-\.]/
 
 ############
 # COMMAND ROUTER CONFIGURATION

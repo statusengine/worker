@@ -51,6 +51,10 @@ class PerfdataStorageBackends {
             $backends['crate'] = new Crate($this->Config, $this->BulkInsertObjectStore);
         }
 
+        if($this->Config->isGraphitePerfdataBackend()){
+            $backends['graphite'] = new GraphitePerfdata($this->Config);
+        }
+
         return $backends;
     }
 
