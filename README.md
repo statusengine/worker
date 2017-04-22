@@ -58,7 +58,7 @@ If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/envi
 # License
 GNU General Public License v3.0
 ````
-Statusengine UI
+Statusengine Worker
 Copyright (C) 2016-2017  Daniel Ziegler
 
 This program is free software: you can redistribute it and/or modify
