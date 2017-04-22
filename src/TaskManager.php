@@ -40,6 +40,11 @@ class TaskManager {
     private $QueryHandler;
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * @var int
      */
     private $checkInterval;
@@ -54,11 +59,18 @@ class TaskManager {
      * @param Config $Config
      * @param StorageBackend $StorageBackend
      * @param QueryHandler $QueryHandler
+     * @param Syslog $Syslog
      */
-    public function __construct(Config $Config, StorageBackend $StorageBackend, QueryHandler $QueryHandler) {
+    public function __construct(
+        Config $Config,
+        StorageBackend $StorageBackend,
+        QueryHandler $QueryHandler,
+        Syslog $Syslog
+    ) {
         $this->Config = $Config;
         $this->StorageBackend = $StorageBackend;
         $this->QueryHandler = $QueryHandler;
+        $this->Syslog = $Syslog;
 
         $this->checkInterval = $Config->getCommandCheckInterval();
     }
@@ -74,7 +86,7 @@ class TaskManager {
                     try {
                         $this->processTask($task);
                     } catch (UnknownTaskTypeException $e) {
-                        //todo implement error handling
+                        $this->Syslog->error(sprintf('Error while executing external command: %s', $e->getMessage()));
                     }
 
                     $taskUuids[] = $task->getUuid();
@@ -101,7 +113,7 @@ class TaskManager {
                 break;
 
             default:
-                throw new UnknownTaskTypeException();
+                throw new UnknownTaskTypeException('Unsupported command type');
 
         }
 

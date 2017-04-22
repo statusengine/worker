@@ -205,8 +205,8 @@ $StatisticCollector = new Statusengine\Redis\StatisticCollector(
     new \Statusengine\Config\StatisticType()
 );
 
-$QueryHandler = new \Statusengine\QueryHandler($Config);
-$TaskManager = new \Statusengine\TaskManager($Config, $StorageBackend, $QueryHandler);
+$QueryHandler = new \Statusengine\QueryHandler($Config, $Syslog);
+$TaskManager = new \Statusengine\TaskManager($Config, $StorageBackend, $QueryHandler, $Syslog);
 $ParentProcess = new \Statusengine\ParentProcess($StatisticCollector, $Config, $TaskManager, $Syslog);
 foreach ($pids as $Pid) {
     $ParentProcess->addChildPid($Pid);
