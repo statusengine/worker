@@ -35,6 +35,7 @@ use Statusengine\Crate\SqlObjects\CrateTask;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
 use Statusengine\Exception\UnknownTypeException;
 use Statusengine\Mysql\SqlObjects\CrateNotification;
+use Statusengine\Syslog;
 use Statusengine\ValueObjects\Gauge;
 use Statusengine\ValueObjects\Servicestatus;
 
@@ -57,6 +58,11 @@ class Crate implements \Statusengine\StorageBackend {
     private $BulkInsertObjectStore;
 
     /**
+     * @var Syslog
+     */
+    protected $Syslog;
+
+    /**
      * @var string
      */
     private $nodeName;
@@ -65,10 +71,13 @@ class Crate implements \Statusengine\StorageBackend {
      * Crate constructor.
      * @param Config $Config
      * @param BulkInsertObjectStore $BulkInsertObjectStore
+     * @param Syslog $Syslog
      */
-    public function __construct(Config $Config, BulkInsertObjectStore $BulkInsertObjectStore) {
+    public function __construct(Config $Config, BulkInsertObjectStore $BulkInsertObjectStore, Syslog $Syslog) {
         $this->Config = $Config;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
+        $this->Syslog = $Syslog;
+
         $this->nodeName = $Config->getNodeName();
     }
 
@@ -79,7 +88,13 @@ class Crate implements \Statusengine\StorageBackend {
         $query->bindValue(1, $this->nodeName);
         $query->bindValue(2, STATUSENGINE_WORKER_VERSION);
         $query->bindValue(3, time());
-        $query->execute();
+
+        try {
+            $query->execute();
+        }catch(\Exception $e){
+            $this->Syslog->emergency($e->getMessage());
+            exit(1);
+        }
 
         $this->disconnect();
     }
@@ -96,8 +111,12 @@ class Crate implements \Statusengine\StorageBackend {
      * @return \Crate\PDO\PDO
      */
     public function connect() {
-        $this->Connection = new PDO($this->getDsn(), null, null, [PDO::ATTR_TIMEOUT => 1]);
-        $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        try {
+            $this->Connection = new PDO($this->getDsn(), null, null, [PDO::ATTR_TIMEOUT => 1]);
+            $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        }catch (\Exception $e){
+            $this->Syslog->error($e->getMessage());
+        }
         return $this->Connection;
     }
 
@@ -131,7 +150,7 @@ class Crate implements \Statusengine\StorageBackend {
             $result = $query->execute();
 
         } catch (\Exception $Exception) {
-            print_r($Exception->getMessage());
+            $this->Syslog->error($Exception->getMessage());
             $this->reconnect();
             //todo implement error handling
             /*

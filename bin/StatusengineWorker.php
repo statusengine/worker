@@ -21,13 +21,15 @@
 require_once __DIR__ . '/../bootstrap.php';
 
 $Config = new \Statusengine\Config();
+$Syslog = new \Statusengine\Syslog($Config);
+$Syslog->info(sprintf('Starting Statusengine-Worker Version %s', STATUSENGINE_WORKER_VERSION));
 
 $BulkConfig = $Config->getBulkSettings();
 $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
     $BulkConfig['max_bulk_delay'],
     $BulkConfig['number_of_bulk_records']
 );
-$BackendSelector = new Statusengine\BackendSelector($Config, $BulkInsertObjectStore);
+$BackendSelector = new Statusengine\BackendSelector($Config, $BulkInsertObjectStore, $Syslog);
 $StorageBackend = $BackendSelector->getStorageBackend();
 
 $StorageBackend->saveNodeName();
@@ -37,16 +39,18 @@ $ParentPid = new \Statusengine\ValueObjects\Pid(getmypid());
 
 if ($Config->isRedisEnabled() || $Config->storeLiveDateInArchive()) {
     for ($i = 0; $i < $Config->getNumberOfHoststatusWorkers(); $i++) {
+        $Syslog->info('Fork new host status worker');
         $HoststatusConfig = new Statusengine\Config\Hoststatus();
         $HoststatusSignalHandler = new \Statusengine\ChildSignalHandler();
-        $HoststatusStatistics = new \Statusengine\Redis\Statistics($Config);
+        $HoststatusStatistics = new \Statusengine\Redis\Statistics($Config, $Syslog);
         $HoststatusChild = new Statusengine\HoststatusChild(
             $HoststatusSignalHandler,
             $Config,
             $HoststatusConfig,
             $ParentPid,
             $HoststatusStatistics,
-            $StorageBackend
+            $StorageBackend,
+            $Syslog
         );
         $hoststatusChildPid = $HoststatusChild->fork();
         $pids[] = $hoststatusChildPid;
@@ -55,16 +59,18 @@ if ($Config->isRedisEnabled() || $Config->storeLiveDateInArchive()) {
 
 if ($Config->isRedisEnabled() || $Config->storeLiveDateInArchive()) {
     for ($i = 0; $i < $Config->getNumberOfServicestatusWorkers(); $i++) {
+        $Syslog->info('Fork new service status worker');
         $ServicestatusConfig = new Statusengine\Config\Servicestatus();
         $ServicestatusSignalHandler = new \Statusengine\ChildSignalHandler();
-        $ServicestatusStatistics = new \Statusengine\Redis\Statistics($Config);
+        $ServicestatusStatistics = new \Statusengine\Redis\Statistics($Config, $Syslog);
         $ServicestatusChild = new Statusengine\ServicestatusChild(
             $ServicestatusSignalHandler,
             $Config,
             $ServicestatusConfig,
             $ParentPid,
             $ServicestatusStatistics,
-            $StorageBackend
+            $StorageBackend,
+            $Syslog
         );
         $servicestatusChildPid = $ServicestatusChild->fork();
         $pids[] = $servicestatusChildPid;
@@ -73,9 +79,10 @@ if ($Config->isRedisEnabled() || $Config->storeLiveDateInArchive()) {
 
 if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
     for ($i = 0; $i < $Config->getNumberOfLogentryWorkers(); $i++) {
+        $Syslog->info('Fork new log entry worker');
         $LogentryConfig = new Statusengine\Config\Logentry();
         $LogentrySignalHandler = new \Statusengine\ChildSignalHandler();
-        $LogentryStatistics = new \Statusengine\Redis\Statistics($Config);
+        $LogentryStatistics = new \Statusengine\Redis\Statistics($Config, $Syslog);
         $LogentryChild = new Statusengine\LogentryChild(
             $LogentrySignalHandler,
             $Config,
@@ -89,9 +96,10 @@ if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
     }
 
     for ($i = 0; $i < $Config->getNumberOfStatechangeWorkers(); $i++) {
+        $Syslog->info('Fork new state change worker');
         $StatechangeConfig = new Statusengine\Config\Statechange();
         $StatechangeSignalHandler = new \Statusengine\ChildSignalHandler();
-        $StatechangeStatistics = new \Statusengine\Redis\Statistics($Config);
+        $StatechangeStatistics = new \Statusengine\Redis\Statistics($Config, $Syslog);
         $StatechangeChild = new Statusengine\StatechangeChild(
             $StatechangeSignalHandler,
             $Config,
@@ -105,9 +113,10 @@ if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
     }
 
     for ($i = 0; $i < $Config->getNumberOfHostcheckWorkers(); $i++) {
+        $Syslog->info('Fork new host check worker');
         $HostcheckConfig = new Statusengine\Config\Hostcheck();
         $HostcheckSignalHandler = new \Statusengine\ChildSignalHandler();
-        $HostcheckStatistics = new \Statusengine\Redis\Statistics($Config);
+        $HostcheckStatistics = new \Statusengine\Redis\Statistics($Config, $Syslog);
         $HostcheckChild = new Statusengine\HostcheckChild(
             $HostcheckSignalHandler,
             $Config,
@@ -121,9 +130,10 @@ if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
     }
 
     for ($i = 0; $i < $Config->getNumberOfServicecheckWorkers(); $i++) {
+        $Syslog->info('Fork new service check worker');
         $ServicecheckConfig = new Statusengine\Config\Servicecheck();
         $ServicecheckSignalHandler = new \Statusengine\ChildSignalHandler();
-        $ServicecheckStatistics = new \Statusengine\Redis\Statistics($Config);
+        $ServicecheckStatistics = new \Statusengine\Redis\Statistics($Config, $Syslog);
         $ServicecheckChild = new Statusengine\ServicecheckChild(
             $ServicecheckSignalHandler,
             $Config,
@@ -137,11 +147,12 @@ if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
     }
 
     for ($i = 0; $i < $Config->getNumberOfMiscWorkers(); $i++) {
+        $Syslog->info('Fork new misc worker');
         $NotificationConfig = new Statusengine\Config\Notification();
         $AcknowledgementConfig = new \Statusengine\Config\Acknowledgement();
 
         $MiscSignalHandler = new \Statusengine\ChildSignalHandler();
-        $MiscStatistics = new \Statusengine\Redis\Statistics($Config);
+        $MiscStatistics = new \Statusengine\Redis\Statistics($Config, $Syslog);
         $MiscChild = new Statusengine\MiscChild(
             $MiscSignalHandler,
             $Config,
@@ -161,12 +172,17 @@ if ($Config->isProcessPerfdataEnabled() && $Config->isOnePerfdataBackendEnabled(
         $BulkConfig['max_bulk_delay'],
         $BulkConfig['number_of_bulk_records']
     );
-    $PerfdataStorageBackends = new \Statusengine\Backends\PerfdataBackends\PerfdataStorageBackends($Config, $BulkInsertObjectStore);
+    $PerfdataStorageBackends = new \Statusengine\Backends\PerfdataBackends\PerfdataStorageBackends(
+        $Config,
+        $BulkInsertObjectStore,
+        $Syslog
+    );
 
     for ($i = 0; $i < $Config->getNumberOfPerfdataWorkers(); $i++) {
+        $Syslog->info('Fork new performance data worker');
         $PerfdataConfig = new Statusengine\Config\Perfdata();
         $PerfdataSignalHandler = new \Statusengine\ChildSignalHandler();
-        $PerfdataStatistics = new \Statusengine\Redis\Statistics($Config);
+        $PerfdataStatistics = new \Statusengine\Redis\Statistics($Config, $Syslog);
         $PerfdataChild = new Statusengine\PerfdataChild(
             $PerfdataSignalHandler,
             $Config,
@@ -182,7 +198,7 @@ if ($Config->isProcessPerfdataEnabled() && $Config->isOnePerfdataBackendEnabled(
 
 // Parent Process
 
-$ParentRedis = new Statusengine\Redis\Redis($Config);
+$ParentRedis = new Statusengine\Redis\Redis($Config, $Syslog);
 $ParentRedis->connect();
 $StatisticCollector = new Statusengine\Redis\StatisticCollector(
     $ParentRedis,
@@ -191,12 +207,13 @@ $StatisticCollector = new Statusengine\Redis\StatisticCollector(
 
 $QueryHandler = new \Statusengine\QueryHandler($Config);
 $TaskManager = new \Statusengine\TaskManager($Config, $StorageBackend, $QueryHandler);
-$ParentProcess = new \Statusengine\ParentProcess($StatisticCollector, $Config, $TaskManager);
+$ParentProcess = new \Statusengine\ParentProcess($StatisticCollector, $Config, $TaskManager, $Syslog);
 foreach ($pids as $Pid) {
     $ParentProcess->addChildPid($Pid);
 }
 
 // while(true) and wait for signals
+$Syslog->info('Finished daemonizing');
 $ParentProcess->loop();
 
 

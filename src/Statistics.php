@@ -21,14 +21,16 @@ namespace Statusengine\Redis;
 
 use Statusengine\Config;
 use Statusengine\Config\StatisticType;
+use Statusengine\Syslog;
 use Statusengine\ValueObjects\Pid;
 
-/**
- * Description of Statistics
- *
- * @author nook
- */
 class Statistics {
+
+    /**
+     * @var Syslog
+     */
+    private $Syslog;
+
     /**
      *
      * @var Redis
@@ -76,9 +78,20 @@ class Statistics {
      */
     private $Type;
 
-    public function __construct(Config $Config) {
-        $this->Redis = new \Statusengine\Redis\Redis($Config);
-        $this->Redis->connect();
+    /**
+     * Statistics constructor.
+     * @param Config $Config
+     * @param Syslog $Syslog
+     */
+    public function __construct(Config $Config, Syslog $Syslog) {
+        $this->Syslog = $Syslog;
+
+        try {
+            $this->Redis = new \Statusengine\Redis\Redis($Config, $Syslog);
+            $this->Redis->connect();
+        }catch (\Exception $e){
+            $this->Syslog->emergency($e->getMessage());
+        }
     }
 
     public function setPid(Pid $Pid) {

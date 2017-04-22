@@ -24,6 +24,7 @@
 namespace Statusengine\Redis;
 
 use Statusengine\Config;
+use Statusengine\Syslog;
 
 
 class Redis {
@@ -42,8 +43,9 @@ class Redis {
      * Redis constructor.
      * @param Config $Config
      */
-    public function __construct(Config $Config) {
+    public function __construct(Config $Config, Syslog $Syslog) {
         $this->Config = $Config;
+        $this->Syslog = $Syslog;
     }
 
     public function connect() {
@@ -61,9 +63,13 @@ class Redis {
      * + Time complexity: O(1) (For expire)
      */
     public function save($key, $data, $expire = 0) {
-        $this->Redis->hMset($key, $data);
-        if ($expire > 0) {
-            $this->Redis->expire($key, $expire);
+        try {
+            $this->Redis->hMset($key, $data);
+            if ($expire > 0) {
+                $this->Redis->expire($key, $expire);
+            }
+        } catch (\RedisException $e) {
+            $this->Syslog->error($e->getMessage());
         }
     }
 
@@ -85,7 +91,11 @@ class Redis {
      * Time complexity: O(1) for each element added
      */
     public function addRecordToSet($setKey, $value) {
-        return $this->Redis->sAdd($setKey, $value);
+        try {
+            return $this->Redis->sAdd($setKey, $value);
+        } catch (\RedisException $e) {
+            $this->Syslog->error($e->getMessage());
+        }
     }
 
     /**
@@ -95,7 +105,11 @@ class Redis {
      * Time complexity: O(N) where N is the number of members to be removed.
      */
     public function removeRecordFromSet($setKey, $record) {
-        return $this->Redis->sRem($setKey, $record);
+        try {
+            return $this->Redis->sRem($setKey, $record);
+        } catch (\RedisException $e) {
+            $this->Syslog->error($e->getMessage());
+        }
     }
 
     /**
@@ -104,7 +118,11 @@ class Redis {
      * Time complexity: O(N) where N is the set cardinality.
      */
     public function getAllRecordsFromSet($setKey) {
-        return $this->Redis->sMembers($setKey);
+        try {
+            return $this->Redis->sMembers($setKey);
+        } catch (\RedisException $e) {
+            $this->Syslog->error($e->getMessage());
+        }
     }
 
 

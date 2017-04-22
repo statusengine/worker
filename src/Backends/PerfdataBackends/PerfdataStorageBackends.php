@@ -23,6 +23,7 @@ namespace Statusengine\Backends\PerfdataBackends;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Config;
 use Statusengine\Crate\Crate;
+use Statusengine\Syslog;
 
 class PerfdataStorageBackends {
 
@@ -32,13 +33,19 @@ class PerfdataStorageBackends {
     private $Config;
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * @var BulkInsertObjectStore
      */
     private $BulkInsertObjectStore;
 
-    public function __construct(Config $Config, BulkInsertObjectStore $BulkInsertObjectStore) {
+    public function __construct(Config $Config, BulkInsertObjectStore $BulkInsertObjectStore, Syslog $Syslog) {
         $this->Config = $Config;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
+        $this->Syslog = $Syslog;
     }
 
     /**
@@ -48,11 +55,11 @@ class PerfdataStorageBackends {
         $backends = [];
 
         if($this->Config->isCratePerfdataBackend()){
-            $backends['crate'] = new Crate($this->Config, $this->BulkInsertObjectStore);
+            $backends['crate'] = new Crate($this->Config, $this->BulkInsertObjectStore, $this->Syslog);
         }
 
         if($this->Config->isGraphitePerfdataBackend()){
-            $backends['graphite'] = new GraphitePerfdata($this->Config);
+            $backends['graphite'] = new GraphitePerfdata($this->Config, $this->Syslog);
         }
 
         return $backends;

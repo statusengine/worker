@@ -25,8 +25,9 @@ use Statusengine\Console\StatsOptions;
 
 
 $Config = new \Statusengine\Config();
+$Syslog = new \Statusengine\Syslog($Config);
 
-$Redis = new Statusengine\Redis\Redis($Config);
+$Redis = new Statusengine\Redis\Redis($Config, $Syslog);
 $Redis->connect();
 
 $stats = $Redis->getHash('statusengine_statistics');

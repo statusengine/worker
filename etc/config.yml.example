@@ -148,3 +148,15 @@ command_check_interval: 15
 # Path to Nagios/Naemon query handler.
 # This is where Statusengine will pass external commands to the monitoring backend
 query_hander: /opt/naemon/var/naemon.qh
+
+############
+# SYSLOG CONFIGURATION
+############
+
+# If Statusengine Worker should write log messages to your syslog
+# Enabled=1, disabled=0
+syslog_enabled: 1
+
+# The tag or ident of Statusengine Worker in your syslog
+syslog_tag: statusengine-worker
+

@@ -77,6 +77,11 @@ class HoststatusChild extends Child {
     private $storeLiveDateInArchive;
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * HoststatusChild constructor.
      * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
@@ -84,13 +89,23 @@ class HoststatusChild extends Child {
      * @param Pid $Pid
      * @param Statistics $Statistics
      * @param StorageBackend $StorageBackend
+     * @param Syslog $Syslog
      */
-    public function __construct(ChildSignalHandler $SignalHandler, Config $Config, $HoststatusConfig, Pid $Pid, Statistics $Statistics, StorageBackend $StorageBackend) {
+    public function __construct(
+        ChildSignalHandler $SignalHandler,
+        Config $Config,
+        $HoststatusConfig,
+        Pid $Pid,
+        Statistics $Statistics,
+        StorageBackend $StorageBackend,
+        Syslog $Syslog
+    ) {
         $this->SignalHandler = $SignalHandler;
         $this->Config = $Config;
         $this->HoststatusConfig = $HoststatusConfig;
         $this->parentPid = $Pid->getPid();
         $this->Statistics = $Statistics;
+        $this->Syslog = $Syslog;
 
         $this->isRedisEnabled = $Config->isRedisEnabled();
         $this->storeLiveDateInArchive = $Config->storeLiveDateInArchive();
@@ -100,7 +115,7 @@ class HoststatusChild extends Child {
         $this->HoststatusGearmanWorker = new GearmanWorker($this->HoststatusConfig, $Config);
         $this->HoststatusGearmanWorker->connect();
 
-        $this->HoststatusRedis = new \Statusengine\Redis\Redis($Config);
+        $this->HoststatusRedis = new \Statusengine\Redis\Redis($Config, $this->Syslog);
         $this->HoststatusRedis->connect();
 
         $this->HoststatusList = new HoststatusList($this->HoststatusRedis);

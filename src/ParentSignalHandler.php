@@ -28,11 +28,18 @@ class ParentSignalHandler {
     private $ParentProcess;
 
     /**
-     * ChildSignalHandler constructor.
-     * @param ParentProcess $parentProcess
+     * @var Syslog
      */
-    public function __construct(ParentProcess $parentProcess) {
+    private $Syslog;
+
+    /**
+     * ParentSignalHandler constructor.
+     * @param ParentProcess $parentProcess
+     * @param Syslog $Syslog
+     */
+    public function __construct(ParentProcess $parentProcess, Syslog $Syslog) {
         $this->ParentProcess = $parentProcess;
+        $this->Syslog = $Syslog;
     }
 
     public function bind() {
@@ -55,6 +62,7 @@ class ParentSignalHandler {
                     \pcntl_waitpid($pid->getPid(), $status);
                 }
 
+                $this->Syslog->info('Bye');
                 exit(0);
                 break;
         }

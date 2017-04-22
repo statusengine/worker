@@ -77,6 +77,11 @@ class ServicestatusChild extends Child {
     private $storeLiveDateInArchive;
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * ServicestatusChild constructor.
      * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
@@ -84,13 +89,23 @@ class ServicestatusChild extends Child {
      * @param Pid $Pid
      * @param Statistics $Statistics
      * @param StorageBackend $StorageBackend
+     * @param Syslog $Syslog
      */
-    public function __construct(ChildSignalHandler $SignalHandler, Config $Config, $ServicestatusConfig, Pid $Pid, Statistics $Statistics, StorageBackend $StorageBackend){
+    public function __construct(
+        ChildSignalHandler $SignalHandler,
+        Config $Config,
+        $ServicestatusConfig,
+        Pid $Pid,
+        Statistics $Statistics,
+        StorageBackend $StorageBackend,
+        Syslog $Syslog
+    ){
         $this->SignalHandler = $SignalHandler;
         $this->Config = $Config;
         $this->ServicestatusConfig = $ServicestatusConfig;
         $this->parentPid = $Pid->getPid();
         $this->Statistics = $Statistics;
+        $this->Syslog = $Syslog;
 
         $this->isRedisEnabled = $Config->isRedisEnabled();
         $this->storeLiveDateInArchive = $Config->storeLiveDateInArchive();
@@ -100,7 +115,7 @@ class ServicestatusChild extends Child {
         $this->ServicetatusGearmanWorker = new GearmanWorker($this->ServicestatusConfig, $Config);
         $this->ServicetatusGearmanWorker->connect();
 
-        $this->ServicestatusRedis = new \Statusengine\Redis\Redis($Config);
+        $this->ServicestatusRedis = new \Statusengine\Redis\Redis($Config, $this->Syslog);
         $this->ServicestatusRedis->connect();
 
         $this->ServicestatusList = new ServicestatusList($this->ServicestatusRedis);

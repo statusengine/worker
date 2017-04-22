@@ -32,6 +32,7 @@ use Statusengine\Mysql\SqlObjects\MysqlHostcheck;
 use Statusengine\Mysql\SqlObjects\MysqlServicecheck;
 use Statusengine\Mysql\SqlObjects\MysqlStatechange;
 use Statusengine\Mysql\SqlObjects\MysqlTask;
+use Statusengine\Syslog;
 
 class MySQL implements \Statusengine\StorageBackend {
 
@@ -51,6 +52,11 @@ class MySQL implements \Statusengine\StorageBackend {
     protected $Connection;
 
     /**
+     * @var Syslog
+     */
+    protected $Syslog;
+
+    /**
      * @var string
      */
     private $nodeName;
@@ -59,10 +65,12 @@ class MySQL implements \Statusengine\StorageBackend {
      * MySQL constructor.
      * @param \Statusengine\Config $Config
      * @param BulkInsertObjectStore $BulkInsertObjectStore
+     * @param Syslog $Syslog
      */
-    public function __construct(\Statusengine\Config $Config, BulkInsertObjectStore $BulkInsertObjectStore){
+    public function __construct(\Statusengine\Config $Config, BulkInsertObjectStore $BulkInsertObjectStore, Syslog $Syslog){
         $this->Config = $Config;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
+        $this->Syslog = $Syslog;
         $this->nodeName = $Config->getNodeName();
     }
 
@@ -85,8 +93,15 @@ class MySQL implements \Statusengine\StorageBackend {
      */
     public function connect(){
         $config = $this->Config->getMysqlConfig();
-        $this->Connection = new \PDO($this->getDsn(), $config['username'], $config['password']);
-        $this->Connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        try {
+            $this->Connection = new \PDO($this->getDsn(), $config['username'], $config['password'], [
+                \PDO::ATTR_TIMEOUT => 1,
+            ]);
+            $this->Connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        }catch (\Exception $e){
+            $this->Syslog->error($e->getMessage());
+        }
 
         //Enable UTF-8
         $query = $this->Connection->prepare('SET NAMES utf8');
@@ -109,12 +124,18 @@ class MySQL implements \Statusengine\StorageBackend {
 
     public function saveNodeName() {
         $this->connect();
-        $query = $this->Connection->prepare('INSERT INTO statusengine_nodes (node_name, node_version, node_start_time)
+        try {
+            $query = $this->Connection->prepare('INSERT INTO statusengine_nodes (node_name, node_version, node_start_time)
           VALUES(?,?,?) ON DUPLICATE KEY UPDATE node_version=VALUES(node_version), node_start_time=VALUES(node_start_time)');
-        $query->bindValue(1, $this->nodeName);
-        $query->bindValue(2, STATUSENGINE_WORKER_VERSION);
-        $query->bindValue(3, date('Y-m-d H:i:s'));
-        $query->execute();
+            $query->bindValue(1, $this->nodeName);
+            $query->bindValue(2, STATUSENGINE_WORKER_VERSION);
+            $query->bindValue(3, date('Y-m-d H:i:s'));
+            $query->execute();
+        }catch (\Exception $e){
+            print_r($e);
+            $this->Syslog->emergency($e->getMessage());
+            exit(1);
+        }
         $this->disconnect();
     }
 
@@ -174,13 +195,11 @@ class MySQL implements \Statusengine\StorageBackend {
         } catch (\Exception $Exception) {
             $errorNo = $Exception->errorInfo[1];
             $errorString = $Exception->errorInfo[2];
+            $this->Syslog->error(sprintf('[%s] %s', $errorNo, $errorString));
 
             if ($errorString == 'MySQL server has gone away') {
                 $this->reconnect();
                 throw new StorageBackendUnavailableExceptions($errorString);
-            } else {
-                //todo implement error handling
-                print_r($Exception);
             }
         }
         return $result;

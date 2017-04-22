@@ -20,6 +20,7 @@
 namespace Statusengine\Backends\PerfdataBackends;
 
 use Statusengine\Config;
+use Statusengine\Syslog;
 use Statusengine\TcpSocket;
 use Statusengine\ValueObjects\Gauge;
 
@@ -29,6 +30,11 @@ class GraphitePerfdata {
      * @var Config
      */
     private $Config;
+
+    /**
+     * @var Syslog
+     */
+    private $Syslog;
 
     /**
      * @var string
@@ -54,9 +60,12 @@ class GraphitePerfdata {
     /**
      * GraphitePerfdata constructor.
      * @param Config $Config
+     * @param Syslog $Syslog
      */
-    public function __construct(Config $Config) {
+    public function __construct(Config $Config, Syslog $Syslog) {
         $this->Config = $Config;
+        $this->Syslog = $Syslog;
+
         $this->address = $this->Config->getGraphiteAddress();
         $this->port = $this->Config->getGraphitePort();
         $this->prefix = $this->Config->getGraphitePrefix();
@@ -74,7 +83,7 @@ class GraphitePerfdata {
         try{
             $TcpSocket->connect();
         }catch (\Exception $e){
-            print_r($e->getMessage());
+            $this->Syslog->error('Graphite error: '.$e->getMessage());
             return false;
         }
 
@@ -82,7 +91,7 @@ class GraphitePerfdata {
             $TcpSocket->send($data.PHP_EOL);
             $TcpSocket->disconnect();
         }catch (\Exception $e){
-            print_r($e->getMessage());
+            $this->Syslog->error('Graphite error: '.$e->getMessage());
             return false;
         }
         return true;

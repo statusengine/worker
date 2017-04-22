@@ -454,5 +454,27 @@ class Config {
         return $default;
     }
 
+    /**
+     * @return bool
+     */
+    public function isSyslogEnabled(){
+        $default = true;
+        if (isset($this->config['syslog_enabled'])) {
+            return (bool)$this->config['syslog_enabled'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSyslogTag() {
+        $default = "statusengine-worker";
+        if (isset($this->config['syslog_tag'])) {
+            return (string)$this->config['syslog_tag'];
+        }
+        return $default;
+    }
+
 
 }

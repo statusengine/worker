@@ -23,6 +23,7 @@ use Output\NaemonPerfdata;
 use Statusengine\Redis\Redis;
 use Statusengine\Config;
 use Statusengine\StatisticsMatcher;
+use Statusengine\Syslog;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -59,7 +60,8 @@ class Statistics extends Command {
 
     public function execute(InputInterface $input, OutputInterface $output){
         $this->Config = new Config();
-        $Redis = new Redis($this->Config);
+        $Syslog = new Syslog($this->Config);
+        $Redis = new Redis($this->Config, $Syslog);
         $Redis->connect();
         $stats = $Redis->getHash('statusengine_statistics');
 

@@ -50,6 +50,11 @@ class ParentProcess {
     private $TaskManager;
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * @var bool
      */
     private $checkForCommands;
@@ -58,16 +63,22 @@ class ParentProcess {
      * ParentProcess constructor.
      * @param StatisticCollector $StatisticCollector
      */
-    public function __construct(StatisticCollector $StatisticCollector, Config $Config, TaskManager $TaskManager) {
+    public function __construct(
+        StatisticCollector $StatisticCollector,
+        Config $Config,
+        TaskManager $TaskManager,
+        Syslog $Syslog
+    ) {
         $this->StatisticCollector = $StatisticCollector;
         $this->Config = $Config;
         $this->TaskManager = $TaskManager;
+        $this->Syslog = $Syslog;
 
         $this->checkForCommands = $Config->checkForCommands();
     }
 
     public function loop() {
-        $this->ParentSignalHandler = new \Statusengine\ParentSignalHandler($this);
+        $this->ParentSignalHandler = new \Statusengine\ParentSignalHandler($this, $this->Syslog);
         $this->ParentSignalHandler->bind();
 
         $this->StatisticCollector->setPids($this->getChildPids());
@@ -109,6 +120,8 @@ class ParentProcess {
             if (pcntl_waitpid($Pid->getPid(), $status, WNOHANG) == 0) {
                 //Child still alive
                 $pidsAlive[] = $Pid;
+            }else{
+                $this->Syslog->alert(sprintf('Child with pid %s is dead!!', $Pid->getPid()));
             }
         }
         $this->pids = $pidsAlive;

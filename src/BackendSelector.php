@@ -34,13 +34,20 @@ class BackendSelector {
     private $BulkInsertObjectStore;
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * BackendSelector constructor.
      * @param Config $Config
      * @param BulkInsertObjectStore $BulkInsertObjectStore
+     * @param Syslog $Syslog
      */
-    public function __construct(Config $Config, BulkInsertObjectStore $BulkInsertObjectStore) {
+    public function __construct(Config $Config, BulkInsertObjectStore $BulkInsertObjectStore, Syslog $Syslog) {
         $this->Config = $Config;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
+        $this->Syslog = $Syslog;
     }
 
     /**
@@ -49,11 +56,11 @@ class BackendSelector {
      */
     public function getStorageBackend() {
         if ($this->Config->isCrateEnabled()) {
-            return new Crate\Crate($this->Config, $this->BulkInsertObjectStore);
+            return new Crate\Crate($this->Config, $this->BulkInsertObjectStore, $this->Syslog);
         }
 
         if ($this->Config->isMysqlEnabled()) {
-            return new Mysql\MySQL($this->Config, $this->BulkInsertObjectStore);
+            return new Mysql\MySQL($this->Config, $this->BulkInsertObjectStore, $this->Syslog);
         }
 
         throw new NoBackendFoundException('No matching backend found to store historical data');
