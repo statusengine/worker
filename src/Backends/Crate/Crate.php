@@ -91,7 +91,7 @@ class Crate implements \Statusengine\StorageBackend {
 
         try {
             $query->execute();
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             $this->Syslog->emergency($e->getMessage());
             exit(1);
         }
@@ -114,10 +114,17 @@ class Crate implements \Statusengine\StorageBackend {
         try {
             $this->Connection = new PDO($this->getDsn(), null, null, [PDO::ATTR_TIMEOUT => 1]);
             $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             $this->Syslog->error($e->getMessage());
         }
         return $this->Connection;
+    }
+
+    /**
+     * @param int $timeout in seconds
+     */
+    public function setTimeout($timeout){
+        $this->Connection->setAttribute(PDO::ATTR_TIMEOUT, $timeout);
     }
 
     public function disconnect() {
@@ -308,6 +315,126 @@ class Crate implements \Statusengine\StorageBackend {
         $result = $TaskLoader->deleteTaskByUuids($uuids);
         $this->disconnect();
         return $result;
+    }
+
+    /**
+     * @param $timestamp
+     * @return bool
+     */
+    public function deleteHostchecksOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_hostchecks WHERE start_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteHostAcknowledgementsOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_host_acknowledgements WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteHostNotificationsOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_host_notifications WHERE start_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteHostStatehistoryOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_host_statehistory WHERE state_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param $timestamp
+     * @return bool
+     */
+    public function deleteServicechecksOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_servicechecks WHERE start_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteServiceAcknowledgementsOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_service_acknowledgements WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteServiceNotificationsOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_service_notifications WHERE start_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteServiceStatehistoryOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_service_statehistory WHERE state_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param $timestamp
+     * @return bool
+     */
+    public function deleteLogentriesOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_logentries WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param $timestamp
+     * @return bool
+     */
+    public function deleteTasksOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_tasks WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
     }
 
 }

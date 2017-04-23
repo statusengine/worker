@@ -52,7 +52,9 @@ If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/envi
 * [x] Add Syslog support
 * [ ] ~~More tests~~
 * [ ] init/systemd support
-* [ ] Cronjob to cleanup database
+* [x] Cronjob to cleanup database
+* [ ] Delete old performance data recors in CrateDB via cron
+
 
 
 

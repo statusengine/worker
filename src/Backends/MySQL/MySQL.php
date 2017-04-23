@@ -67,7 +67,7 @@ class MySQL implements \Statusengine\StorageBackend {
      * @param BulkInsertObjectStore $BulkInsertObjectStore
      * @param Syslog $Syslog
      */
-    public function __construct(\Statusengine\Config $Config, BulkInsertObjectStore $BulkInsertObjectStore, Syslog $Syslog){
+    public function __construct(\Statusengine\Config $Config, BulkInsertObjectStore $BulkInsertObjectStore, Syslog $Syslog) {
         $this->Config = $Config;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
         $this->Syslog = $Syslog;
@@ -78,7 +78,7 @@ class MySQL implements \Statusengine\StorageBackend {
     /**
      * @return string
      */
-    public function getDsn(){
+    public function getDsn() {
         $config = $this->Config->getMysqlConfig();
         return sprintf(
             'mysql:host=%s:%s;dbname=%s',
@@ -91,7 +91,7 @@ class MySQL implements \Statusengine\StorageBackend {
     /**
      * @return \PDO
      */
-    public function connect(){
+    public function connect() {
         $config = $this->Config->getMysqlConfig();
 
         try {
@@ -99,7 +99,7 @@ class MySQL implements \Statusengine\StorageBackend {
                 \PDO::ATTR_TIMEOUT => 1,
             ]);
             $this->Connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             $this->Syslog->error($e->getMessage());
         }
 
@@ -111,14 +111,21 @@ class MySQL implements \Statusengine\StorageBackend {
     }
 
     /**
+     * @param int $timeout in seconds
+     */
+    public function setTimeout($timeout){
+        $this->Connection->setAttribute(\PDO::ATTR_TIMEOUT, $timeout);
+    }
+
+    /**
      * @return \PDO
      */
-    public function reconnect(){
+    public function reconnect() {
         $this->Connection = null;
         return $this->connect();
     }
 
-    public function disconnect(){
+    public function disconnect() {
         unset($this->Connection);
     }
 
@@ -131,7 +138,7 @@ class MySQL implements \Statusengine\StorageBackend {
             $query->bindValue(2, STATUSENGINE_WORKER_VERSION);
             $query->bindValue(3, time());
             $query->execute();
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             print_r($e);
             $this->Syslog->emergency($e->getMessage());
             exit(1);
@@ -139,7 +146,7 @@ class MySQL implements \Statusengine\StorageBackend {
         $this->disconnect();
     }
 
-    public function dispatch(){
+    public function dispatch() {
         if ($this->BulkInsertObjectStore->hasRaisedTimeout()) {
             try {
                 $type = $this->BulkInsertObjectStore->getStoredType();
@@ -187,7 +194,7 @@ class MySQL implements \Statusengine\StorageBackend {
      * @return bool
      * @throws StorageBackendUnavailableExceptions
      */
-    public function executeQuery(\PDOStatement $query){
+    public function executeQuery(\PDOStatement $query) {
         $result = false;
         try {
             $result = $query->execute();
@@ -229,7 +236,7 @@ class MySQL implements \Statusengine\StorageBackend {
      * @param array $uuids
      * @return array|bool
      */
-    public function deleteTaskByUuids($uuids = []){
+    public function deleteTaskByUuids($uuids = []) {
         $this->connect();
         $TaskLoader = new MysqlTask($this, $this->nodeName);
         $result = $TaskLoader->deleteTaskByUuids($uuids);
@@ -240,7 +247,7 @@ class MySQL implements \Statusengine\StorageBackend {
     /**
      * @return \PDO
      */
-    public function getConnection(){
+    public function getConnection() {
         return $this->Connection;
     }
 
@@ -249,49 +256,49 @@ class MySQL implements \Statusengine\StorageBackend {
      * @param string $statement
      * @return \PDOStatement
      */
-    public function prepare($statement){
+    public function prepare($statement) {
         return $this->Connection->prepare($statement);
     }
 
     /**
      * @param \Statusengine\ValueObjects\Logentry $Logentry
      */
-    public function saveLogentry(\Statusengine\ValueObjects\Logentry $Logentry){
+    public function saveLogentry(\Statusengine\ValueObjects\Logentry $Logentry) {
         $this->BulkInsertObjectStore->addObject($Logentry);
     }
 
     /**
      * @param \Statusengine\ValueObjects\Statechange $Statechange
      */
-    public function saveStatechange(\Statusengine\ValueObjects\Statechange $Statechange){
+    public function saveStatechange(\Statusengine\ValueObjects\Statechange $Statechange) {
         $this->BulkInsertObjectStore->addObject($Statechange);
     }
 
     /**
      * @param \Statusengine\ValueObjects\Hostcheck $Hostcheck
      */
-    public function saveHostcheck(\Statusengine\ValueObjects\Hostcheck $Hostcheck){
+    public function saveHostcheck(\Statusengine\ValueObjects\Hostcheck $Hostcheck) {
         $this->BulkInsertObjectStore->addObject($Hostcheck);
     }
 
     /**
      * @param \Statusengine\ValueObjects\Servicecheck $Servicecheck
      */
-    public function saveServicecheck(\Statusengine\ValueObjects\Servicecheck $Servicecheck){
+    public function saveServicecheck(\Statusengine\ValueObjects\Servicecheck $Servicecheck) {
         $this->BulkInsertObjectStore->addObject($Servicecheck);
     }
 
     /**
      * @param \Statusengine\ValueObjects\Servicestatus $Servicestatus
      */
-    public function saveServicestatus(\Statusengine\ValueObjects\Servicestatus $Servicestatus){
+    public function saveServicestatus(\Statusengine\ValueObjects\Servicestatus $Servicestatus) {
         $this->BulkInsertObjectStore->addObject($Servicestatus);
     }
 
     /**
      * @param \Statusengine\ValueObjects\Hoststatus $Hoststatus
      */
-    public function saveHoststatus(\Statusengine\ValueObjects\Hoststatus $Hoststatus){
+    public function saveHoststatus(\Statusengine\ValueObjects\Hoststatus $Hoststatus) {
         $this->BulkInsertObjectStore->addObject($Hoststatus);
     }
 
@@ -306,13 +313,132 @@ class MySQL implements \Statusengine\StorageBackend {
      * @param \Statusengine\ValueObjects\Acknowledgement $Acknowledgement
      */
     public function saveAcknowledgement(\Statusengine\ValueObjects\Acknowledgement $Acknowledgement) {
-        if($Acknowledgement->isHostAcknowledgement()){
+        if ($Acknowledgement->isHostAcknowledgement()) {
             $MysqlAcknowledgementSaver = new MysqlHostAcknowledgement($this, $Acknowledgement);
-        }else{
+        } else {
             $MysqlAcknowledgementSaver = new MysqlServiceAcknowledgement($this, $Acknowledgement);
         }
         $MysqlAcknowledgementSaver->insert();
     }
 
+    /**
+     * @param $timestamp
+     * @return bool
+     */
+    public function deleteHostchecksOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_hostchecks WHERE start_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteHostAcknowledgementsOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_host_acknowledgements WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteHostNotificationsOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_host_notifications WHERE start_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteHostStatehistoryOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_host_statehistory WHERE state_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param $timestamp
+     * @return bool
+     */
+    public function deleteServicechecksOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_servicechecks WHERE start_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteServiceAcknowledgementsOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_service_acknowledgements WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteServiceNotificationsOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_service_notifications WHERE start_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteServiceStatehistoryOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_service_statehistory WHERE state_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param $timestamp
+     * @return bool
+     */
+    public function deleteLogentriesOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_logentries WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param $timestamp
+     * @return bool
+     */
+    public function deleteTasksOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_tasks WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
 
 }

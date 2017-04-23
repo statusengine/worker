@@ -457,7 +457,7 @@ class Config {
     /**
      * @return bool
      */
-    public function isSyslogEnabled(){
+    public function isSyslogEnabled() {
         $default = true;
         if (isset($this->config['syslog_enabled'])) {
             return (bool)$this->config['syslog_enabled'];
@@ -476,5 +476,114 @@ class Config {
         return $default;
     }
 
+    /**
+     * @return int
+     */
+    public function getAgeHostchecks() {
+        $default = 5;
+        if (isset($this->config['age_hostchecks'])) {
+            return (int)$this->config['age_hostchecks'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeHostAcknowledgements() {
+        $default = 60;
+        if (isset($this->config['age_host_acknowledgements'])) {
+            return (int)$this->config['age_host_acknowledgements'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeHostNotifications() {
+        $default = 5;
+        if (isset($this->config['age_host_notifications'])) {
+            return (int)$this->config['age_host_notifications'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeHostStatehistory() {
+        $default = 365;
+        if (isset($this->config['age_host_statehistory'])) {
+            return (int)$this->config['age_host_statehistory'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeServicechecks() {
+        $default = 5;
+        if (isset($this->config['age_servicechecks'])) {
+            return (int)$this->config['age_servicechecks'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeServiceAcknowledgements() {
+        $default = 60;
+        if (isset($this->config['age_service_acknowledgements'])) {
+            return (int)$this->config['age_service_acknowledgements'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeServiceNotifications() {
+        $default = 60;
+        if (isset($this->config['age_service_notifications'])) {
+            return (int)$this->config['age_service_notifications'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeServiceStatehistory() {
+        $default = 365;
+        if (isset($this->config['age_service_statehistory'])) {
+            return (int)$this->config['age_service_statehistory'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeLogentries() {
+        $default = 5;
+        if (isset($this->config['age_logentries'])) {
+            return (int)$this->config['age_logentries'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeTasks() {
+        $default = 5;
+        if (isset($this->config['age_tasks'])) {
+            return (int)$this->config['age_tasks'];
+        }
+        return $default;
+    }
 
 }

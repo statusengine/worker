@@ -22,12 +22,14 @@ require_once __DIR__ . '/../bootstrap.php';
 
 use Symfony\Component\Console\Application;
 use Statusengine\Console\Statistics;
+use Statusengine\Console\Cleanup;
 
 
 $application = new Application();
 
 
 $application->add(new Statistics());
+$application->add(new Cleanup());
 $application->run();
 
 

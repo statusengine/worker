@@ -160,3 +160,53 @@ syslog_enabled: 1
 # The tag or ident of Statusengine Worker in your syslog
 syslog_tag: statusengine-worker
 
+############
+# ARCHIVE AGE CONFIGURATION
+############
+
+# NOTICE:
+# The Statusengine Database cleanup cronjob should only run at one node of your cluster
+# You can run the cron on as many nodes as you want, but this will increase the load of the system.
+# If you want to run the cronjob on more than one node, you should set different times for scheduling the cron
+# For example at 01:00AM on node1 and at 01:00PM on node2 or so
+# Cronjob usage:
+# bin/Console.php cleanup -q (will run the cronjob without any output, perfect for crontab)
+#
+# bin/Console.php cleanup (will run the cronjob with output, perfect to check whats going on)
+#
+# In this section you can define, how long which data should be stored in the database
+# Every value is in DAYs!
+# Set 0 to disable automatic cleanup of a particular table
+
+# Settings for Host related records
+# How long should every executed check for a host be stored
+age_hostchecks: 5
+
+# How long should acknowledgement data of a host be stored
+age_host_acknowledgements: 60
+
+# How long should host notifications be stored
+age_host_notifications: 60
+
+# How long should host state change records be stored
+age_host_statehistory: 365
+
+# Settings for Service related records
+# How long should every executed check for a service be stored
+age_servicechecks: 5
+
+# How long should acknowledgement data of a service be stored
+age_service_acknowledgements: 60
+
+# How long should service notifications be stored
+age_service_notifications: 60
+
+# How long should service state change records be stored
+age_service_statehistory: 365
+
+# Misc records
+# How long should log entries records be stored
+age_logentries: 5
+
+# How long should unprocessed task in Statusengine's task queue be stored
+age_tasks: 1

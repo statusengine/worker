@@ -25,6 +25,11 @@ interface StorageBackend {
 
     public function dispatch();
 
+    /**
+     * @param int $timeout in seconds
+     */
+    public function setTimeout($timeout);
+
     public function saveNodeName();
 
     public function saveLogentry(ValueObjects\Logentry $Logentry);
@@ -42,6 +47,27 @@ interface StorageBackend {
     public function saveNotification(\Statusengine\ValueObjects\Notification $Notification);
 
     public function saveAcknowledgement(\Statusengine\ValueObjects\Acknowledgement $Acknowledgement);
+
+    public function deleteHostchecksOlderThan($timestamp);
+
+    public function deleteHostAcknowledgementsOlderThan($timestamp);
+
+    public function deleteHostNotificationsOlderThan($timestamp);
+
+    public function deleteHostStatehistoryOlderThan($timestamp);
+
+    public function deleteServicechecksOlderThan($timestamp);
+
+    public function deleteServiceAcknowledgementsOlderThan($timestamp);
+
+    public function deleteServiceNotificationsOlderThan($timestamp);
+
+    public function deleteServiceStatehistoryOlderThan($timestamp);
+
+    public function deleteLogentriesOlderThan($timestamp);
+
+    public function deleteTasksOlderThan($timestamp);
+
 
     /**
      * @return array
