@@ -64,7 +64,7 @@ class MysqlTask extends MysqlModel {
         $dbResult = $this->MySQL->fetchAll($query);
         $result = [];
         foreach ($dbResult as $record) {
-            $result[] = new Task(strtotime($record['entry_time']), $record['node_name'], $record['payload'], $record['type'], $record['uuid']);
+            $result[] = new Task($record['entry_time'], $record['node_name'], $record['payload'], $record['type'], $record['uuid']);
         }
         return $result;
     }

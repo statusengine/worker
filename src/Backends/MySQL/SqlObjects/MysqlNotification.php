@@ -119,12 +119,8 @@ class MysqlNotification extends Mysql\MysqlModel {
             $query->bindValue($i++, $Notification->getCommandName());
             $query->bindValue($i++, $Notification->getCommandArgs());
             $query->bindValue($i++, $Notification->getState());
-            $query->bindValue($i++, $this->datetime(
-                $Notification->getStartTime()
-            ));
-            $query->bindValue($i++, $this->datetime(
-                $Notification->getEndTime()
-            ));
+            $query->bindValue($i++, $Notification->getStartTime());
+            $query->bindValue($i++, $Notification->getEndTime());
             $query->bindValue($i++, $Notification->getReasonType());
             $query->bindValue($i++, $Notification->getOutput());
             $query->bindValue($i++, $Notification->getAckAuthor());
@@ -162,12 +158,8 @@ class MysqlNotification extends Mysql\MysqlModel {
             $query->bindValue($i++, $Notification->getCommandName());
             $query->bindValue($i++, $Notification->getCommandArgs());
             $query->bindValue($i++, $Notification->getState());
-            $query->bindValue($i++, $this->datetime(
-                $Notification->getStartTime()
-            ));
-            $query->bindValue($i++, $this->datetime(
-                $Notification->getEndTime()
-            ));
+            $query->bindValue($i++, $Notification->getStartTime());
+            $query->bindValue($i++, $Notification->getEndTime());
             $query->bindValue($i++, $Notification->getReasonType());
             $query->bindValue($i++, $Notification->getOutput());
             $query->bindValue($i++, $Notification->getAckAuthor());

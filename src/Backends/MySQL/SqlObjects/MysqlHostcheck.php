@@ -77,12 +77,8 @@ class MysqlHostcheck extends Mysql\MysqlModel {
             $query->bindValue($i++, $Hostcheck->getHostName());
             $query->bindValue($i++, $Hostcheck->getState());
             $query->bindValue($i++, $Hostcheck->getStateType());
-            $query->bindValue($i++, $this->datetime(
-                $Hostcheck->getStartTime()
-            ));
-            $query->bindValue($i++, $this->datetime(
-                $Hostcheck->getEndTime()
-            ));
+            $query->bindValue($i++, $Hostcheck->getStartTime());
+            $query->bindValue($i++, $Hostcheck->getEndTime());
             $query->bindValue($i++, $Hostcheck->getOutput());
             $query->bindValue($i++, $Hostcheck->getTimeout());
             $query->bindValue($i++, $Hostcheck->getEarlyTimeout());

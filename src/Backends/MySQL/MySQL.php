@@ -129,7 +129,7 @@ class MySQL implements \Statusengine\StorageBackend {
           VALUES(?,?,?) ON DUPLICATE KEY UPDATE node_version=VALUES(node_version), node_start_time=VALUES(node_start_time)');
             $query->bindValue(1, $this->nodeName);
             $query->bindValue(2, STATUSENGINE_WORKER_VERSION);
-            $query->bindValue(3, date('Y-m-d H:i:s'));
+            $query->bindValue(3, time());
             $query->execute();
         }catch (\Exception $e){
             print_r($e);

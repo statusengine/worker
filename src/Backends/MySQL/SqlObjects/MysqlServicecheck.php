@@ -77,12 +77,8 @@ class MysqlServicecheck extends Mysql\MysqlModel {
             $query->bindValue($i++, $Servicecheck->getServiceDescription());
             $query->bindValue($i++, $Servicecheck->getState());
             $query->bindValue($i++, $Servicecheck->getStateType());
-            $query->bindValue($i++, $this->datetime(
-                $Servicecheck->getStartTime()
-            ));
-            $query->bindValue($i++, $this->datetime(
-                $Servicecheck->getEndTime())
-            );
+            $query->bindValue($i++, $Servicecheck->getStartTime());
+            $query->bindValue($i++, $Servicecheck->getEndTime());
             $query->bindValue($i++, $Servicecheck->getOutput());
             $query->bindValue($i++, $Servicecheck->getTimeout());
             $query->bindValue($i++, $Servicecheck->getEarlyTimeout());

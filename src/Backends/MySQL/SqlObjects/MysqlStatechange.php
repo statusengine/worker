@@ -67,13 +67,13 @@ class MysqlStatechange extends Mysql\MysqlModel {
      * @param Mysql\MySQL $MySQL
      * @param BulkInsertObjectStore $BulkInsertObjectStore
      */
-    public function __construct(Mysql\MySQL $MySQL, BulkInsertObjectStore $BulkInsertObjectStore){
+    public function __construct(Mysql\MySQL $MySQL, BulkInsertObjectStore $BulkInsertObjectStore) {
         $this->MySQL = $MySQL;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
     }
 
 
-    public function insert(){
+    public function insert() {
         /**
          * @var Statechange $Statechange
          */
@@ -104,7 +104,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
      * @param bool $isRecursion
      * @return bool
      */
-    public function getHostQuery($hostStatechangeCache, $isRecursion = false){
+    public function getHostQuery($hostStatechangeCache, $isRecursion = false) {
         /**
          * @var Statechange $Statechange
          */
@@ -115,9 +115,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
         $i = 1;
         foreach ($hostStatechangeCache as $Statechange) {
             $query->bindValue($i++, $Statechange->getHostname());
-            $query->bindValue($i++, $this->datetime(
-                $Statechange->getStateTime()
-            ));
+            $query->bindValue($i++, $Statechange->getStateTime());
             $query->bindValue($i++, $Statechange->getState());
             $query->bindValue($i++, $Statechange->getStateChange());
             $query->bindValue($i++, $Statechange->getStateType());
@@ -144,7 +142,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
      * @param bool $isRecursion
      * @return bool
      */
-    public function getServiceQuery($serviceStatechangeCache, $isRecursion = false){
+    public function getServiceQuery($serviceStatechangeCache, $isRecursion = false) {
         /**
          * @var Statechange $Statechange
          */
@@ -156,9 +154,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
         foreach ($serviceStatechangeCache as $Statechange) {
             $query->bindValue($i++, $Statechange->getHostname());
             $query->bindValue($i++, $Statechange->getServiceDescription());
-            $query->bindValue($i++, $this->datetime(
-                $Statechange->getStateTime()
-            ));
+            $query->bindValue($i++, $Statechange->getStateTime());
             $query->bindValue($i++, $Statechange->getState());
             $query->bindValue($i++, $Statechange->getStateChange());
             $query->bindValue($i++, $Statechange->getStateType());
@@ -186,7 +182,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
      * @param string $baseQuery
      * @return string
      */
-    public function buildQuery($numberOfObjects, $baseValue, $baseQuery){
+    public function buildQuery($numberOfObjects, $baseValue, $baseQuery) {
         $values = [];
         for ($i = 1; $i <= $numberOfObjects; $i++) {
             $values[] = $baseValue;

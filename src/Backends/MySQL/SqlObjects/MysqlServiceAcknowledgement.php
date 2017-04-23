@@ -71,9 +71,7 @@ class MysqlServiceAcknowledgement extends Mysql\MysqlModel {
         $query->bindValue($i++, $this->Acknowledgement->getState());
         $query->bindValue($i++, $this->Acknowledgement->getAuthorName());
         $query->bindValue($i++, $this->Acknowledgement->getCommentData());
-        $query->bindValue($i++, $this->datetime(
-            $this->Acknowledgement->getTimestamp()
-        ));
+        $query->bindValue($i++, $this->Acknowledgement->getTimestamp());
         $query->bindValue($i++, $this->Acknowledgement->getAcknowledgementType());
         $query->bindValue($i++, (int)$this->Acknowledgement->isSticky());
         $query->bindValue($i++, (int)$this->Acknowledgement->isPersistentComment());

@@ -77,9 +77,7 @@ class MysqlLogentry extends Mysql\MysqlModel {
         $query = $this->MySQL->prepare($baseQuery);
         $i = 1;
         foreach ($this->BulkInsertObjectStore->getObjects() as $key => $Logentry) {
-            $query->bindValue($i++, $this->datetime(
-                $Logentry->getEntryTime()
-            ));
+            $query->bindValue($i++, $Logentry->getEntryTime());
             $query->bindValue($i++, $Logentry->getLogentryType());
             $query->bindValue($i++, $Logentry->getLogentryData());
             $query->bindValue($i++, $this->nodeName);
