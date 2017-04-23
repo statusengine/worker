@@ -586,4 +586,15 @@ class Config {
         return $default;
     }
 
+    /**
+     * @return bool
+     */
+    public function getDisableHttpProxy() {
+        $default = true;
+        if (isset($this->config['disable_http_proxy'])) {
+            return (bool)$this->config['disable_http_proxy'];
+        }
+        return $default;
+    }
+
 }

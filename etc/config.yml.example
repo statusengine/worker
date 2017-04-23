@@ -210,3 +210,13 @@ age_logentries: 5
 
 # How long should unprocessed task in Statusengine's task queue be stored
 age_tasks: 1
+
+############
+# ENVIRONMENT CONFIGURATION
+############
+
+# Sometimes creepy proxies are get in the way and than we can't connect to the database backend
+# or what every the proxy thinks to know about your connection
+# Enable (1) this option to clear proxy environment variables
+# Disable (0) and Statusengine will use the proxy out of your environment
+disable_http_proxy: 1

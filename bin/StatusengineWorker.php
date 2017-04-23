@@ -21,6 +21,11 @@
 require_once __DIR__ . '/../bootstrap.php';
 
 $Config = new \Statusengine\Config();
+
+if($Config->getDisableHttpProxy()){
+    \Statusengine\ProxySettings::disableAllProxySettings();
+}
+
 $Syslog = new \Statusengine\Syslog($Config);
 $Syslog->info(sprintf('Starting Statusengine-Worker Version %s', STATUSENGINE_WORKER_VERSION));
 
