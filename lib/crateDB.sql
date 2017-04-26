@@ -9,8 +9,9 @@ CREATE TABLE statusengine_logentries (
     entry_time timestamp,
     logentry_type int,
     logentry_data string,
-    node_name string
-) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+    node_name string,
+    day as date_trunc('day', logentry_time * 1000)
+) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
 
 CREATE TABLE statusengine_host_statehistory (
     hostname   string,
@@ -23,8 +24,9 @@ CREATE TABLE statusengine_host_statehistory (
     last_state short,
     last_hard_state short,
     output string,
-    long_output string
-) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+    long_output string,
+    day as date_trunc('day', state_time * 1000)
+) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
 
 CREATE TABLE statusengine_service_statehistory (
     hostname   string,
@@ -38,8 +40,9 @@ CREATE TABLE statusengine_service_statehistory (
     last_state short,
     last_hard_state short,
     output string,
-    long_output string
-) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+    long_output string,
+    day as date_trunc('day', state_time * 1000)
+) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
 
 CREATE TABLE statusengine_hostchecks (
     hostname string,
@@ -56,8 +59,9 @@ CREATE TABLE statusengine_hostchecks (
     command string,
     current_check_attempt int,
     max_check_attempts int,
-    long_output string
-) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+    long_output string,
+    day as date_trunc('day', start_time * 1000)
+) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
 
 CREATE TABLE statusengine_servicechecks (
     hostname string,
@@ -75,8 +79,9 @@ CREATE TABLE statusengine_servicechecks (
     command string,
     current_check_attempt int,
     max_check_attempts int,
-    long_output string
-) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+    long_output string,
+    day as date_trunc('day', start_time * 1000)
+) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
 
 create table statusengine_perfdata (
     hostname string,
@@ -192,8 +197,9 @@ create table statusengine_host_notifications (
     reason_type int,
     output string,
     ack_author string,
-    ack_data string
-) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+    ack_data string,
+    day as date_trunc('day', start_time * 1000)
+) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
 
 create table statusengine_service_notifications (
     hostname string,
@@ -207,8 +213,9 @@ create table statusengine_service_notifications (
     reason_type int,
     output string,
     ack_author string,
-    ack_data string
-) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
+    ack_data string,
+    day as date_trunc('day', start_time * 1000)
+) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
 
 
 create table statusengine_host_acknowledgements (

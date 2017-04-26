@@ -53,7 +53,7 @@ class CratePerfdata extends Crate\CrateModel {
      * @param Crate\Crate $CrateDB
      * @param BulkInsertObjectStore $BulkInsertObjectStore
      */
-    public function __construct(Crate\Crate $CrateDB, BulkInsertObjectStore $BulkInsertObjectStore){
+    public function __construct(Crate\Crate $CrateDB, BulkInsertObjectStore $BulkInsertObjectStore) {
         $this->CrateDB = $CrateDB;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
     }
@@ -63,7 +63,7 @@ class CratePerfdata extends Crate\CrateModel {
      * @param bool $isRecursion
      * @return bool
      */
-    public function insert($isRecursion = false){
+    public function insert($isRecursion = false) {
         /**
          * @var Gauge $Gauge
          */

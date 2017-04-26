@@ -319,14 +319,19 @@ class Crate implements \Statusengine\StorageBackend {
 
     /**
      * @param $timestamp
-     * @return bool
      */
     public function deleteHostchecksOlderThan($timestamp) {
-        $query = $this->prepare(
-            'DELETE FROM statusengine_hostchecks WHERE start_time < ?'
-        );
-        $query->bindValue(1, $timestamp);
-        return $query->execute();
+        $partitions = $this->getPartitionsByTableName('statusengine_hostchecks');
+        $daysToDelete = [];
+        foreach($partitions as $record){
+            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+                $daysToDelete[] = $record['values']['day'];
+            }
+        }
+
+        foreach($daysToDelete as $partition){
+            $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_hostchecks', $partition);
+        }
     }
 
     /**
@@ -343,38 +348,53 @@ class Crate implements \Statusengine\StorageBackend {
 
     /**
      * @param int $timestamp
-     * @return bool
      */
     public function deleteHostNotificationsOlderThan($timestamp) {
-        $query = $this->prepare(
-            'DELETE FROM statusengine_host_notifications WHERE start_time < ?'
-        );
-        $query->bindValue(1, $timestamp);
-        return $query->execute();
+        $partitions = $this->getPartitionsByTableName('statusengine_host_notifications');
+        $daysToDelete = [];
+        foreach($partitions as $record){
+            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+                $daysToDelete[] = $record['values']['day'];
+            }
+        }
+
+        foreach($daysToDelete as $partition){
+            $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_host_notifications', $partition);
+        }
     }
 
     /**
      * @param int $timestamp
-     * @return bool
      */
     public function deleteHostStatehistoryOlderThan($timestamp) {
-        $query = $this->prepare(
-            'DELETE FROM statusengine_host_statehistory WHERE state_time < ?'
-        );
-        $query->bindValue(1, $timestamp);
-        return $query->execute();
+        $partitions = $this->getPartitionsByTableName('statusengine_host_statehistory');
+        $daysToDelete = [];
+        foreach($partitions as $record){
+            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+                $daysToDelete[] = $record['values']['day'];
+            }
+        }
+
+        foreach($daysToDelete as $partition){
+            $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_host_statehistory', $partition);
+        }
     }
 
     /**
      * @param $timestamp
-     * @return bool
      */
     public function deleteServicechecksOlderThan($timestamp) {
-        $query = $this->prepare(
-            'DELETE FROM statusengine_servicechecks WHERE start_time < ?'
-        );
-        $query->bindValue(1, $timestamp);
-        return $query->execute();
+        $partitions = $this->getPartitionsByTableName('statusengine_servicechecks');
+        $daysToDelete = [];
+        foreach($partitions as $record){
+            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+                $daysToDelete[] = $record['values']['day'];
+            }
+        }
+
+        foreach($daysToDelete as $partition){
+            $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_servicechecks', $partition);
+        }
     }
 
     /**
@@ -391,14 +411,19 @@ class Crate implements \Statusengine\StorageBackend {
 
     /**
      * @param int $timestamp
-     * @return bool
      */
     public function deleteServiceNotificationsOlderThan($timestamp) {
-        $query = $this->prepare(
-            'DELETE FROM statusengine_service_notifications WHERE start_time < ?'
-        );
-        $query->bindValue(1, $timestamp);
-        return $query->execute();
+        $partitions = $this->getPartitionsByTableName('statusengine_service_notifications');
+        $daysToDelete = [];
+        foreach($partitions as $record){
+            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+                $daysToDelete[] = $record['values']['day'];
+            }
+        }
+
+        foreach($daysToDelete as $partition){
+            $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_service_notifications', $partition);
+        }
     }
 
     /**
@@ -406,11 +431,17 @@ class Crate implements \Statusengine\StorageBackend {
      * @return bool
      */
     public function deleteServiceStatehistoryOlderThan($timestamp) {
-        $query = $this->prepare(
-            'DELETE FROM statusengine_service_statehistory WHERE state_time < ?'
-        );
-        $query->bindValue(1, $timestamp);
-        return $query->execute();
+        $partitions = $this->getPartitionsByTableName('statusengine_service_statehistory');
+        $daysToDelete = [];
+        foreach ($partitions as $record) {
+            if (isset($record['values']['day']) && $record['values']['day'] < $timestamp) {
+                $daysToDelete[] = $record['values']['day'];
+            }
+        }
+
+        foreach ($daysToDelete as $partition) {
+            $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_service_statehistory', $partition);
+        }
     }
 
     /**
@@ -418,11 +449,17 @@ class Crate implements \Statusengine\StorageBackend {
      * @return bool
      */
     public function deleteLogentriesOlderThan($timestamp) {
-        $query = $this->prepare(
-            'DELETE FROM statusengine_logentries WHERE entry_time < ?'
-        );
-        $query->bindValue(1, $timestamp);
-        return $query->execute();
+        $partitions = $this->getPartitionsByTableName('statusengine_logentries');
+        $daysToDelete = [];
+        foreach($partitions as $record){
+            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+                $daysToDelete[] = $record['values']['day'];
+            }
+        }
+
+        foreach($daysToDelete as $partition){
+            $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_logentries', $partition);
+        }
     }
 
     /**
@@ -443,24 +480,41 @@ class Crate implements \Statusengine\StorageBackend {
      */
     public function deletePerfdataOlderThan($timestamp){
         $timestamp = $timestamp * 1000;
-        $query = $this->prepare(
-            'SELECT * FROM information_schema.table_partitions WHERE table_name=?'
-        );
-        $query->bindValue(1, 'statusengine_perfdata');
-        $query->execute();
 
+        $partitions = $this->getPartitionsByTableName('statusengine_perfdata');
         $daysToDelete = [];
-        foreach($query->fetchAll() as $record){
+        foreach($partitions as $record){
             if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
                $daysToDelete[] = $record['values']['day'];
            }
         }
 
         foreach($daysToDelete as $partition){
-            $query = $this->prepare('DELETE FROM statusengine_perfdata WHERE DAY = ?');
-            $query->bindValue(1, $partition);
-            $query->execute();
-            unset($query);
+            $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_perfdata', $partition);
         }
+    }
+
+    /**
+     * @param string $tablename
+     * @return array
+     */
+    public function getPartitionsByTableName($tablename){
+        $query = $this->prepare(
+            'SELECT * FROM information_schema.table_partitions WHERE table_name=?'
+        );
+        $query->bindValue(1, $tablename);
+        $query->execute();
+        return $query->fetchAll();
+    }
+
+    /**
+     * @param string $tableName
+     * @param int $dayValue
+     * @return bool
+     */
+    public function dropPartitionsFromTableByTableNameAndDayValue($tableName, $dayValue){
+        $query = $this->prepare(sprintf('DELETE FROM %s WHERE DAY = ?', $tableName));
+        $query->bindValue(1, $dayValue);
+        return $query->execute();
     }
 }

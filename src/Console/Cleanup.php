@@ -122,7 +122,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupHostchecks(InputInterface $input, OutputInterface $output) {
-        if($this->Config->getAgeHostchecks() === 0){
+        if ($this->Config->getAgeHostchecks() === 0) {
             $output->writeln('<cyan>Skipping host check records</cyan>');
             return;
         }
@@ -134,7 +134,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupHostAcknowledgements(InputInterface $input, OutputInterface $output) {
-        if($this->Config->getAgeHostAcknowledgements() === 0){
+        if ($this->Config->getAgeHostAcknowledgements() === 0) {
             $output->writeln('<cyan>Skipping host acknowledgements records</cyan>');
             return;
         }
@@ -146,7 +146,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupHostNotifications(InputInterface $input, OutputInterface $output) {
-        if($this->Config->getAgeHostNotifications() === 0){
+        if ($this->Config->getAgeHostNotifications() === 0) {
             $output->writeln('<cyan>Skipping host notification records</cyan>');
             return;
         }
@@ -158,7 +158,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupHostStatehistory(InputInterface $input, OutputInterface $output) {
-        if($this->Config->getAgeHostStatehistory() === 0){
+        if ($this->Config->getAgeHostStatehistory() === 0) {
             $output->writeln('<cyan>Skipping host state history records</cyan>');
             return;
         }
@@ -170,7 +170,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupServicechecks(InputInterface $input, OutputInterface $output) {
-        if($this->Config->getAgeServicechecks() === 0){
+        if ($this->Config->getAgeServicechecks() === 0) {
             $output->writeln('<cyan>Skipping service check records</cyan>');
             return;
         }
@@ -182,7 +182,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupServiceAcknowledgements(InputInterface $input, OutputInterface $output) {
-        if($this->Config->getAgeServiceAcknowledgements() === 0){
+        if ($this->Config->getAgeServiceAcknowledgements() === 0) {
             $output->writeln('<cyan>Skipping service acknowledgements records</cyan>');
             return;
         }
@@ -194,7 +194,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupServiceNotifications(InputInterface $input, OutputInterface $output) {
-        if($this->Config->getAgeServiceNotifications() === 0){
+        if ($this->Config->getAgeServiceNotifications() === 0) {
             $output->writeln('<cyan>Skipping service notifications records</cyan>');
             return;
         }
@@ -206,7 +206,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupServiceStatehistory(InputInterface $input, OutputInterface $output) {
-        if($this->Config->getAgeServiceStatehistory() === 0){
+        if ($this->Config->getAgeServiceStatehistory() === 0) {
             $output->writeln('<cyan>Skipping service state history records</cyan>');
             return;
         }
@@ -218,7 +218,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupLogentries(InputInterface $input, OutputInterface $output) {
-        if($this->Config->getAgeLogentries() === 0){
+        if ($this->Config->getAgeLogentries() === 0) {
             $output->writeln('<cyan>Skipping log entry records</cyan>');
             return;
         }
@@ -230,7 +230,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupTasks(InputInterface $input, OutputInterface $output) {
-        if($this->Config->getAgeLogentries() === 0){
+        if ($this->Config->getAgeLogentries() === 0) {
             $output->writeln('<cyan>Skipping task records</cyan>');
             return;
         }
@@ -241,12 +241,12 @@ class Cleanup extends Command {
         $output->writeln('<info> done</info>');
     }
 
-    private function cleanupPerfdata(InputInterface $input, OutputInterface $output){
-        if($this->Config->getAgePerfdata() === 0){
+    private function cleanupPerfdata(InputInterface $input, OutputInterface $output) {
+        if ($this->Config->getAgePerfdata() === 0) {
             $output->writeln('<cyan>Skipping perfdata records</cyan>');
             return;
         }
-        foreach($this->PerfdataStorageBackends->getBackends() as $backendName => $backend){
+        foreach ($this->PerfdataStorageBackends->getBackends() as $backendName => $backend) {
             $output->write(sprintf(
                 'Delete old <comment>perfdata</comment> records for backend <comment>%s</comment>',
                 $backendName
@@ -263,8 +263,8 @@ class Cleanup extends Command {
      * @param $interval
      * @return int
      */
-    private function getTimestampByInterval($interval){
-        if(!is_numeric($interval) || $interval < 0){
+    private function getTimestampByInterval($interval) {
+        if (!is_numeric($interval) || $interval < 0) {
             throw new \RuntimeException(sprintf('Value %s for archive age is not valid!', $interval));
         }
         return time() - (3600 * 24 * $interval);
