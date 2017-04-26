@@ -138,4 +138,12 @@ class GraphitePerfdata {
         return true;
     }
 
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deletePerfdataOlderThan($timestamp){
+        return true;
+    }
+
 }

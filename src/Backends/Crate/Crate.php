@@ -437,4 +437,30 @@ class Crate implements \Statusengine\StorageBackend {
         return $query->execute();
     }
 
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deletePerfdataOlderThan($timestamp){
+        $timestamp = $timestamp * 1000;
+        $query = $this->prepare(
+            'SELECT * FROM information_schema.table_partitions WHERE table_name=?'
+        );
+        $query->bindValue(1, 'statusengine_perfdata');
+        $query->execute();
+
+        $daysToDelete = [];
+        foreach($query->fetchAll() as $record){
+            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+               $daysToDelete[] = $record['values']['day'];
+           }
+        }
+
+        foreach($daysToDelete as $partition){
+            $query = $this->prepare('DELETE FROM statusengine_perfdata WHERE DAY = ?');
+            $query->bindValue(1, $partition);
+            $query->execute();
+            unset($query);
+        }
+    }
 }

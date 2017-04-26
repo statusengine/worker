@@ -19,7 +19,9 @@
 
 namespace Statusengine\Console;
 
+use Statusengine\Backends\PerfdataBackends\PerfdataStorageBackends;
 use Statusengine\BackendSelector;
+use Statusengine\BulkInsertObjectStore;
 use Statusengine\Config;
 use Statusengine\StorageBackend;
 use Statusengine\Syslog;
@@ -50,6 +52,11 @@ class Cleanup extends Command {
      */
     private $StorageBackend;
 
+    /**
+     * @var PerfdataStorageBackends
+     */
+    private $PerfdataStorageBackends;
+
     protected function configure() {
 
         $this
@@ -75,14 +82,21 @@ class Cleanup extends Command {
 
         $this->Config = new Config();
         $this->Syslog = new Syslog($this->Config);
-        $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
+        $BulkInsertObjectStore = new BulkInsertObjectStore(
             1,
             1
         );
         $BackendSelector = new BackendSelector($this->Config, $BulkInsertObjectStore, $this->Syslog);
         $this->StorageBackend = $BackendSelector->getStorageBackend();
 
+        $this->PerfdataStorageBackends = new PerfdataStorageBackends(
+            $this->Config,
+            $BulkInsertObjectStore,
+            $this->Syslog
+        );
+
         //Connect to storage backend
+
         $this->StorageBackend->connect();
         $this->StorageBackend->setTimeout(3600);
 
@@ -99,7 +113,8 @@ class Cleanup extends Command {
         $this->cleanupLogentries($input, $output);
         $this->cleanupTasks($input, $output);
 
-        //todo implement clenup of performance data
+
+        $this->cleanupPerfdata($input, $output);
 
 
         $output->writeln(sprintf('Cleanup took: <info>%s</info> seconds...', time() - $startTime));
@@ -224,6 +239,24 @@ class Cleanup extends Command {
             $this->getTimestampByInterval($this->Config->getAgeTasks())
         );
         $output->writeln('<info> done</info>');
+    }
+
+    private function cleanupPerfdata(InputInterface $input, OutputInterface $output){
+        if($this->Config->getAgePerfdata() === 0){
+            $output->writeln('<cyan>Skipping perfdata records</cyan>');
+            return;
+        }
+        foreach($this->PerfdataStorageBackends->getBackends() as $backendName => $backend){
+            $output->write(sprintf(
+                'Delete old <comment>perfdata</comment> records for backend <comment>%s</comment>',
+                $backendName
+            ));
+            $backend->connect();
+            $backend->deletePerfdataOlderThan($this->getTimestampByInterval(
+                $this->Config->getAgePerfdata()
+            ));
+            $output->writeln('<info> done</info>');
+        }
     }
 
     /**

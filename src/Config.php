@@ -587,6 +587,17 @@ class Config {
     }
 
     /**
+     * @return int
+     */
+    public function getAgePerfdata() {
+        $default = 90;
+        if (isset($this->config['age_perfdata'])) {
+            return (int)$this->config['age_perfdata'];
+        }
+        return $default;
+    }
+
+    /**
      * @return bool
      */
     public function getDisableHttpProxy() {

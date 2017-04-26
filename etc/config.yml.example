@@ -211,6 +211,10 @@ age_logentries: 5
 # How long should unprocessed task in Statusengine's task queue be stored
 age_tasks: 1
 
+# For some perfdata backends, Statusengine is able to cleanup the database (CrateDB for example)
+# Other backends to this by them self (Graphite for example)
+age_perfdata: 90
+
 ############
 # ENVIRONMENT CONFIGURATION
 ############
