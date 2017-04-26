@@ -67,7 +67,7 @@ crate:
 # How many records get inserted in one statement
 number_of_bulk_records: 1000
 # Timeout in seconds Statusengine will wait that number_of_bulk_records is reached until a flush get forced
-max_bulk_delay: 15
+max_bulk_delay: 5
 
 # Number of worker processes for service status records
 # Target: Redis
