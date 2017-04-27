@@ -24,6 +24,10 @@ use Symfony\Component\Console\Application;
 use Statusengine\Console\Statistics;
 use Statusengine\Console\Cleanup;
 
+$Config = new \Statusengine\Config();
+if($Config->getDisableHttpProxy()){
+    \Statusengine\ProxySettings::disableAllProxySettings();
+}
 
 $application = new Application();
 
