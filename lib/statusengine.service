@@ -1,0 +1,17 @@
+[Unit]
+Description=Statusengine Worker
+# If you run the MySQL database on the same node, add the following to After=
+# mysql.service
+#
+# If you run the CrateDB database on the same node, add the following to After=
+# crate.service
+After=syslog.target network.target gearman-job-server.service
+
+[Service]
+User=root
+Type=simple
+Restart=on-failure
+ExecStart=/opt/statusengine/worker/bin/StatusengineWorker.php
+
+[Install]
+WantedBy=multi-user.target
