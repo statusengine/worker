@@ -26,7 +26,9 @@ gearman:
 ############
 
 # If Statusengine should save status data to Redis
-use_redis: 1
+# NOTICE: Redis is always required, to calculate internal statistics!
+# So this switch will only determine, if Statusengine will save monitoring status results to redis as well
+use_redis: 0
 
 # Configuration of your redis server
 redis:
