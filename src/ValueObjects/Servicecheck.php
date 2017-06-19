@@ -109,7 +109,7 @@ class Servicecheck implements DataStructInterface {
 
 
     /**
-     * Statechange constructor.
+     * Servicecheck constructor.
      * @param \stdClass $servicecheck
      */
     public function __construct(\stdClass $servicecheck) {

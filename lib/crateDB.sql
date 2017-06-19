@@ -247,3 +247,39 @@ create table statusengine_users (
     username string,
     password string
 ) CLUSTERED INTO 4 shards with (number_of_replicas = '1-all');
+
+create table statusengine_host_downtimehistory (
+    hostname string,
+    entry_time timestamp,
+    author_name string,
+    comment_data string,
+    internal_downtime_id int,
+    triggered_by_id int,
+    is_fixed boolean,
+    duration int,
+    scheduled_start_time timestamp,
+    scheduled_end_time timestamp,
+    was_started boolean,
+    actual_start_time timestamp,
+    actual_end_time timestamp,
+    was_cancelled boolean,
+    node_name string,
+    PRIMARY KEY ("hostname", "node_name", "scheduled_start_time", "internal_downtime_id")
+) CLUSTERED INTO 4 shards with (number_of_replicas = '1-all');
+
+create table statusengine_host_scheduleddowntimes (
+    hostname string,
+    entry_time timestamp,
+    author_name string,
+    comment_data string,
+    internal_downtime_id int,
+    triggered_by_id int,
+    is_fixed boolean,
+    duration int,
+    scheduled_start_time timestamp,
+    scheduled_end_time timestamp,
+    was_started boolean,
+    actual_start_time timestamp,
+    node_name string,
+    PRIMARY KEY ("hostname", "node_name", "scheduled_start_time", "internal_downtime_id")
+) CLUSTERED INTO 4 shards with (number_of_replicas = '1-all');

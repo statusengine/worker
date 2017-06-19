@@ -82,6 +82,9 @@ class Logentry implements DataStructInterface {
         return $this->logentry_data;
     }
 
+    /**
+     * @return array
+     */
     public function serialize() {
         return [
             'logentry_time' => $this->logentry_time,

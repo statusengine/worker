@@ -80,4 +80,12 @@ interface StorageBackend {
      */
     public function deleteTaskByUuids($uuids = []);
 
+    public function getHostDowntimehistorySaver();
+
+    public function getHostScheduleddowntimeSaver();
+
+    public function getServiceDowntimehistorySaver();
+
+    public function getServiceScheduleddowntimeSaver();
+
 }

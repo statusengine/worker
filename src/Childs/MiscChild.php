@@ -19,11 +19,13 @@
 
 namespace Statusengine;
 
+use Statusengine\Config\Downtime;
 use Statusengine\Config\WorkerConfig;
 use Statusengine\ValueObjects\Acknowledgement;
 use Statusengine\ValueObjects\Notification;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
+
 
 class MiscChild extends Child {
 
@@ -38,6 +40,11 @@ class MiscChild extends Child {
     private $AcknowledgementGearmanWorker;
 
     /**
+     * @var GearmanWorker
+     */
+    private $DowntimeGearmanWorker;
+
+    /**
      * @var WorkerConfig
      */
     private $NotificationConfig;
@@ -46,6 +53,11 @@ class MiscChild extends Child {
      * @var WorkerConfig
      */
     private $AcknowledgementConfig;
+
+    /**
+     * @var WorkerConfig
+     */
+    private $DowntimeConfig;
 
     /**
      * @var Config
@@ -67,12 +79,13 @@ class MiscChild extends Child {
      */
     private $StorageBackend;
 
-
     /**
      * MiscChild constructor.
      * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
-     * @param $NotificationConfig
+     * @param \Statusengine\Config\Notification $NotificationConfig
+     * @param \Statusengine\Config\Acknowledgement $AcknowledgementConfig
+     * @param Downtime $DowntimeConfig
      * @param Pid $Pid
      * @param Statistics $Statistics
      * @param $StorageBackend
@@ -82,6 +95,7 @@ class MiscChild extends Child {
         Config $Config,
         $NotificationConfig,
         $AcknowledgementConfig,
+        $DowntimeConfig,
         Pid $Pid,
         Statistics $Statistics,
         $StorageBackend
@@ -91,6 +105,7 @@ class MiscChild extends Child {
 
         $this->NotificationConfig = $NotificationConfig;
         $this->AcknowledgementConfig = $AcknowledgementConfig;
+        $this->DowntimeConfig = $DowntimeConfig;
 
         $this->parentPid = $Pid->getPid();
         $this->Statistics = $Statistics;
@@ -103,6 +118,9 @@ class MiscChild extends Child {
 
         $this->AcknowledgementGearmanWorker = new GearmanWorker($this->AcknowledgementConfig, $Config);
         $this->AcknowledgementGearmanWorker->connect();
+
+        $this->DowntimeGearmanWorker = new GearmanWorker($this->DowntimeConfig, $Config);
+        $this->DowntimeGearmanWorker->connect();
     }
 
 
@@ -118,6 +136,7 @@ class MiscChild extends Child {
         while (true) {
             $this->handleNotifications();
             $this->handleAcknowledgements();
+            $this->handleDowntime();
 
             $this->StorageBackend->dispatch();
 
@@ -149,6 +168,30 @@ class MiscChild extends Child {
                 $Acknowledgement
             );
             $this->Statistics->increase();
+        }
+    }
+
+    private function handleDowntime() {
+        $jobData = $this->DowntimeGearmanWorker->getJob();
+        if ($jobData !== null) {
+            $Downtime = new \Statusengine\ValueObjects\Downtime($jobData);
+
+            if ($Downtime->isHostDowntime()) {
+                $DowntimehistorySaver = $this->StorageBackend->getHostDowntimehistorySaver();
+                $ScheduleddowntimeSaver = $this->StorageBackend->getHostScheduleddowntimeSaver();
+            } else {
+                $DowntimehistorySaver = $this->StorageBackend->getHostDowntimehistorySaver();
+                $ScheduleddowntimeSaver = $this->StorageBackend->getHostScheduleddowntimeSaver();
+            }
+
+
+            if (!$Downtime->wasDowntimeDeleted()) {
+                $DowntimehistorySaver->saveDowntime($Downtime);
+                $ScheduleddowntimeSaver->saveDowntime($Downtime);
+            } else {
+                //User delete the downtime
+            }
+
         }
     }
 }

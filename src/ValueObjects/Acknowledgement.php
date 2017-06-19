@@ -187,8 +187,9 @@ class Acknowledgement implements DataStructInterface {
         return $this->notify_contacts;
     }
 
-
-
+    /**
+     * @return array
+     */
     public function serialize() {
         return [
             'timestamp' => $this->timestamp,

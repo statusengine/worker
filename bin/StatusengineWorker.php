@@ -155,6 +155,7 @@ if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
         $Syslog->info('Fork new misc worker');
         $NotificationConfig = new Statusengine\Config\Notification();
         $AcknowledgementConfig = new \Statusengine\Config\Acknowledgement();
+        $DowntimeConfig = new \Statusengine\Config\Downtime();
 
         $MiscSignalHandler = new \Statusengine\ChildSignalHandler();
         $MiscStatistics = new \Statusengine\Redis\Statistics($Config, $Syslog);
@@ -163,6 +164,7 @@ if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
             $Config,
             $NotificationConfig,
             $AcknowledgementConfig,
+            $DowntimeConfig,
             $ParentPid,
             $MiscStatistics,
             $StorageBackend

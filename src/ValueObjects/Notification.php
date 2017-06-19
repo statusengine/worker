@@ -90,7 +90,7 @@ class Notification implements DataStructInterface {
     private $end_time;
 
     /**
-     * Logentry constructor.
+     * Notification constructor.
      * @param \stdClass $notification
      */
     public function __construct(\stdClass $notification) {
@@ -231,8 +231,9 @@ class Notification implements DataStructInterface {
         return $this->end_time;
     }
 
-
-
+    /**
+     * @return array
+     */
     public function serialize() {
         return [
             'host_name' => $this->host_name,

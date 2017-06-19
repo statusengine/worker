@@ -119,7 +119,7 @@ class Hostcheck implements DataStructInterface {
 
 
     /**
-     * Statechange constructor.
+     * Hostcheck constructor.
      * @param \stdClass $hostcheck
      */
     public function __construct(\stdClass $hostcheck) {

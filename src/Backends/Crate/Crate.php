@@ -25,6 +25,8 @@ use Crate\PDO\PDO as PDO;
 use Crate\PDO\PDOStatement;
 use Statusengine\Crate\SqlObjects\CrateHostAcknowledgement;
 use Statusengine\Crate\SqlObjects\CrateHostcheck;
+use Statusengine\Crate\SqlObjects\CrateHostDowntimehistory;
+use Statusengine\Crate\SqlObjects\CrateHostScheduleddowntime;
 use Statusengine\Crate\SqlObjects\CrateHoststatus;
 use Statusengine\Crate\SqlObjects\CratePerfdata;
 use Statusengine\Crate\SqlObjects\CrateServiceAcknowledgement;
@@ -516,5 +518,27 @@ class Crate implements \Statusengine\StorageBackend {
         $query = $this->prepare(sprintf('DELETE FROM %s WHERE DAY = ?', $tableName));
         $query->bindValue(1, $dayValue);
         return $query->execute();
+    }
+
+    /**
+     * @return CrateHostDowntimehistory
+     */
+    public function getHostDowntimehistorySaver() {
+        return new CrateHostDowntimehistory($this, $this->nodeName);
+    }
+
+    /**
+     * @return CrateHostScheduleddowntime
+     */
+    public function getHostScheduleddowntimeSaver() {
+        return new CrateHostScheduleddowntime($this, $this->nodeName);
+    }
+
+    public function getServiceDowntimehistorySaver() {
+        // TODO: Implement getServiceDowntimehistoryLoader() method.
+    }
+
+    public function getServiceScheduleddowntimeSaver() {
+        // TODO: Implement getServiceScheduleddowntimeLoader() method.
     }
 }
