@@ -128,4 +128,21 @@ class CrateHoststatus extends Crate\CrateModel {
         }
     }
 
+    /**
+     * @param bool $isRecursion
+     * @return bool
+     */
+    public function truncate($isRecursion = false){
+        $query = $this->CrateDB->prepare('DELETE FROM statusengine_hoststatus WHERE node_name=?');
+        $query->bindValue(1, $this->nodeName);
+        try {
+            return $this->CrateDB->executeQuery($query);
+        } catch (StorageBackendUnavailableExceptions $Exceptions) {
+            //Retry
+            if ($isRecursion === false) {
+                $this->insert(true);
+            }
+        }
+    }
+
 }

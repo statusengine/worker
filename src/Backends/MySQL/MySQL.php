@@ -37,6 +37,7 @@ use Statusengine\Mysql\SqlObjects\MysqlServicecheck;
 use Statusengine\Mysql\SqlObjects\MysqlStatechange;
 use Statusengine\Mysql\SqlObjects\MysqlTask;
 use Statusengine\Syslog;
+use Statusengine\ValueObjects\NodeName;
 
 class MySQL implements \Statusengine\StorageBackend {
 
@@ -133,20 +134,71 @@ class MySQL implements \Statusengine\StorageBackend {
         unset($this->Connection);
     }
 
-    public function saveNodeName() {
+    /**
+     * @param null $nodeName
+     * @param null $startTime
+     */
+    public function saveNodeName($nodeName = null, $startTime = null) {
+        if($nodeName === null){
+            $nodeName = $this->nodeName;
+        }
+
+        if($startTime === null){
+            $startTime = time();
+        }
+
         $this->connect();
         try {
             $query = $this->Connection->prepare('INSERT INTO statusengine_nodes (node_name, node_version, node_start_time)
           VALUES(?,?,?) ON DUPLICATE KEY UPDATE node_version=VALUES(node_version), node_start_time=VALUES(node_start_time)');
-            $query->bindValue(1, $this->nodeName);
+            $query->bindValue(1, $nodeName);
             $query->bindValue(2, STATUSENGINE_WORKER_VERSION);
-            $query->bindValue(3, time());
+            $query->bindValue(3, $startTime);
             $query->execute();
         } catch (\Exception $e) {
             print_r($e);
             $this->Syslog->emergency($e->getMessage());
             exit(1);
         }
+        $this->disconnect();
+    }
+
+    /**
+     * @return array
+     */
+    public function getNodes(){
+        $this->connect();
+        $query = $this->Connection->prepare('SELECT * FROM statusengine_nodes ORDER BY node_name ASC');
+
+        try {
+            $result = $this->fetchAll($query);
+        } catch (\Exception $e) {
+            $this->Syslog->emergency($e->getMessage());
+            exit(1);
+        }
+        $this->disconnect();
+        $nodes = [];
+        foreach($result as $record){
+            $nodes[] = NodeName::fromMysqlDb($record);
+        }
+        return $nodes;
+    }
+
+    /**
+     * @param string $nodeName
+     */
+    public function deleteNodeByName($nodeName){
+        $this->connect();
+        $query = $this->Connection->prepare('DELETE FROM statusengine_nodes WHERE node_name=?');
+        $query->bindValue(1, $nodeName);
+        $query->execute();
+
+        $Hoststatus = new MysqlHoststatus($this, $this->BulkInsertObjectStore, $nodeName);
+        $Hoststatus->truncate();
+
+        $Servicestatus = new MysqlServicestatus($this, $this->BulkInsertObjectStore, $nodeName);
+        $Servicestatus->truncate();
+
         $this->disconnect();
     }
 

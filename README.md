@@ -30,6 +30,11 @@ cp worker/etc/config.yml.example worker/etc/config.yml
 ````
 Change `node_name` to a unique name in your monitoring cluster!
 
+# Add node to the cluster
+````
+php bin/Console.php cluster add --nodename NODENAME
+````
+
 # Usage
 ````
 /opt/statusengine/worker/bin/StatusengineWorker.php
@@ -56,7 +61,15 @@ If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/envi
 * [x] Delete old performance data records in CrateDB via cron
 
 
+### Delete node from the cluster
+````
+php bin/Console.php cluster delete --nodename NODENAME
+````
 
+### Show all nodes of the cluster
+````
+php bin/Console.php cluster
+````
 
 
 # License

@@ -129,4 +129,21 @@ class MysqlServicestatus extends MysqlModel {
         }
     }
 
+    /**
+     * @param bool $isRecursion
+     * @return bool
+     */
+    public function truncate($isRecursion = false){
+        $query = $this->MySQL->prepare('DELETE FROM statusengine_servicestatus WHERE node_name=?');
+        $query->bindValue(1, $this->nodeName);
+        try {
+            return $this->MySQL->executeQuery($query);
+        } catch (StorageBackendUnavailableExceptions $Exceptions) {
+            //Retry
+            if ($isRecursion === false) {
+                $this->insert(true);
+            }
+        }
+    }
+
 }

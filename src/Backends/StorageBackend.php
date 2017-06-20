@@ -30,7 +30,20 @@ interface StorageBackend {
      */
     public function setTimeout($timeout);
 
-    public function saveNodeName();
+    /**
+     * @param null|string $nodeName
+     * @param null|int $startTime
+     * @return mixed
+     */
+    public function saveNodeName($nodeName = null, $startTime = null);
+
+    public function getNodes();
+
+    /**
+     * @param $nodeName
+     * @return mixed
+     */
+    public function deleteNodeByName($nodeName);
 
     public function saveLogentry(ValueObjects\Logentry $Logentry);
 
