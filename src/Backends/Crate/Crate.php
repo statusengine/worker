@@ -523,22 +523,22 @@ class Crate implements \Statusengine\StorageBackend {
     /**
      * @return CrateHostDowntimehistory
      */
-    public function getHostDowntimehistorySaver() {
+    public function getHostDowntimehistoryBackend() {
         return new CrateHostDowntimehistory($this, $this->nodeName);
     }
 
     /**
      * @return CrateHostScheduleddowntime
      */
-    public function getHostScheduleddowntimeSaver() {
+    public function getHostScheduleddowntimeBackend() {
         return new CrateHostScheduleddowntime($this, $this->nodeName);
     }
 
-    public function getServiceDowntimehistorySaver() {
+    public function getServiceDowntimehistoryBackend() {
         // TODO: Implement getServiceDowntimehistoryLoader() method.
     }
 
-    public function getServiceScheduleddowntimeSaver() {
+    public function getServiceScheduleddowntimeBackend() {
         // TODO: Implement getServiceScheduleddowntimeLoader() method.
     }
 }

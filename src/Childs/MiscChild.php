@@ -177,21 +177,27 @@ class MiscChild extends Child {
             $Downtime = new \Statusengine\ValueObjects\Downtime($jobData);
 
             if ($Downtime->isHostDowntime()) {
-                $DowntimehistorySaver = $this->StorageBackend->getHostDowntimehistorySaver();
-                $ScheduleddowntimeSaver = $this->StorageBackend->getHostScheduleddowntimeSaver();
+                $DowntimehistoryBackend = $this->StorageBackend->getHostDowntimehistoryBackend();
+                $ScheduleddowntimeBackend = $this->StorageBackend->getHostScheduleddowntimeBackend();
             } else {
-                $DowntimehistorySaver = $this->StorageBackend->getHostDowntimehistorySaver();
-                $ScheduleddowntimeSaver = $this->StorageBackend->getHostScheduleddowntimeSaver();
+                $DowntimehistoryBackend = $this->StorageBackend->getHostDowntimehistoryBackend();
+                $ScheduleddowntimeBackend = $this->StorageBackend->getHostScheduleddowntimeBackend();
             }
-
 
             if (!$Downtime->wasDowntimeDeleted()) {
-                $DowntimehistorySaver->saveDowntime($Downtime);
-                $ScheduleddowntimeSaver->saveDowntime($Downtime);
-            } else {
-                //User delete the downtime
+                //Filter delete event
+                $DowntimehistoryBackend->saveDowntime($Downtime);
             }
 
+            if ($Downtime->wasDowntimeStopped()) {
+                //User delete the downtime or it is expired
+                $ScheduleddowntimeBackend->deleteDowntime($Downtime);
+            } else {
+                if (!$Downtime->wasDowntimeDeleted()) {
+                    //Filter delete event
+                    $ScheduleddowntimeBackend->saveDowntime($Downtime);
+                }
+            }
         }
     }
 }
