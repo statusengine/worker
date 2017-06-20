@@ -386,6 +386,18 @@ class Crate implements \Statusengine\StorageBackend {
 
     /**
      * @param $timestamp
+     * @return bool
+     */
+    public function deleteHostDowntimeHistoryOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_host_downtimehistory WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param $timestamp
      */
     public function deleteServicechecksOlderThan($timestamp) {
         $partitions = $this->getPartitionsByTableName('statusengine_servicechecks');
@@ -446,6 +458,18 @@ class Crate implements \Statusengine\StorageBackend {
         foreach ($daysToDelete as $partition) {
             $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_service_statehistory', $partition);
         }
+    }
+
+    /**
+     * @param $timestamp
+     * @return bool
+     */
+    public function deleteServiceDowntimeHistoryOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_service_downtimehistory WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
     }
 
     /**

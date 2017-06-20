@@ -373,6 +373,14 @@ class MySQL implements \Statusengine\StorageBackend {
         return $query->execute();
     }
 
+    public function deleteHostDowntimeHistoryOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_host_downtimehistory WHERE entry_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
     /**
      * @param $timestamp
      * @return bool
@@ -416,6 +424,14 @@ class MySQL implements \Statusengine\StorageBackend {
     public function deleteServiceStatehistoryOlderThan($timestamp) {
         $query = $this->prepare(
             'DELETE FROM statusengine_service_statehistory WHERE state_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    public function deleteServiceDowntimeHistoryOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_service_downtimehistory WHERE entry_time < ?'
         );
         $query->bindValue(1, $timestamp);
         return $query->execute();

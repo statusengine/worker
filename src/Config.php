@@ -598,6 +598,28 @@ class Config {
     }
 
     /**
+     * @return int
+     */
+    public function getAgeHostDowntimes() {
+        $default = 60;
+        if (isset($this->config['age_host_downtimes'])) {
+            return (int)$this->config['age_host_downtimes'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeServiceDowntimes() {
+        $default = 60;
+        if (isset($this->config['age_service_downtimes'])) {
+            return (int)$this->config['age_service_downtimes'];
+        }
+        return $default;
+    }
+
+    /**
      * @return bool
      */
     public function getDisableHttpProxy() {

@@ -59,6 +59,9 @@ mysql:
 use_crate: 1
 # Configuration of your CrateDB Cluster
 # This is an array of cluster nodes.
+#
+# It is recommended to you a load balancer in front of your CrateDB cluster!
+# So you will have a single ip address where Statusengine is going to connect to
 crate:
   nodes:
     - 172.0.0.1:4200
@@ -73,28 +76,28 @@ max_bulk_delay: 5
 
 # Number of worker processes for service status records
 # Target: Redis
-number_servicestatus_worker: 4
+number_servicestatus_worker: 1
 
 # Number of worker processes for host status records
 # Target: Redis
-number_hoststatus_worker: 4
+number_hoststatus_worker: 1
 
 # Number of worker processes for logentry records
 # Target: MySQL|CrateDB
-number_logentry_worker: 4
+number_logentry_worker: 1
 
 # Number of worker processes for host and service
 # state change records
 # Target: MySQL|CrateDB
-number_statechange_worker: 4
+number_statechange_worker: 1
 
 # Number of worker processes for host check results
 # Target: MySQL|CrateDB
-number_hostcheck_worker: 4
+number_hostcheck_worker: 1
 
 # Number of worker processes for service check results
 # Target: MySQL|CrateDB
-number_servicecheck_worker: 4
+number_servicecheck_worker: 1
 
 # Number of worker other queues like notifications, downtimes and acknowledgements
 # Target: MySQL|CrateDB
@@ -193,6 +196,9 @@ age_host_notifications: 60
 # How long should host state change records be stored
 age_host_statehistory: 365
 
+# How long should downtime data of a host be stored
+age_host_downtimes: 60
+
 # Settings for Service related records
 # How long should every executed check for a service be stored
 age_servicechecks: 5
@@ -205,6 +211,9 @@ age_service_notifications: 60
 
 # How long should service state change records be stored
 age_service_statehistory: 365
+
+# How long should downtime data of a service be stored
+age_service_downtimes: 60
 
 # Misc records
 # How long should log entries records be stored
@@ -223,6 +232,6 @@ age_perfdata: 90
 
 # Sometimes creepy proxies are get in the way and than we can't connect to the database backend
 # or what every the proxy thinks to know about your connection
-# Enable (1) this option to clear proxy environment variables
+# Enable (1) this option to clear proxy environment variables (For Statusengine only)
 # Disable (0) and Statusengine will use the proxy out of your environment
 disable_http_proxy: 1

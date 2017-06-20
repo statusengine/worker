@@ -56,6 +56,8 @@ interface StorageBackend {
 
     public function deleteHostStatehistoryOlderThan($timestamp);
 
+    public function deleteHostDowntimeHistoryOlderThan($timestamp);
+
     public function deleteServicechecksOlderThan($timestamp);
 
     public function deleteServiceAcknowledgementsOlderThan($timestamp);
@@ -63,6 +65,8 @@ interface StorageBackend {
     public function deleteServiceNotificationsOlderThan($timestamp);
 
     public function deleteServiceStatehistoryOlderThan($timestamp);
+
+    public function deleteServiceDowntimeHistoryOlderThan($timestamp);
 
     public function deleteLogentriesOlderThan($timestamp);
 

@@ -100,16 +100,21 @@ class Cleanup extends Command {
         $this->StorageBackend->connect();
         $this->StorageBackend->setTimeout(3600);
 
+        $output->writeln('<cyan>Delete old host records</cyan>');
         $this->cleanupHostchecks($input, $output);
         $this->cleanupHostAcknowledgements($input, $output);
         $this->cleanupHostNotifications($input, $output);
         $this->cleanupHostStatehistory($input, $output);
+        $this->cleanupHostDowntimes($input, $output);
 
+        $output->writeln('<cyan>Delete old service records</cyan>');
         $this->cleanupServicechecks($input, $output);
         $this->cleanupServiceAcknowledgements($input, $output);
         $this->cleanupServiceNotifications($input, $output);
         $this->cleanupServiceStatehistory($input, $output);
+        $this->cleanupServiceDowntimes($input, $output);
 
+        $output->writeln('<cyan>Delete old misc records</cyan>');
         $this->cleanupLogentries($input, $output);
         $this->cleanupTasks($input, $output);
 
@@ -169,6 +174,18 @@ class Cleanup extends Command {
         $output->writeln('<info> done</info>');
     }
 
+    private function cleanupHostDowntimes(InputInterface $input, OutputInterface $output) {
+        if ($this->Config->getAgeHostDowntimes() === 0) {
+            $output->writeln('<cyan>Skipping host downtime history records</cyan>');
+            return;
+        }
+        $output->write('Delete old <comment>host downtime history</comment> records...');
+        $this->StorageBackend->deleteHostDowntimeHistoryOlderThan(
+            $this->getTimestampByInterval($this->Config->getAgeHostDowntimes())
+        );
+        $output->writeln('<info> done</info>');
+    }
+
     private function cleanupServicechecks(InputInterface $input, OutputInterface $output) {
         if ($this->Config->getAgeServicechecks() === 0) {
             $output->writeln('<cyan>Skipping service check records</cyan>');
@@ -213,6 +230,18 @@ class Cleanup extends Command {
         $output->write('Delete old <comment>service state history</comment> records...');
         $this->StorageBackend->deleteServiceStatehistoryOlderThan(
             $this->getTimestampByInterval($this->Config->getAgeServiceStatehistory())
+        );
+        $output->writeln('<info> done</info>');
+    }
+
+    private function cleanupServiceDowntimes(InputInterface $input, OutputInterface $output) {
+        if ($this->Config->getAgeServiceDowntimes() === 0) {
+            $output->writeln('<cyan>Skipping service downtime history records</cyan>');
+            return;
+        }
+        $output->write('Delete old <comment>service downtime history</comment> records...');
+        $this->StorageBackend->deleteServiceDowntimeHistoryOlderThan(
+            $this->getTimestampByInterval($this->Config->getAgeServiceDowntimes())
         );
         $output->writeln('<info> done</info>');
     }
