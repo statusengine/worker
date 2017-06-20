@@ -24,14 +24,14 @@ use Statusengine\Crate;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
 use Statusengine\ValueObjects\Downtime;
 
-class CrateHostScheduleddowntime extends Crate\CrateModel {
+class CrateServiceScheduleddowntime extends Crate\CrateModel {
 
     /**
      * @var string
      */
-    protected $baseQuery = "INSERT INTO statusengine_host_scheduleddowntimes
-    (hostname, entry_time, author_name, comment_data, internal_downtime_id, triggered_by_id, is_fixed, duration, scheduled_start_time,
-    scheduled_end_time, node_name %s)
+    protected $baseQuery = "INSERT INTO statusengine_service_scheduleddowntimes
+    (hostname, service_description, entry_time, author_name, comment_data, internal_downtime_id, triggered_by_id, is_fixed,
+    duration, scheduled_start_time, scheduled_end_time, node_name %s)
     VALUES%s
     ON DUPLICATE KEY UPDATE entry_time=VALUES(entry_time), author_name=VALUES(author_name), comment_data=VALUES(comment_data),
     triggered_by_id=VALUES(triggered_by_id), is_fixed=VALUES(is_fixed), duration=VALUES(duration), scheduled_end_time=VALUES(scheduled_end_time) %s";
@@ -40,7 +40,7 @@ class CrateHostScheduleddowntime extends Crate\CrateModel {
     /**
      * @var string
      */
-    protected $baseValue = '?,?,?,?,?,?,?,?,?,?,?';
+    protected $baseValue = '?,?,?,?,?,?,?,?,?,?,?,?';
 
     /**
      * @var Crate\Crate
@@ -71,6 +71,7 @@ class CrateHostScheduleddowntime extends Crate\CrateModel {
         $query = $this->CrateDB->prepare($this->getQuery($Downtime));
         $i = 1;
         $query->bindValue($i++, $Downtime->getHostName());
+        $query->bindValue($i++, $Downtime->getServiceDescription());
         $query->bindValue($i++, $Downtime->getEntryTime());
         $query->bindValue($i++, $Downtime->getAuthorName());
         $query->bindValue($i++, $Downtime->getCommentData());
@@ -104,7 +105,7 @@ class CrateHostScheduleddowntime extends Crate\CrateModel {
      * @return bool
      */
     public function deleteDowntime(Downtime $Downtime, $isRecursion = false){
-        $sql = "DELETE FROM statusengine_host_scheduleddowntimes 
+        $sql = "DELETE FROM statusengine_service_scheduleddowntimes 
         WHERE hostname=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=? AND duration=?";
 
         $query = $this->CrateDB->prepare($sql);

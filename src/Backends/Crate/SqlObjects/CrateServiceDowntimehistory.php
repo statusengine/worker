@@ -22,16 +22,17 @@ namespace Statusengine\Crate\SqlObjects;
 use Crate\PDO\PDO;
 use Statusengine\Crate;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
+use Statusengine\Exception\UnknownTypeException;
 use Statusengine\ValueObjects\Downtime;
 
-class CrateHostScheduleddowntime extends Crate\CrateModel {
+class CrateServiceDowntimehistory extends Crate\CrateModel {
 
     /**
      * @var string
      */
-    protected $baseQuery = "INSERT INTO statusengine_host_scheduleddowntimes
-    (hostname, entry_time, author_name, comment_data, internal_downtime_id, triggered_by_id, is_fixed, duration, scheduled_start_time,
-    scheduled_end_time, node_name %s)
+    protected $baseQuery = "INSERT INTO statusengine_service_downtimehistory
+    (hostname, service_description, entry_time, author_name, comment_data, internal_downtime_id, triggered_by_id, is_fixed,
+    duration, scheduled_start_time, scheduled_end_time, node_name %s)
     VALUES%s
     ON DUPLICATE KEY UPDATE entry_time=VALUES(entry_time), author_name=VALUES(author_name), comment_data=VALUES(comment_data),
     triggered_by_id=VALUES(triggered_by_id), is_fixed=VALUES(is_fixed), duration=VALUES(duration), scheduled_end_time=VALUES(scheduled_end_time) %s";
@@ -40,7 +41,7 @@ class CrateHostScheduleddowntime extends Crate\CrateModel {
     /**
      * @var string
      */
-    protected $baseValue = '?,?,?,?,?,?,?,?,?,?,?';
+    protected $baseValue = '?,?,?,?,?,?,?,?,?,?,?,?';
 
     /**
      * @var Crate\Crate
@@ -53,7 +54,7 @@ class CrateHostScheduleddowntime extends Crate\CrateModel {
     private $nodeName;
 
     /**
-     * CrateHostScheduleddowntime constructor.
+     * CrateServiceDowntimehistory constructor.
      * @param Crate\Crate $CrateDB
      * @param $nodeName
      */
@@ -71,6 +72,7 @@ class CrateHostScheduleddowntime extends Crate\CrateModel {
         $query = $this->CrateDB->prepare($this->getQuery($Downtime));
         $i = 1;
         $query->bindValue($i++, $Downtime->getHostName());
+        $query->bindValue($i++, $Downtime->getServiceDescription());
         $query->bindValue($i++, $Downtime->getEntryTime());
         $query->bindValue($i++, $Downtime->getAuthorName());
         $query->bindValue($i++, $Downtime->getCommentData());
@@ -82,10 +84,22 @@ class CrateHostScheduleddowntime extends Crate\CrateModel {
         $query->bindValue($i++, $Downtime->getScheduledEndTime());
         $query->bindValue($i++, $this->nodeName);
 
-        //Add dynamic Fields
-        if ($Downtime->wasDowntimeAdded() || $Downtime->wasRestoredFromRetentionDat() || $Downtime->wasDowntimeStarted()) {
+
+        if ($Downtime->wasDowntimeAdded() || $Downtime->wasRestoredFromRetentionDat()) {
             $query->bindValue($i++, $Downtime->wasStarted(), PDO::PARAM_BOOL);
             $query->bindValue($i++, $Downtime->getActualStartTime(), PDO::PARAM_INT);
+            $query->bindValue($i++, $Downtime->getActualEndTime(), PDO::PARAM_INT);
+            $query->bindValue($i++, $Downtime->wasCancelled(), PDO::PARAM_BOOL);
+        }
+
+        if ($Downtime->wasDowntimeStarted()) {
+            $query->bindValue($i++, $Downtime->wasStarted(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, $Downtime->getActualStartTime(), PDO::PARAM_INT);
+        }
+
+        if ($Downtime->wasDowntimeStopped() || $Downtime->wasDowntimeDeleted()) {
+            $query->bindValue($i++, $Downtime->getActualEndTime(), PDO::PARAM_INT);
+            $query->bindValue($i++, $Downtime->wasCancelled(), PDO::PARAM_BOOL);
         }
 
         try {
@@ -100,66 +114,57 @@ class CrateHostScheduleddowntime extends Crate\CrateModel {
 
     /**
      * @param Downtime $Downtime
-     * @param bool $isRecursion
-     * @return bool
-     */
-    public function deleteDowntime(Downtime $Downtime, $isRecursion = false){
-        $sql = "DELETE FROM statusengine_host_scheduleddowntimes 
-        WHERE hostname=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=? AND duration=?";
-
-        $query = $this->CrateDB->prepare($sql);
-        $query->bindValue(1, $Downtime->getHostName());
-        $query->bindValue(2, $this->nodeName);
-        $query->bindValue(3, $Downtime->getScheduledStartTime());
-        $query->bindValue(4, $Downtime->getDowntimeId());
-
-        //We add duration, because there is/was a bug in CrateDB
-        //https://github.com/crate/crate/issues/5763
-        //todo - check if this was fixed :)
-        $query->bindValue(5, $Downtime->getDuration());
-
-        try {
-            return $this->CrateDB->executeQuery($query);
-        } catch (StorageBackendUnavailableExceptions $Exceptions) {
-            //Retry
-            if ($isRecursion === false) {
-                $this->deleteDowntime($Downtime, true);
-            }
-        }
-    }
-
-    /**
-     * @param Downtime $Downtime
      * @return string
+     * @throws UnknownTypeException
      */
-    public function getQuery(Downtime $Downtime) {
-        if ($Downtime->wasDowntimeAdded() || $Downtime->wasRestoredFromRetentionDat() || $Downtime->wasDowntimeStarted()) {
+    private function getQuery(Downtime $Downtime) {
+        if ($Downtime->wasDowntimeAdded() || $Downtime->wasRestoredFromRetentionDat()) {
+            $dynamicFields = [
+                'insert' => ['was_started', 'actual_start_time', 'actual_end_time', 'was_cancelled'],
+                'update' => [
+                    'was_started=VALUES(was_started)',
+                    'actual_start_time=VALUES(actual_start_time)',
+                    'actual_end_time=VALUES(actual_end_time)',
+                    'was_cancelled=VALUES(was_cancelled)'
+                ]
+            ];
+            return $this->buildQueryString($dynamicFields);
+        }
+
+        if ($Downtime->wasDowntimeStarted()) {
             $dynamicFields = [
                 'insert' => ['was_started', 'actual_start_time'],
                 'update' => ['was_started=VALUES(was_started)', 'actual_start_time=VALUES(actual_start_time)']
             ];
-
-            $placeholdersToAdd = [];
-            foreach ($dynamicFields['insert'] as $field) {
-                $placeholdersToAdd[] = '?';
-            }
-
-
-            return sprintf(
-                $this->baseQuery,
-                ', ' . implode(', ', $dynamicFields['insert']),
-                '(' . $this->baseValue . ', ' . implode(',', $placeholdersToAdd) . ')',
-                ', ' . implode(', ', $dynamicFields['update'])
-            );
+            return $this->buildQueryString($dynamicFields);
         }
 
+        if ($Downtime->wasDowntimeStopped() || $Downtime->wasDowntimeDeleted()) {
+            $dynamicFields = [
+                'insert' => ['actual_end_time', 'was_cancelled'],
+                'update' => ['actual_end_time=VALUES(actual_end_time)', 'was_cancelled=VALUES(was_cancelled)']
+            ];
+            return $this->buildQueryString($dynamicFields);
+        }
+
+        throw new UnknownTypeException('Downtime action/type is not supported');
+    }
+
+    /**
+     * @param array $dynamicFields
+     * @return string
+     */
+    public function buildQueryString($dynamicFields = []) {
+        $placeholdersToAdd = [];
+        foreach ($dynamicFields['insert'] as $field) {
+            $placeholdersToAdd[] = '?';
+        }
         return sprintf(
             $this->baseQuery,
-            '',
-            '(' . $this->baseValue . ')',
-            ''
+            ', ' . implode(', ', $dynamicFields['insert']),
+            '(' . $this->baseValue . ',' . implode(',', $placeholdersToAdd) . ')',
+            ', ' . implode(', ', $dynamicFields['update'])
         );
-
     }
 
 

@@ -180,8 +180,8 @@ class MiscChild extends Child {
                 $DowntimehistoryBackend = $this->StorageBackend->getHostDowntimehistoryBackend();
                 $ScheduleddowntimeBackend = $this->StorageBackend->getHostScheduleddowntimeBackend();
             } else {
-                $DowntimehistoryBackend = $this->StorageBackend->getHostDowntimehistoryBackend();
-                $ScheduleddowntimeBackend = $this->StorageBackend->getHostScheduleddowntimeBackend();
+                $DowntimehistoryBackend = $this->StorageBackend->getServiceDowntimehistoryBackend();
+                $ScheduleddowntimeBackend = $this->StorageBackend->getServiceScheduleddowntimeBackend();
             }
 
             if (!$Downtime->wasDowntimeDeleted()) {

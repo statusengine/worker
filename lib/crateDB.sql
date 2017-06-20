@@ -283,3 +283,41 @@ create table statusengine_host_scheduleddowntimes (
     node_name string,
     PRIMARY KEY ("hostname", "node_name", "scheduled_start_time", "internal_downtime_id")
 ) CLUSTERED INTO 4 shards with (number_of_replicas = '1-all');
+
+create table statusengine_service_downtimehistory (
+    hostname string,
+    service_description string,
+    entry_time timestamp,
+    author_name string,
+    comment_data string,
+    internal_downtime_id int,
+    triggered_by_id int,
+    is_fixed boolean,
+    duration int,
+    scheduled_start_time timestamp,
+    scheduled_end_time timestamp,
+    was_started boolean,
+    actual_start_time timestamp,
+    actual_end_time timestamp,
+    was_cancelled boolean,
+    node_name string,
+    PRIMARY KEY ("hostname", "service_description", "node_name", "scheduled_start_time", "internal_downtime_id")
+) CLUSTERED INTO 4 shards with (number_of_replicas = '1-all');
+
+create table statusengine_service_scheduleddowntimes (
+    hostname string,
+    service_description string,
+    entry_time timestamp,
+    author_name string,
+    comment_data string,
+    internal_downtime_id int,
+    triggered_by_id int,
+    is_fixed boolean,
+    duration int,
+    scheduled_start_time timestamp,
+    scheduled_end_time timestamp,
+    was_started boolean,
+    actual_start_time timestamp,
+    node_name string,
+    PRIMARY KEY ("hostname", "service_description", "node_name", "scheduled_start_time", "internal_downtime_id")
+) CLUSTERED INTO 4 shards with (number_of_replicas = '1-all');

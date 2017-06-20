@@ -31,6 +31,8 @@ use Statusengine\Crate\SqlObjects\CrateHoststatus;
 use Statusengine\Crate\SqlObjects\CratePerfdata;
 use Statusengine\Crate\SqlObjects\CrateServiceAcknowledgement;
 use Statusengine\Crate\SqlObjects\CrateServicecheck;
+use Statusengine\Crate\SqlObjects\CrateServiceDowntimehistory;
+use Statusengine\Crate\SqlObjects\CrateServiceScheduleddowntime;
 use Statusengine\Crate\SqlObjects\CrateStatechange;
 use Statusengine\Crate\SqlObjects\CrateServicestatus;
 use Statusengine\Crate\SqlObjects\CrateTask;
@@ -534,11 +536,17 @@ class Crate implements \Statusengine\StorageBackend {
         return new CrateHostScheduleddowntime($this, $this->nodeName);
     }
 
+    /**
+     * @return CrateServiceDowntimehistory
+     */
     public function getServiceDowntimehistoryBackend() {
-        // TODO: Implement getServiceDowntimehistoryLoader() method.
+        return new CrateServiceDowntimehistory($this, $this->nodeName);
     }
 
+    /**
+     * @return CrateServiceScheduleddowntime
+     */
     public function getServiceScheduleddowntimeBackend() {
-        // TODO: Implement getServiceScheduleddowntimeLoader() method.
+        return new CrateServiceScheduleddowntime($this, $this->nodeName);
     }
 }
