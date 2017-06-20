@@ -271,3 +271,89 @@ CREATE TABLE `statusengine_users` (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_general_ci;
+
+CREATE TABLE `statusengine_host_downtimehistory` (
+  `hostname`             VARCHAR(255),
+  `entry_time`           BIGINT(13) NOT NULL,
+  `author_name`          VARCHAR(255),
+  `comment_data`         VARCHAR(1024),
+  `internal_downtime_id` INT(11) UNSIGNED,
+  `triggered_by_id`      INT(11) UNSIGNED,
+  `is_fixed`             TINYINT(1) UNSIGNED DEFAULT 0,
+  `duration`             INT(11) UNSIGNED,
+  `scheduled_start_time` BIGINT(13) NOT NULL,
+  `scheduled_end_time`   BIGINT(13) NOT NULL,
+  `was_started`          TINYINT(1) UNSIGNED DEFAULT 0,
+  `actual_start_time`    BIGINT(13) NOT NULL,
+  `actual_end_time`      BIGINT(13) NOT NULL,
+  `was_cancelled`        TINYINT(1) UNSIGNED DEFAULT 0,
+  `node_name`            VARCHAR(255),
+  PRIMARY KEY (`hostname`, `node_name`, `scheduled_start_time`, `internal_downtime_id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_general_ci;
+
+CREATE TABLE `statusengine_host_scheduleddowntimes` (
+  `hostname`             VARCHAR(255),
+  `entry_time`           BIGINT(13) NOT NULL,
+  `author_name`          VARCHAR(255),
+  `comment_data`         VARCHAR(1024),
+  `internal_downtime_id` INT(11) UNSIGNED,
+  `triggered_by_id`      INT(11) UNSIGNED,
+  `is_fixed`             TINYINT(1) UNSIGNED DEFAULT 0,
+  `duration`             INT(11) UNSIGNED,
+  `scheduled_start_time` BIGINT(13) NOT NULL,
+  `scheduled_end_time`   BIGINT(13) NOT NULL,
+  `was_started`          TINYINT(1) UNSIGNED DEFAULT 0,
+  `actual_start_time`    BIGINT(13) NOT NULL,
+  `node_name`            VARCHAR(255),
+  PRIMARY KEY (`hostname`, `node_name`, `scheduled_start_time`, `internal_downtime_id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_general_ci;
+
+CREATE TABLE `statusengine_service_downtimehistory` (
+  `hostname`             VARCHAR(255),
+  `service_description`  VARCHAR(255),
+  `entry_time`           BIGINT(13) NOT NULL,
+  `author_name`          VARCHAR(255),
+  `comment_data`         VARCHAR(1024),
+  `internal_downtime_id` INT(11) UNSIGNED,
+  `triggered_by_id`      INT(11) UNSIGNED,
+  `is_fixed`             TINYINT(1) UNSIGNED DEFAULT 0,
+  `duration`             INT(11) UNSIGNED,
+  `scheduled_start_time` BIGINT(13) NOT NULL,
+  `scheduled_end_time`   BIGINT(13) NOT NULL,
+  `was_started`          TINYINT(1) UNSIGNED DEFAULT 0,
+  `actual_start_time`    BIGINT(13) NOT NULL,
+  `actual_end_time`      BIGINT(13) NOT NULL,
+  `was_cancelled`        TINYINT(1) UNSIGNED DEFAULT 0,
+  `node_name`            VARCHAR(255),
+  PRIMARY KEY (`hostname`, `service_description`, `node_name`, `scheduled_start_time`, `internal_downtime_id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_general_ci;
+
+CREATE TABLE `statusengine_service_scheduleddowntimes` (
+  `hostname`             VARCHAR(255),
+  `service_description`  VARCHAR(255),
+  `entry_time`           BIGINT(13) NOT NULL,
+  `author_name`          VARCHAR(255),
+  `comment_data`         VARCHAR(1024),
+  `internal_downtime_id` INT(11) UNSIGNED,
+  `triggered_by_id`      INT(11) UNSIGNED,
+  `is_fixed`             TINYINT(1) UNSIGNED DEFAULT 0,
+  `duration`             INT(11) UNSIGNED,
+  `scheduled_start_time` BIGINT(13) NOT NULL,
+  `scheduled_end_time`   BIGINT(13) NOT NULL,
+  `was_started`          TINYINT(1) UNSIGNED DEFAULT 0,
+  `actual_start_time`    BIGINT(13) NOT NULL,
+  `node_name`            VARCHAR(255),
+  PRIMARY KEY (`hostname`, `service_description`, `node_name`, `scheduled_start_time`, `internal_downtime_id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_general_ci;

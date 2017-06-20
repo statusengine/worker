@@ -22,9 +22,13 @@ namespace Statusengine\Mysql;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Exception\UnknownTypeException;
 use Statusengine\Mysql\SqlObjects\MysqlHostAcknowledgement;
+use Statusengine\Mysql\SqlObjects\MySQLHostDowntimehistory;
+use Statusengine\Mysql\SqlObjects\MysqlHostScheduleddowntime;
 use Statusengine\Mysql\SqlObjects\MysqlHoststatus;
 use Statusengine\Mysql\SqlObjects\MysqlNotification;
 use Statusengine\Mysql\SqlObjects\MysqlServiceAcknowledgement;
+use Statusengine\Mysql\SqlObjects\MysqlServiceDowntimehistory;
+use Statusengine\Mysql\SqlObjects\MysqlServiceScheduleddowntime;
 use Statusengine\Mysql\SqlObjects\MysqlServicestatus;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
 use Statusengine\Mysql\SqlObjects\MysqlLogentry;
@@ -439,6 +443,34 @@ class MySQL implements \Statusengine\StorageBackend {
         );
         $query->bindValue(1, $timestamp);
         return $query->execute();
+    }
+
+    /**
+     * @return MySQLHostDowntimehistory
+     */
+    public function getHostDowntimehistoryBackend() {
+        return new MySQLHostDowntimehistory($this, $this->nodeName);
+    }
+
+    /**
+     * @return MysqlHostScheduleddowntime
+     */
+    public function getHostScheduleddowntimeBackend() {
+        return new MysqlHostScheduleddowntime($this, $this->nodeName);
+    }
+
+    /**
+     * @return MysqlServiceDowntimehistory
+     */
+    public function getServiceDowntimehistoryBackend() {
+        return new MysqlServiceDowntimehistory($this, $this->nodeName);
+    }
+
+    /**
+     * @return MysqlServiceScheduleddowntime
+     */
+    public function getServiceScheduleddowntimeBackend() {
+        return new MysqlServiceScheduleddowntime($this, $this->nodeName);
     }
 
 }
