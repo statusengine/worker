@@ -116,6 +116,7 @@ class CrateHostScheduleddowntime extends Crate\CrateModel {
         //We add duration, because there is/was a bug in CrateDB
         //https://github.com/crate/crate/issues/5763
         //todo - check if this was fixed :)
+        //last testet on CrateDB 1.1.5 - should be fixed in 1.1.6
         $query->bindValue(5, $Downtime->getDuration());
 
         try {
