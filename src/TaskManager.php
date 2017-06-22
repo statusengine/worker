@@ -40,6 +40,11 @@ class TaskManager {
     private $QueryHandler;
 
     /**
+     * @var ExternalCommandFile
+     */
+    private $ExternalCommandFile;
+
+    /**
      * @var Syslog
      */
     private $Syslog;
@@ -65,11 +70,13 @@ class TaskManager {
         Config $Config,
         StorageBackend $StorageBackend,
         QueryHandler $QueryHandler,
+        ExternalCommandFile $ExternalCommandFile,
         Syslog $Syslog
     ) {
         $this->Config = $Config;
         $this->StorageBackend = $StorageBackend;
         $this->QueryHandler = $QueryHandler;
+        $this->ExternalCommandFile = $ExternalCommandFile;
         $this->Syslog = $Syslog;
 
         $this->checkInterval = $Config->getCommandCheckInterval();
@@ -107,9 +114,17 @@ class TaskManager {
         switch ($task->getType()) {
 
             case 'externalcommand':
-                $this->QueryHandler->connect();
-                $this->QueryHandler->runCommand($task->getPayload());
-                $this->QueryHandler->disconnect();
+                if($this->Config->getSubmitMethod() === 'qh') {
+                    $this->QueryHandler->connect();
+                    $this->QueryHandler->runCommand($task->getPayload());
+                    $this->QueryHandler->disconnect();
+                }
+
+                if($this->Config->getSubmitMethod() === 'cmd') {
+                    $this->ExternalCommandFile->connect();
+                    $this->ExternalCommandFile->runCommand($task->getPayload());
+                    $this->ExternalCommandFile->disconnect();
+                }
                 break;
 
             default:

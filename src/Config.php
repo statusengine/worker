@@ -401,10 +401,35 @@ class Config {
         return $default;
     }
 
+    /**
+     * @return string
+     */
     public function getQueryHandler() {
         $default = '/opt/naemon/var/naemon.qh';
         if (isset($this->config['query_hander'])) {
             return $this->config['query_hander'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExternalCommandFile() {
+        $default = '/opt/naemon/var/naemon.cmd';
+        if (isset($this->config['external_command_file'])) {
+            return $this->config['external_command_file'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubmitMethod() {
+        $default = 'cmd';
+        if (isset($this->config['submit_method'])) {
+            return $this->config['submit_method'];
         }
         return $default;
     }

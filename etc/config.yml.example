@@ -150,9 +150,25 @@ check_for_commands: 1
 # Every check will fire a SQL query, to choose wisely
 command_check_interval: 15
 
-# Path to Nagios/Naemon query handler.
+# External command file where Statusengine will pass external commands to.
+# If you are using Nagios you MUST USE the nagios.cmd!!
+# If you are not sure, of what you are doing, use the .cmd file :)
+external_command_file: /opt/naemon/var/naemon.cmd
+
+# Path to Naemon query handler.
 # This is where Statusengine will pass external commands to the monitoring backend
+# NOTICE! At the moment only Naemon supports to pass external commands through the query handler!
+# If you are using Nagios, you need to use the nagios.cmd (External Command File)
+# See: https://github.com/NagiosEnterprises/nagioscore/issues/364
 query_hander: /opt/naemon/var/naemon.qh
+
+# Pass external commands to the external commands file.
+# Naemon and Nagios
+submit_method: cmd
+
+# Pass external commands to the query handler
+# Naemon only at the moment, but i but i recommend to use this, with Naemon
+#submit_method: qh
 
 ############
 # SYSLOG CONFIGURATION

@@ -60,6 +60,11 @@ class QueryHandler {
      */
     private $timeout = 5;
 
+    /**
+     * QueryHandler constructor.
+     * @param Config $Config
+     * @param Syslog $Syslog
+     */
     public function __construct(Config $Config, Syslog $Syslog) {
         $this->Config = $Config;
         $this->Syslog = $Syslog;
@@ -92,7 +97,7 @@ class QueryHandler {
      * @return null|string
      */
     public function runCommand($commandstring) {
-        $this->Syslog->info(sprintf('Execute external command: %s', $commandstring));
+        $this->Syslog->info(sprintf('Execute external command (via Query Handler): %s', $commandstring));
         $command = sprintf('%s %s%s', '#command run', $commandstring, "\0");
         return $this->executeQuery($command);
     }
