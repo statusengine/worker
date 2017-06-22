@@ -49,7 +49,7 @@ If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/envi
 ````
 
 # ToDos
-* [ ] Add Downtimes
+* [x] Add Downtimes
 * [X] Add Acknowledgements
 * [x] Add Notifications
 * [x] Add Graphite
@@ -59,6 +59,7 @@ If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/envi
 * [ ] init/systemd support
 * [x] Cronjob to cleanup database
 * [x] Delete old performance data records in CrateDB via cron
+* [x] Implement External Command File
 
 
 ### Delete node from the cluster
