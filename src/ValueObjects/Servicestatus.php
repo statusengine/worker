@@ -193,6 +193,46 @@ class Servicestatus implements StatusInterface {
     private $check_period;
 
     /**
+     * @var int
+     */
+    private $last_time_ok;
+
+    /**
+     * @var int
+     */
+    private $last_time_warning;
+
+    /**
+     * @var int
+     */
+    private $last_time_unknown;
+
+    /**
+     * @var int
+     */
+    private $last_time_critical;
+
+    /**
+     * @var int
+     */
+    private $current_notification_number;
+
+    /**
+     * @var double
+     */
+    private $percent_state_change;
+
+    /**
+     * @var string
+     */
+    private $event_handler;
+
+    /**
+     * @var string
+     */
+    private $check_command;
+
+    /**
      * Servicestatus constructor.
      * @param \stdClass $servicestatus
      */
@@ -233,6 +273,15 @@ class Servicestatus implements StatusInterface {
 
         $this->state_type = (bool)$servicestatus->servicestatus->state_type;
         $this->check_period = $servicestatus->servicestatus->check_period;
+
+        $this->last_time_ok = (int)$servicestatus->servicestatus->last_time_ok;
+        $this->last_time_warning = (int)$servicestatus->servicestatus->last_time_warning;
+        $this->last_time_critical = (int)$servicestatus->servicestatus->last_time_critical;
+        $this->last_time_unknown = (int)$servicestatus->servicestatus->last_time_unknown;
+        $this->current_notification_number = (int)$servicestatus->servicestatus->current_notification_number;
+        $this->percent_state_change = (double)$servicestatus->servicestatus->percent_state_change;
+        $this->event_handler = $servicestatus->servicestatus->event_handler;
+        $this->check_command = $servicestatus->servicestatus->check_command;
     }
 
     /**
@@ -502,6 +551,62 @@ class Servicestatus implements StatusInterface {
     }
 
     /**
+     * @return int
+     */
+    public function getLastTimeOk() {
+        return $this->last_time_ok;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastTimeWarning() {
+        return $this->last_time_warning;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastTimeUnknown() {
+        return $this->last_time_unknown;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastTimeCritical() {
+        return $this->last_time_critical;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCurrentNotificationNumber() {
+        return $this->current_notification_number;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPercentStateChange() {
+        return $this->percent_state_change;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEventHandler() {
+        return $this->event_handler;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCheckCommand() {
+        return $this->check_command;
+    }
+
+    /**
      * @return array
      */
     public function serialize() {
@@ -530,8 +635,16 @@ class Servicestatus implements StatusInterface {
             'process_performance_data' => (int)$this->process_performance_data,
             'obsess' => (int)$this->obsess,
             'check_interval' => $this->check_interval,
-            'retry_interval' => $this->retry_interval
+            'retry_interval' => $this->retry_interval,
+            'check_period' => $this->check_period,
+            'last_time_ok' => $this->last_time_ok,
+            'last_time_warning' => $this->last_time_warning,
+            'last_time_critical' => $this->last_time_critical,
+            'last_time_unknown' => $this->last_time_unknown,
+            'current_notification_number' => $this->current_notification_number,
+            'percent_state_change' => $this->percent_state_change,
+            'event_handler' => $this->event_handler,
+            'check_command' => $this->check_command
         ];
     }
-
 }

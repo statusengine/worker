@@ -129,6 +129,13 @@ create table statusengine_hoststatus (
     retry_check_interval int,
     check_timeperiod string,
     node_name string,
+    last_time_up timestamp,
+    last_time_down timestamp,
+    last_time_unreachable timestamp,
+    current_notification_number int,
+    percent_state_change double,
+    event_handler string,
+    check_command string,
     PRIMARY KEY ("hostname")
 ) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
 
@@ -168,6 +175,14 @@ create table statusengine_servicestatus (
     retry_check_interval int,
     check_timeperiod string,
     node_name string,
+    last_time_ok timestamp,
+    last_time_warning timestamp,
+    last_time_critical timestamp,
+    last_time_unknown timestamp,
+    current_notification_number int,
+    percent_state_change double,
+    event_handler string,
+    check_command string,
     PRIMARY KEY ("hostname", "service_description")
 ) CLUSTERED INTO 4 shards with (number_of_replicas = '0');
 
@@ -321,3 +336,12 @@ create table statusengine_service_scheduleddowntimes (
     node_name string,
     PRIMARY KEY ("hostname", "service_description", "node_name", "scheduled_start_time", "internal_downtime_id")
 ) CLUSTERED INTO 4 shards with (number_of_replicas = '1-all');
+
+create table statusengine_dbversion (
+    id int,
+    dbversion string,
+    PRIMARY KEY ("id")
+) CLUSTERED INTO 1 shards with (number_of_replicas = '1-all');
+
+
+INSERT INTO statusengine_dbversion (id, dbversion)VALUES(1, '3.0.0');

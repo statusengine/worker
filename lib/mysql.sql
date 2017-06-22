@@ -125,6 +125,13 @@ CREATE TABLE `statusengine_hoststatus` (
   `retry_check_interval`          INT(11) UNSIGNED    DEFAULT 0,
   `check_timeperiod`              VARCHAR(255),
   `node_name`                     VARCHAR(255),
+  `last_time_up`                  BIGINT(13) NOT NULL,
+  `last_time_down`                BIGINT(13) NOT NULL,
+  `last_time_unreachable`         BIGINT(13) NOT NULL,
+  `current_notification_number`   INT(11) UNSIGNED    DEFAULT 0,
+  `percent_state_change`          DOUBLE              DEFAULT 0,
+  `event_handler`                 VARCHAR(255),
+  `check_command`                 VARCHAR(255),
   PRIMARY KEY (`hostname`)
 )
   ENGINE = InnoDB
@@ -167,6 +174,14 @@ CREATE TABLE `statusengine_servicestatus` (
   `retry_check_interval`          INT(11) UNSIGNED    DEFAULT 0,
   `check_timeperiod`              VARCHAR(255),
   `node_name`                     VARCHAR(255),
+  last_time_ok                    BIGINT(13) NOT NULL,
+  last_time_warning               BIGINT(13) NOT NULL,
+  last_time_critical              BIGINT(13) NOT NULL,
+  last_time_unknown               BIGINT(13) NOT NULL,
+  `current_notification_number`   INT(11) UNSIGNED    DEFAULT 0,
+  `percent_state_change`          DOUBLE              DEFAULT 0,
+  `event_handler`                 VARCHAR(255),
+  `check_command`                 VARCHAR(255),
   PRIMARY KEY (`hostname`, `service_description`)
 )
   ENGINE = InnoDB
@@ -357,3 +372,13 @@ CREATE TABLE `statusengine_service_scheduleddowntimes` (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_general_ci;
+
+CREATE TABLE IF NOT EXISTS `statusengine_dbversion` (
+  `id`        INT(13) NOT NULL,
+  `dbversion` VARCHAR(255) DEFAULT '3.0.0',
+  PRIMARY KEY (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+
+INSERT INTO `statusengine_dbversion` (`id`, `dbversion`)VALUES(1, '3.0.0');

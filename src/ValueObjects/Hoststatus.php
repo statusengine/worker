@@ -188,6 +188,41 @@ class Hoststatus implements StatusInterface {
     private $check_period;
 
     /**
+     * @var int
+     */
+    private $last_time_up;
+
+    /**
+     * @var int
+     */
+    private $last_time_down;
+
+    /**
+     * @var int
+     */
+    private $last_time_unreachable;
+
+    /**
+     * @var int
+     */
+    private $current_notification_number;
+
+    /**
+     * @var double
+     */
+    private $percent_state_change;
+
+    /**
+     * @var string
+     */
+    private $event_handler;
+
+    /**
+     * @var string
+     */
+    private $check_command;
+
+    /**
      * Hoststatus constructor.
      * @param \stdClass $hoststatus
      */
@@ -226,6 +261,14 @@ class Hoststatus implements StatusInterface {
         $this->next_notification = (int)$hoststatus->hoststatus->next_notification;
         $this->state_type = (bool)$hoststatus->hoststatus->state_type;
         $this->check_period = $hoststatus->hoststatus->check_period;
+
+        $this->last_time_up = (int)$hoststatus->hoststatus->last_time_up;
+        $this->last_time_down = (int)$hoststatus->hoststatus->last_time_down;
+        $this->last_time_unreachable = (int)$hoststatus->hoststatus->last_time_unreachable;
+        $this->current_notification_number = (int)$hoststatus->hoststatus->current_notification_number;
+        $this->percent_state_change = (double)$hoststatus->hoststatus->percent_state_change;
+        $this->event_handler = $hoststatus->hoststatus->event_handler;
+        $this->check_command = $hoststatus->hoststatus->check_command;
     }
 
     /**
@@ -301,8 +344,8 @@ class Hoststatus implements StatusInterface {
     /**
      * @return bool
      */
-    public function getIsActiveCheckResult(){
-        if($this->check_type == 0){
+    public function getIsActiveCheckResult() {
+        if ($this->check_type == 0) {
             return true;
         }
         return false;
@@ -477,6 +520,56 @@ class Hoststatus implements StatusInterface {
     }
 
     /**
+     * @return int
+     */
+    public function getLastTimeUp() {
+        return $this->last_time_up;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastTimeDown() {
+        return $this->last_time_down;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastTimeUnreachable() {
+        return $this->last_time_unreachable;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCurrentNotificationNumber() {
+        return $this->current_notification_number;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPercentStateChange() {
+        return $this->percent_state_change;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEventHandler() {
+        return $this->event_handler;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCheckCommand() {
+        return $this->check_command;
+    }
+
+
+    /**
      * @return array
      */
     public function serialize() {
@@ -505,8 +598,15 @@ class Hoststatus implements StatusInterface {
             'process_performance_data' => (int)$this->process_performance_data,
             'obsess' => (int)$this->obsess,
             'check_interval' => $this->check_interval,
-            'retry_interval' => $this->retry_interval
+            'retry_interval' => $this->retry_interval,
+            'check_period' => $this->check_period,
+            'last_time_up' => $this->last_time_up,
+            'last_time_down' => $this->last_time_down,
+            'last_time_unreachable' => $this->last_time_unreachable,
+            'current_notification_number' => $this->current_notification_number,
+            'percent_state_change' => $this->percent_state_change,
+            'event_handler' => $this->event_handler,
+            'check_command' => $this->check_command
         ];
     }
-
 }
