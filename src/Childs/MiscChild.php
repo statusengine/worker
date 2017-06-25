@@ -184,16 +184,16 @@ class MiscChild extends Child {
                 $ScheduleddowntimeBackend = $this->StorageBackend->getServiceScheduleddowntimeBackend();
             }
 
-            if (!$Downtime->wasDowntimeDeleted()) {
+            if (!$Downtime->wasDowntimeDeleted() && !$Downtime->wasDowntimeDeleted()) {
                 //Filter delete event
                 $DowntimehistoryBackend->saveDowntime($Downtime);
             }
 
-            if ($Downtime->wasDowntimeStopped()) {
+            if ($Downtime->wasDowntimeStopped() || $Downtime->wasDowntimeDeleted()) {
                 //User delete the downtime or it is expired
                 $ScheduleddowntimeBackend->deleteDowntime($Downtime);
             } else {
-                if (!$Downtime->wasDowntimeDeleted()) {
+                if (!$Downtime->wasDowntimeDeleted() && !$Downtime->wasDowntimeDeleted()) {
                     //Filter delete event
                     $ScheduleddowntimeBackend->saveDowntime($Downtime);
                 }

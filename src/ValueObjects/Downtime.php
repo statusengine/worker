@@ -300,7 +300,11 @@ class Downtime implements DataStructInterface {
      * @return bool
      */
     public function wasCancelled(){
+        if($this->wasDowntimeDeleted()){
+            return true;
+        }
         return $this->attr === 2;
+
     }
 
     /**
