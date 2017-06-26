@@ -105,4 +105,6 @@ interface StorageBackend {
 
     public function getServiceScheduleddowntimeBackend();
 
+    public function monitoringengineWasRestarted();
+
 }

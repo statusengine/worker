@@ -20,6 +20,7 @@
 namespace Statusengine;
 
 
+use Statusengine\Config\WorkerConfig;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\StatisticCollector;
 
@@ -29,6 +30,7 @@ class ParentProcess {
      * @var ParentSignalHandler
      */
     private $ParentSignalHandler;
+
     /**
      * @var array
      */
@@ -55,6 +57,21 @@ class ParentProcess {
     private $Syslog;
 
     /**
+     * @var WorkerConfig
+     */
+    private $MonitoringRestartConfig;
+
+    /**
+     * @var GearmanWorker
+     */
+    private $MonitoringRestartWorker;
+
+    /**
+     * @var StorageBackend
+     */
+    private $StorageBackend;
+
+    /**
      * @var bool
      */
     private $checkForCommands;
@@ -67,12 +84,20 @@ class ParentProcess {
         StatisticCollector $StatisticCollector,
         Config $Config,
         TaskManager $TaskManager,
-        Syslog $Syslog
+        Syslog $Syslog,
+        $MonitoringRestartConfig,
+        StorageBackend $StorageBackend
     ) {
         $this->StatisticCollector = $StatisticCollector;
         $this->Config = $Config;
         $this->TaskManager = $TaskManager;
         $this->Syslog = $Syslog;
+        $this->MonitoringRestartConfig = $MonitoringRestartConfig;
+        $this->StorageBackend = $StorageBackend;
+
+        $this->MonitoringRestartWorker = new GearmanWorker($this->MonitoringRestartConfig, $Config);
+        $this->MonitoringRestartWorker->connect();
+
 
         $this->checkForCommands = $Config->checkForCommands();
     }
@@ -92,7 +117,15 @@ class ParentProcess {
                 $this->TaskManager->checkAndProcessTasks();
             }
 
-            sleep(1);
+            //Also replaces sleep(1)
+            $jobData = $this->MonitoringRestartWorker->getJob();
+            if ($jobData !== null) {
+                //Monitoring engine was restarted
+                if($jobData->object_type == 102){
+                    $this->Syslog->info('Catch monitoring restart. Trigger callbacks...');
+                    $this->StorageBackend->monitoringengineWasRestarted();
+                }
+            }
         }
     }
 

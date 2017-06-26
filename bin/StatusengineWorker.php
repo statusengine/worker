@@ -22,7 +22,7 @@ require_once __DIR__ . '/../bootstrap.php';
 
 $Config = new \Statusengine\Config();
 
-if($Config->getDisableHttpProxy()){
+if ($Config->getDisableHttpProxy()) {
     \Statusengine\ProxySettings::disableAllProxySettings();
 }
 
@@ -215,7 +215,15 @@ $StatisticCollector = new Statusengine\Redis\StatisticCollector(
 $QueryHandler = new \Statusengine\QueryHandler($Config, $Syslog);
 $ExternalCommandFile = new \Statusengine\ExternalCommandFile($Config, $Syslog);
 $TaskManager = new \Statusengine\TaskManager($Config, $StorageBackend, $QueryHandler, $ExternalCommandFile, $Syslog);
-$ParentProcess = new \Statusengine\ParentProcess($StatisticCollector, $Config, $TaskManager, $Syslog);
+$MonitoringRestartConfig = new Statusengine\Config\MonitoringRestart();
+$ParentProcess = new \Statusengine\ParentProcess(
+    $StatisticCollector,
+    $Config,
+    $TaskManager,
+    $Syslog,
+    $MonitoringRestartConfig,
+    $StorageBackend
+);
 foreach ($pids as $Pid) {
     $ParentProcess->addChildPid($Pid);
 }

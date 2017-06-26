@@ -541,4 +541,14 @@ class MySQL implements \Statusengine\StorageBackend {
         return new MysqlServiceScheduleddowntime($this, $this->nodeName);
     }
 
+    public function monitoringengineWasRestarted() {
+        $this->connect();
+        $Hoststatus = new MysqlHoststatus($this, $this->BulkInsertObjectStore, $this->nodeName);
+        $Hoststatus->truncate();
+
+        $Servicestatus = new MysqlServicestatus($this, $this->BulkInsertObjectStore, $this->nodeName);
+        $Servicestatus->truncate();
+        $this->disconnect();
+    }
+
 }

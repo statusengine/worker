@@ -625,4 +625,15 @@ class Crate implements \Statusengine\StorageBackend {
     public function getServiceScheduleddowntimeBackend() {
         return new CrateServiceScheduleddowntime($this, $this->nodeName);
     }
+
+    public function monitoringengineWasRestarted(){
+        $this->connect();
+        $Hoststatus = new CrateHoststatus($this, $this->BulkInsertObjectStore, $this->nodeName);
+        $Hoststatus->truncate();
+
+        $Servicestatus = new CrateServicestatus($this, $this->BulkInsertObjectStore, $this->nodeName);
+        $Servicestatus->truncate();
+        $this->disconnect();
+    }
+
 }
