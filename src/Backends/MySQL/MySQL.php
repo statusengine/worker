@@ -86,7 +86,7 @@ class MySQL implements \Statusengine\StorageBackend {
     public function getDsn() {
         $config = $this->Config->getMysqlConfig();
         return sprintf(
-            'mysql:host=%s:%s;dbname=%s',
+            'mysql:host=%s;port=%s;dbname=%s',
             $config['host'],
             $config['port'],
             $config['database']
