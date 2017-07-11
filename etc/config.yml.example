@@ -50,9 +50,9 @@ use_mysql: 0
 mysql:
     host: 127.0.0.1
     port: 3306
-    username: root
+    username: statusengine
     password: password
-    database: statusengine_data
+    database: statusengine
 
 # If Statusengine should save historical data to CrateDB
 # WARNING: Do not set use_crate and use_mysql to 1 at the same time!
@@ -110,7 +110,7 @@ number_misc_worker: 1
 # If statusengine should process performance data or not
 # 1 = yes
 # 0 = no
-process_perfdata: 1
+process_perfdata: 0
 
 # Number of worker processes for service check results
 # Target: You selected this at 'perfdata_backend' option
