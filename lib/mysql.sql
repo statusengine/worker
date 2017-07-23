@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS `statusengine_logentries` (
   `logentry_type` INT(11)      DEFAULT '0',
   `logentry_data` VARCHAR(255) DEFAULT NULL,
   `node_name`     VARCHAR(255) DEFAULT NULL,
-  KEY `logentries` (`entry_time`, `logentry_data`, `node_name`)
+  KEY `logentries` (`entry_time`, `logentry_data`, `node_name`),
+  KEY `logentry_data_time` (`logentry_data`, `entry_time`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
@@ -22,7 +23,8 @@ CREATE TABLE `statusengine_host_statehistory` (
   `last_state`            TINYINT(1) UNSIGNED DEFAULT 0,
   `last_hard_state`       TINYINT(1) UNSIGNED DEFAULT 0,
   `output`                VARCHAR(1024),
-  `long_output`           VARCHAR(8192)
+  `long_output`           VARCHAR(8192),
+  KEY `hostname_time` (`hostname`, `state_time`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -40,7 +42,9 @@ CREATE TABLE `statusengine_service_statehistory` (
   `last_state`            TINYINT(1) UNSIGNED DEFAULT 0,
   `last_hard_state`       TINYINT(1) UNSIGNED DEFAULT 0,
   `output`                VARCHAR(1024),
-  `long_output`           VARCHAR(8192)
+  `long_output`           VARCHAR(8192),
+  KEY `servicename_time` (`hostname`, `service_description`, `state_time`)
+
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -62,7 +66,8 @@ CREATE TABLE `statusengine_hostchecks` (
   `command`               VARCHAR(1024),
   `current_check_attempt` TINYINT(3) UNSIGNED DEFAULT 0,
   `max_check_attempts`    TINYINT(3) UNSIGNED DEFAULT 0,
-  `long_output`           VARCHAR(8192)
+  `long_output`           VARCHAR(8192),
+  KEY `times` (`start_time`, `end_time`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -84,7 +89,9 @@ CREATE TABLE `statusengine_servicechecks` (
   `command`               VARCHAR(1024),
   `current_check_attempt` TINYINT(3) UNSIGNED DEFAULT 0,
   `max_check_attempts`    TINYINT(3) UNSIGNED DEFAULT 0,
-  `long_output`           VARCHAR(8192)
+  `long_output`           VARCHAR(8192),
+  KEY `servicename` (`hostname`, `service_description`, `start_time`)
+
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -182,7 +189,9 @@ CREATE TABLE `statusengine_servicestatus` (
   `percent_state_change`          DOUBLE              DEFAULT 0,
   `event_handler`                 VARCHAR(255),
   `check_command`                 VARCHAR(255),
-  PRIMARY KEY (`hostname`, `service_description`)
+  PRIMARY KEY (`hostname`, `service_description`),
+  KEY `current_state_node` (`current_state`, `node_name`),
+  KEY `issues` (`problem_has_been_acknowledged`, `scheduled_downtime_depth`, `current_state`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -203,7 +212,9 @@ CREATE TABLE `statusengine_tasks` (
   `node_name`  VARCHAR(255),
   `entry_time` BIGINT(13) NOT NULL,
   `type`       VARCHAR(255),
-  `payload`    VARCHAR(8192)
+  `payload`    VARCHAR(8192),
+  KEY `node_name` (`node_name`),
+  KEY `uuid` (`uuid`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -220,7 +231,8 @@ CREATE TABLE `statusengine_host_notifications` (
   `reason_type`  TINYINT(1) UNSIGNED DEFAULT 0,
   `output`       VARCHAR(1024),
   `ack_author`   VARCHAR(255),
-  `ack_data`     VARCHAR(1024)
+  `ack_data`     VARCHAR(1024),
+  KEY `hostname` (`hostname`)
 
 )
   ENGINE = InnoDB
@@ -239,7 +251,8 @@ CREATE TABLE `statusengine_service_notifications` (
   `reason_type`         TINYINT(1) UNSIGNED DEFAULT 0,
   `output`              VARCHAR(1024),
   `ack_author`          VARCHAR(255),
-  `ack_data`            VARCHAR(1024)
+  `ack_data`            VARCHAR(1024),
+  KEY `servicename` (`hostname`, `service_description`)
 
 )
   ENGINE = InnoDB
@@ -255,7 +268,9 @@ CREATE TABLE `statusengine_host_acknowledgements` (
   `acknowledgement_type` TINYINT(1) UNSIGNED DEFAULT 0,
   `is_sticky`            TINYINT(1) UNSIGNED DEFAULT 0,
   `persistent_comment`   TINYINT(1) UNSIGNED DEFAULT 0,
-  `notify_contacts`      TINYINT(1) UNSIGNED DEFAULT 0
+  `notify_contacts`      TINYINT(1) UNSIGNED DEFAULT 0,
+  KEY `hostname` (`hostname`),
+  KEY `entry_time` (`entry_time`)
 
 )
   ENGINE = InnoDB
@@ -272,7 +287,9 @@ CREATE TABLE `statusengine_service_acknowledgements` (
   `acknowledgement_type` TINYINT(1) UNSIGNED DEFAULT 0,
   `is_sticky`            TINYINT(1) UNSIGNED DEFAULT 0,
   `persistent_comment`   TINYINT(1) UNSIGNED DEFAULT 0,
-  `notify_contacts`      TINYINT(1) UNSIGNED DEFAULT 0
+  `notify_contacts`      TINYINT(1) UNSIGNED DEFAULT 0,
+  KEY `servicename` (`hostname`, `service_description`),
+  KEY `entry_time` (`entry_time`)
 
 )
   ENGINE = InnoDB
@@ -281,7 +298,8 @@ CREATE TABLE `statusengine_service_acknowledgements` (
 
 CREATE TABLE `statusengine_users` (
   `username` VARCHAR(255),
-  `password` VARCHAR(255)
+  `password` VARCHAR(255),
+  KEY `username` (`username`, `password`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -381,4 +399,4 @@ CREATE TABLE IF NOT EXISTS `statusengine_dbversion` (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-INSERT INTO `statusengine_dbversion` (`id`, `dbversion`)VALUES(1, '3.0.0');
+INSERT INTO `statusengine_dbversion` (`id`, `dbversion`) VALUES (1, '3.0.0');
