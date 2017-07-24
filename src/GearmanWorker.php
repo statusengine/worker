@@ -43,6 +43,11 @@ class GearmanWorker {
     private $lastJobData;
 
     /**
+     * @var array
+     */
+    private $queues = [];
+
+    /**
      * GearmanWorker constructor.
      * @param WorkerConfig $WorkerConfig
      * @param Config $Config
@@ -50,8 +55,12 @@ class GearmanWorker {
     public function __construct($WorkerConfig, Config $Config) {
         $this->WorkerConfig = $WorkerConfig;
         $this->Config = $Config;
+        $this->addQueue($this->WorkerConfig);
     }
 
+    public function addQueue($WorkerConfig) {
+        $this->queues[] = $WorkerConfig->getQueueName();
+    }
 
     public function connect() {
         $config = $this->Config->getGearmanConfig();
@@ -60,7 +69,9 @@ class GearmanWorker {
         $this->worker->addOptions(GEARMAN_WORKER_NON_BLOCKING);
         $this->worker->addServer($config['address'], $config['port']);
         $this->worker->setTimeout($config['timeout']);
-        $this->worker->addFunction($this->WorkerConfig->getQueueName(), [$this, 'handleJob']);
+        foreach ($this->queues as $queue) {
+            $this->worker->addFunction($queue, [$this, 'handleJob']);
+        }
     }
 
     /**

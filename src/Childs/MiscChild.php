@@ -32,17 +32,7 @@ class MiscChild extends Child {
     /**
      * @var GearmanWorker
      */
-    private $NotificationGearmanWorker;
-
-    /**
-     * @var GearmanWorker
-     */
-    private $AcknowledgementGearmanWorker;
-
-    /**
-     * @var GearmanWorker
-     */
-    private $DowntimeGearmanWorker;
+    private $MiscGearmanWorker;
 
     /**
      * @var WorkerConfig
@@ -113,14 +103,10 @@ class MiscChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->NotificationGearmanWorker = new GearmanWorker($this->NotificationConfig, $Config);
-        $this->NotificationGearmanWorker->connect();
-
-        $this->AcknowledgementGearmanWorker = new GearmanWorker($this->AcknowledgementConfig, $Config);
-        $this->AcknowledgementGearmanWorker->connect();
-
-        $this->DowntimeGearmanWorker = new GearmanWorker($this->DowntimeConfig, $Config);
-        $this->DowntimeGearmanWorker->connect();
+        $this->MiscGearmanWorker = new GearmanWorker($this->NotificationConfig, $Config);
+        $this->MiscGearmanWorker->addQueue($this->AcknowledgementConfig);
+        $this->MiscGearmanWorker->addQueue($this->DowntimeConfig);
+        $this->MiscGearmanWorker->connect();
     }
 
 
@@ -134,9 +120,18 @@ class MiscChild extends Child {
         $this->StorageBackend->connect();
 
         while (true) {
-            $this->handleNotifications();
-            $this->handleAcknowledgements();
-            $this->handleDowntime();
+            $jobData = $this->MiscGearmanWorker->getJob();
+            if ($jobData !== null) {
+                if (property_exists($jobData, 'contactnotificationmethod')) {
+                    $this->handleNotifications($jobData);
+                }
+                if (property_exists($jobData, 'acknowledgement')) {
+                    $this->handleAcknowledgements($jobData);
+                }
+                if (property_exists($jobData, 'downtime')) {
+                    $this->handleDowntime($jobData);
+                }
+            }
 
             $this->StorageBackend->dispatch();
 
@@ -147,56 +142,58 @@ class MiscChild extends Child {
         }
     }
 
-    private function handleNotifications() {
-        $jobData = $this->NotificationGearmanWorker->getJob();
-        if ($jobData !== null) {
-            $Notification = new Notification($jobData);
-            if ($Notification->isValidNotification()) {
-                $this->StorageBackend->saveNotification(
-                    $Notification
-                );
-                $this->Statistics->increase();
-            }
-        }
-    }
-
-    private function handleAcknowledgements() {
-        $jobData = $this->AcknowledgementGearmanWorker->getJob();
-        if ($jobData !== null) {
-            $Acknowledgement = new Acknowledgement($jobData);
-            $this->StorageBackend->saveAcknowledgement(
-                $Acknowledgement
+    /**
+     * @param \stdClass $jobData
+     */
+    private function handleNotifications($jobData) {
+        $Notification = new Notification($jobData);
+        if ($Notification->isValidNotification()) {
+            $this->StorageBackend->saveNotification(
+                $Notification
             );
             $this->Statistics->increase();
         }
+
     }
 
-    private function handleDowntime() {
-        $jobData = $this->DowntimeGearmanWorker->getJob();
-        if ($jobData !== null) {
-            $Downtime = new \Statusengine\ValueObjects\Downtime($jobData);
+    /**
+     * @param \stdClass $jobData
+     */
+    private function handleAcknowledgements($jobData) {
+        $Acknowledgement = new Acknowledgement($jobData);
+        $this->StorageBackend->saveAcknowledgement(
+            $Acknowledgement
+        );
+        $this->Statistics->increase();
+    }
 
-            if ($Downtime->isHostDowntime()) {
-                $DowntimehistoryBackend = $this->StorageBackend->getHostDowntimehistoryBackend();
-                $ScheduleddowntimeBackend = $this->StorageBackend->getHostScheduleddowntimeBackend();
-            } else {
-                $DowntimehistoryBackend = $this->StorageBackend->getServiceDowntimehistoryBackend();
-                $ScheduleddowntimeBackend = $this->StorageBackend->getServiceScheduleddowntimeBackend();
-            }
+    /**
+     * @param \stdClass $jobData
+     */
+    private function handleDowntime($jobData) {
 
+        $Downtime = new \Statusengine\ValueObjects\Downtime($jobData);
+
+        if ($Downtime->isHostDowntime()) {
+            $DowntimehistoryBackend = $this->StorageBackend->getHostDowntimehistoryBackend();
+            $ScheduleddowntimeBackend = $this->StorageBackend->getHostScheduleddowntimeBackend();
+        } else {
+            $DowntimehistoryBackend = $this->StorageBackend->getServiceDowntimehistoryBackend();
+            $ScheduleddowntimeBackend = $this->StorageBackend->getServiceScheduleddowntimeBackend();
+        }
+
+        if (!$Downtime->wasDowntimeDeleted() && !$Downtime->wasDowntimeDeleted()) {
+            //Filter delete event
+            $DowntimehistoryBackend->saveDowntime($Downtime);
+        }
+
+        if ($Downtime->wasDowntimeStopped() || $Downtime->wasDowntimeDeleted()) {
+            //User delete the downtime or it is expired
+            $ScheduleddowntimeBackend->deleteDowntime($Downtime);
+        } else {
             if (!$Downtime->wasDowntimeDeleted() && !$Downtime->wasDowntimeDeleted()) {
                 //Filter delete event
-                $DowntimehistoryBackend->saveDowntime($Downtime);
-            }
-
-            if ($Downtime->wasDowntimeStopped() || $Downtime->wasDowntimeDeleted()) {
-                //User delete the downtime or it is expired
-                $ScheduleddowntimeBackend->deleteDowntime($Downtime);
-            } else {
-                if (!$Downtime->wasDowntimeDeleted() && !$Downtime->wasDowntimeDeleted()) {
-                    //Filter delete event
-                    $ScheduleddowntimeBackend->saveDowntime($Downtime);
-                }
+                $ScheduleddowntimeBackend->saveDowntime($Downtime);
             }
         }
     }
