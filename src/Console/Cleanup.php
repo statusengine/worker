@@ -271,7 +271,7 @@ class Cleanup extends Command {
     }
 
     private function cleanupPerfdata(InputInterface $input, OutputInterface $output) {
-        if ($this->Config->getAgePerfdata() === 0) {
+        if ($this->Config->getAgePerfdata() === 0 || $this->Config->isProcessPerfdataEnabled() === false) {
             $output->writeln('<cyan>Skipping perfdata records</cyan>');
             return;
         }
