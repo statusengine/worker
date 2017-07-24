@@ -109,7 +109,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
          * @var Statechange $Statechange
          */
 
-        $baseQuery = $this->buildQuery(sizeof($hostStatechangeCache), $this->baseValueHost, $this->baseQueryHost);
+        $baseQuery = $this->buildQueryString(sizeof($hostStatechangeCache), $this->baseValueHost, $this->baseQueryHost);
         $query = $this->MySQL->prepare($baseQuery);
 
         $i = 1;
@@ -147,7 +147,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
          * @var Statechange $Statechange
          */
 
-        $baseQuery = $this->buildQuery(sizeof($serviceStatechangeCache), $this->baseValueService, $this->baseQueryService);
+        $baseQuery = $this->buildQueryString(sizeof($serviceStatechangeCache), $this->baseValueService, $this->baseQueryService);
         $query = $this->MySQL->prepare($baseQuery);
 
         $i = 1;
@@ -182,7 +182,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
      * @param string $baseQuery
      * @return string
      */
-    public function buildQuery($numberOfObjects, $baseValue, $baseQuery) {
+    public function buildQueryString($numberOfObjects, $baseValue, $baseQuery) {
         $values = [];
         for ($i = 1; $i <= $numberOfObjects; $i++) {
             $values[] = $baseValue;

@@ -110,7 +110,7 @@ class CrateNotification extends CrateModel {
          * @var Notification $Notification
          */
 
-        $baseQuery = $this->buildQuery(sizeof($hostNotificationCache), $this->baseValueHost, $this->baseQueryHost);
+        $baseQuery = $this->buildQueryString(sizeof($hostNotificationCache), $this->baseValueHost, $this->baseQueryHost);
         $query = $this->CrateDB->prepare($baseQuery);
 
         $i = 1;
@@ -148,7 +148,7 @@ class CrateNotification extends CrateModel {
          * @var Notification $Notification
          */
 
-        $baseQuery = $this->buildQuery(sizeof($serviceNotificationCache), $this->baseValueService, $this->baseQueryService);
+        $baseQuery = $this->buildQueryString(sizeof($serviceNotificationCache), $this->baseValueService, $this->baseQueryService);
         $query = $this->CrateDB->prepare($baseQuery);
 
         $i = 1;
@@ -183,7 +183,7 @@ class CrateNotification extends CrateModel {
      * @param string $baseQuery
      * @return string
      */
-    public function buildQuery($numberOfObjects, $baseValue, $baseQuery) {
+    public function buildQueryString($numberOfObjects, $baseValue, $baseQuery) {
         $values = [];
         for ($i = 1; $i <= $numberOfObjects; $i++) {
             $values[] = $baseValue;
