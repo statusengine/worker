@@ -20,8 +20,7 @@
 namespace Statusengine\Config;
 class Perfdata implements WorkerConfig {
 
-    //todo change this to a perfdata only queue!
-    private $queueName = 'statusngin_ocsp';
+    private $queueName = 'statusngin_service_perfdata';
 
     public function getQueueName() {
         return $this->queueName;
