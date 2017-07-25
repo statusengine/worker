@@ -23,6 +23,7 @@ namespace Statusengine\Backends\PerfdataBackends;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Config;
 use Statusengine\Crate\Crate;
+use Statusengine\Mysql\MySQL;
 use Statusengine\Syslog;
 
 class PerfdataStorageBackends {
@@ -51,15 +52,19 @@ class PerfdataStorageBackends {
     /**
      * @return array with BackendObjects
      */
-    public function getBackends(){
+    public function getBackends() {
         $backends = [];
 
-        if($this->Config->isCratePerfdataBackend()){
+        if ($this->Config->isCratePerfdataBackend()) {
             $backends['crate'] = new Crate($this->Config, $this->BulkInsertObjectStore, $this->Syslog);
         }
 
-        if($this->Config->isGraphitePerfdataBackend()){
+        if ($this->Config->isGraphitePerfdataBackend()) {
             $backends['graphite'] = new GraphitePerfdata($this->Config, $this->Syslog);
+        }
+
+        if ($this->Config->isMysqlPerfdataBackend()) {
+            $backends['mysql'] = new MySQL($this->Config, $this->BulkInsertObjectStore, $this->Syslog);
         }
 
         return $backends;

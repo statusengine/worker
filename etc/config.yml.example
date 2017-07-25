@@ -46,6 +46,7 @@ store_live_data_in_archive_backend: 1
 # If Statusengine should save historical data to MySQL
 # WARNING: Do not set use_mysql and use_crate to 1 at the same time!
 use_mysql: 0
+
 # Configuration of your MySQL server
 mysql:
     host: 127.0.0.1
@@ -57,6 +58,7 @@ mysql:
 # If Statusengine should save historical data to CrateDB
 # WARNING: Do not set use_crate and use_mysql to 1 at the same time!
 use_crate: 1
+
 # Configuration of your CrateDB Cluster
 # This is an array of cluster nodes.
 #
@@ -121,6 +123,7 @@ number_perfdata_worker: 2
 perfdata_backend:
  - crate
 # - graphite
+# - mysql
 
 ############
 # GRAPHITE CONFIGURATION

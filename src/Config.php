@@ -146,12 +146,27 @@ class Config {
     /**
      * @return bool
      */
+    public function isMysqlPerfdataBackend() {
+        if (!isset($this->config['perfdata_backend']) || !is_array($this->config['perfdata_backend'])) {
+            return false;
+        }
+
+        return in_array('mysql', $this->config['perfdata_backend'], true);
+    }
+
+    /**
+     * @return bool
+     */
     public function isOnePerfdataBackendEnabled() {
         if ($this->isCratePerfdataBackend()) {
             return true;
         }
 
         if ($this->isGraphitePerfdataBackend()) {
+            return true;
+        }
+
+        if ($this->isMysqlPerfdataBackend()) {
             return true;
         }
 

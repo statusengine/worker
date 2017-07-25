@@ -26,6 +26,7 @@ use Statusengine\Mysql\SqlObjects\MySQLHostDowntimehistory;
 use Statusengine\Mysql\SqlObjects\MysqlHostScheduleddowntime;
 use Statusengine\Mysql\SqlObjects\MysqlHoststatus;
 use Statusengine\Mysql\SqlObjects\MysqlNotification;
+use Statusengine\Mysql\SqlObjects\MysqlPerfdata;
 use Statusengine\Mysql\SqlObjects\MysqlServiceAcknowledgement;
 use Statusengine\Mysql\SqlObjects\MysqlServiceDowntimehistory;
 use Statusengine\Mysql\SqlObjects\MysqlServiceScheduleddowntime;
@@ -37,6 +38,7 @@ use Statusengine\Mysql\SqlObjects\MysqlServicecheck;
 use Statusengine\Mysql\SqlObjects\MysqlStatechange;
 use Statusengine\Mysql\SqlObjects\MysqlTask;
 use Statusengine\Syslog;
+use Statusengine\ValueObjects\Gauge;
 use Statusengine\ValueObjects\NodeName;
 
 class MySQL implements \Statusengine\StorageBackend {
@@ -118,7 +120,7 @@ class MySQL implements \Statusengine\StorageBackend {
     /**
      * @param int $timeout in seconds
      */
-    public function setTimeout($timeout){
+    public function setTimeout($timeout) {
         $this->Connection->setAttribute(\PDO::ATTR_TIMEOUT, $timeout);
     }
 
@@ -139,11 +141,11 @@ class MySQL implements \Statusengine\StorageBackend {
      * @param null $startTime
      */
     public function saveNodeName($nodeName = null, $startTime = null) {
-        if($nodeName === null){
+        if ($nodeName === null) {
             $nodeName = $this->nodeName;
         }
 
-        if($startTime === null){
+        if ($startTime === null) {
             $startTime = time();
         }
 
@@ -166,7 +168,7 @@ class MySQL implements \Statusengine\StorageBackend {
     /**
      * @return array
      */
-    public function getNodes(){
+    public function getNodes() {
         $this->connect();
         $query = $this->Connection->prepare('SELECT * FROM statusengine_nodes ORDER BY node_name ASC');
 
@@ -178,7 +180,7 @@ class MySQL implements \Statusengine\StorageBackend {
         }
         $this->disconnect();
         $nodes = [];
-        foreach($result as $record){
+        foreach ($result as $record) {
             $nodes[] = NodeName::fromMysqlDb($record);
         }
         return $nodes;
@@ -187,7 +189,7 @@ class MySQL implements \Statusengine\StorageBackend {
     /**
      * @param string $nodeName
      */
-    public function deleteNodeByName($nodeName){
+    public function deleteNodeByName($nodeName) {
         $this->connect();
         $query = $this->Connection->prepare('DELETE FROM statusengine_nodes WHERE node_name=?');
         $query->bindValue(1, $nodeName);
@@ -234,6 +236,10 @@ class MySQL implements \Statusengine\StorageBackend {
 
                     case 'Statusengine\ValueObjects\Notification':
                         $MySQLSqlObject = new  MysqlNotification($this, $this->BulkInsertObjectStore);
+                        break;
+
+                    case 'Statusengine\ValueObjects\Gauge':
+                        $MySQLSqlObject = new  MysqlPerfdata($this, $this->BulkInsertObjectStore);
                         break;
                 }
                 $MySQLSqlObject->insert();
@@ -298,6 +304,18 @@ class MySQL implements \Statusengine\StorageBackend {
         $result = $TaskLoader->deleteTaskByUuids($uuids);
         $this->disconnect();
         return $result;
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deletePerfdataOlderThan($timestamp){
+        $query = $this->prepare(
+            'DELETE FROM statusengine_perfdata WHERE timestamp_unix < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
     }
 
     /**
@@ -375,6 +393,13 @@ class MySQL implements \Statusengine\StorageBackend {
             $MysqlAcknowledgementSaver = new MysqlServiceAcknowledgement($this, $Acknowledgement);
         }
         $MysqlAcknowledgementSaver->insert();
+    }
+
+    /**
+     * @param Gauge $Gauge
+     */
+    public function savePerfdata(Gauge $Gauge) {
+        $this->BulkInsertObjectStore->addObject($Gauge);
     }
 
     /**

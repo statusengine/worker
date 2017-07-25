@@ -1,5 +1,5 @@
-#!/usr/bin/php
 <?php
+
 /**
  * Statusengine Worker
  * Copyright (C) 2016-2017  Daniel Ziegler
@@ -18,19 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once __DIR__ . '/../bootstrap.php';
 
-use Symfony\Component\Console\Application;
-use Statusengine\Console\StatsOptions;
+namespace Statusengine\Backends\PerfdataBackends;
 
 
-$Config = new \Statusengine\Config();
-$Syslog = new \Statusengine\Syslog($Config);
+use Statusengine\Mysql\MysqlModel;
 
-$Redis = new Statusengine\Redis\Redis($Config, $Syslog);
-$Redis->connect();
+class MysqlPerfdata extends MysqlModel {
 
-$stats = $Redis->getHash('statusengine_statistics');
 
-debug($stats);
-
+}
