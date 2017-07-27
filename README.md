@@ -1,20 +1,23 @@
-# Alpha code
-This is alpha code! May be things are broken, not implemented or got removed with the stable version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License 3 for more details.
+# Statusengine Worker
+Statusengine Worker is a PHP application that will consume the events provided by the Statusengine Broker Module. 
+All status data are save in a database (CrateDB, MySQL or Redis) 
+In addition, the Worker is able to parse and process performance data to store them in a time series databases like Graphite. 
 
-# Requirements
+For External Command Routing, it is required to run Statusengine Worker on the same node as your monitoring core is running.
+
+Visit the [documentation](https://statusengine.org/) for more information about Statusengine Worker
+
+
+## Requirements
 - PHP's composer
 - CrateDB or MySQL
 - Redis
 - php >= 5.5.9
 - Ubuntu 14.04, 16.04 or 16.10
 
-# Install (Ubuntu 14.04)
+## Install (Ubuntu 14.04)
 ````
-apt-get install redis-server php5-redis git
+apt-get install redis-server php5-redis git php5-gearman
 
 mkdir -p /opt/statusengine
 cd /opt/statusengine
@@ -24,42 +27,29 @@ chmod +x worker/bin/*
 composer install
 ````
 
-# Config
+## Config
 ````
 cp worker/etc/config.yml.example worker/etc/config.yml
 ````
 Change `node_name` to a unique name in your monitoring cluster!
 
-# Add node to the cluster
+## Add node to the cluster
 ````
 php bin/Console.php cluster add --nodename NODENAME
 ````
 
-# Usage
+## Usage
 ````
 /opt/statusengine/worker/bin/StatusengineWorker.php
 ````
 
-# Proxy warnign
+## Proxy warnign
 If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/environment`!
 
-# Statusengine statistics
+## Statusengine statistics
 ````
 /opt/statusengine/worker/bin/bin/Console.php statistics --watch 5
 ````
-
-# ToDos
-* [x] Add Downtimes
-* [X] Add Acknowledgements
-* [x] Add Notifications
-* [x] Add Graphite
-* [x] Implement Query Error handling
-* [x] Add Syslog support
-* [ ] ~~More tests~~
-* [ ] init/systemd support
-* [x] Cronjob to cleanup database
-* [x] Delete old performance data records in CrateDB via cron
-* [x] Implement External Command File
 
 
 ### Delete node from the cluster

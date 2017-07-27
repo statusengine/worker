@@ -116,7 +116,7 @@ process_perfdata: 0
 
 # Number of worker processes for service check results
 # Target: You selected this at 'perfdata_backend' option
-number_perfdata_worker: 2
+number_perfdata_worker: 1
 
 # Uncomment to enable
 # You can enable as much backends as you want

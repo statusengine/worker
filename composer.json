@@ -1,9 +1,9 @@
 {
-  "name": "Statusengine Redis Worker",
+  "name": "Statusengine Worker",
   "description": "The missing event broker + responsive web frontend for Nagios and Naemon",
-  "version": "2",
+  "version": "3",
   "homepage": "https://statusengine.org/",
-  "license": "GPLv2",
+  "license": "GPLv3",
   "authors": [
     {
       "name": "Daniel Ziegler (nook24)",
