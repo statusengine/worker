@@ -53,6 +53,7 @@ class Redis {
 
         $config = $this->Config->getRedisConfig();
         $this->Redis->connect($config['address'], $config['port']);
+        $this->Redis->select($config['db']);
     }
 
     /**

@@ -241,7 +241,8 @@ class Config {
     public function getRedisConfig() {
         $config = [
             'address' => '127.0.0.1',
-            'port' => 6379
+            'port' => 6379,
+            'db' => 0
         ];
 
         if (isset($this->config['redis']['address'])) {
@@ -250,6 +251,10 @@ class Config {
 
         if (isset($this->config['redis']['port'])) {
             $config['port'] = $this->config['redis']['port'];
+        }
+
+        if (isset($this->config['redis']['db'])) {
+            $config['db'] = (int)$this->config['redis']['db'];
         }
 
         return $config;
