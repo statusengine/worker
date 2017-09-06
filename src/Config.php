@@ -157,6 +157,17 @@ class Config {
     /**
      * @return bool
      */
+    public function isElasticsearchPerfdataBackend() {
+        if (!isset($this->config['perfdata_backend']) || !is_array($this->config['perfdata_backend'])) {
+            return false;
+        }
+
+        return in_array('elasticsearch', $this->config['perfdata_backend'], true);
+    }
+
+    /**
+     * @return bool
+     */
     public function isOnePerfdataBackendEnabled() {
         if ($this->isCratePerfdataBackend()) {
             return true;
@@ -167,6 +178,10 @@ class Config {
         }
 
         if ($this->isMysqlPerfdataBackend()) {
+            return true;
+        }
+
+        if ($this->isElasticsearchPerfdataBackend()) {
             return true;
         }
 
@@ -495,6 +510,39 @@ class Config {
         $default = "statusengine";
         if (isset($this->config['graphite_prefix'])) {
             return (string)$this->config['graphite_prefix'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return string
+     */
+    public function getElasticsearchIndex() {
+        $default = 'statusengine-metric';
+        if (isset($this->config['elasticsearch_index'])) {
+            return (string)$this->config['elasticsearch_index'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return string
+     */
+    public function getElasticsearchAddress() {
+        $default = '127.0.0.1';
+        if (isset($this->config['elasticsearch_address'])) {
+            return (string)$this->config['elasticsearch_address'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getElasticsearchPort() {
+        $default = 9200;
+        if (isset($this->config['elasticsearch_port'])) {
+            return (int)$this->config['elasticsearch_port'];
         }
         return $default;
     }

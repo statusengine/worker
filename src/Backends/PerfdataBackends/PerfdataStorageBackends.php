@@ -67,6 +67,10 @@ class PerfdataStorageBackends {
             $backends['mysql'] = new MySQL($this->Config, $this->BulkInsertObjectStore, $this->Syslog);
         }
 
+        if ($this->Config->isElasticsearchPerfdataBackend()) {
+            $backends['elasticsearch'] = new ElasticsearchPerfdata($this->Config, $this->Syslog);
+        }
+
         return $backends;
     }
 

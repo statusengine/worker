@@ -125,6 +125,7 @@ perfdata_backend:
  - crate
 # - graphite
 # - mysql
+# - elasticsearch
 
 ############
 # GRAPHITE CONFIGURATION
@@ -144,6 +145,20 @@ graphite_port: 2003
 # Every characters in the key which not match the given regex
 # will be replace with an underscore _
 graphite_illegal_characters: /[^a-zA-Z^0-9\-\.]/
+
+############
+# ELASTICSEARCH CONFIGURATION
+############
+
+# Index that will be used to store data in Elasticsearch
+elasticsearch_index: statusengine-metric-
+
+# Set the ip address or hostname for your Elasticsearch system or cluster
+# Statusengine will use the HTTP API
+elasticsearch_address: 127.0.0.1
+
+# Port where your Elasticsearch server is listening to
+elasticsearch_port: 9200
 
 ############
 # COMMAND ROUTER CONFIGURATION
