@@ -78,7 +78,7 @@ class ElasticsearchPerfdata {
                 'index' => $this->index,
                 'type' => 'metric',
                 'body' => [
-                    'timestamp' => ($Gauge->getTimestamp() * 1000),
+                    '@timestamp' => ($Gauge->getTimestamp() * 1000),
                     'value' => $Gauge->getValue(),
                     'hostname' => $Gauge->getHostName(),
                     'service_description' => $Gauge->getServiceDescription(),
