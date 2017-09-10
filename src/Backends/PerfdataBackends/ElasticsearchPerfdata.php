@@ -180,10 +180,10 @@ class ElasticsearchPerfdata {
                         'mappings' => [
                             '_default_' => [
                                 '_all' => [
-                                    'enabled' => 'false'
+                                    'enabled' => $tempalteConfig['enable_all']
                                 ],
                                 '_source' => [
-                                    'enabled' => 'true'
+                                    'enabled' => $tempalteConfig['enable_source']
                                 ]
                             ],
                             'metric' => [
