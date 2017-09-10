@@ -20,6 +20,7 @@
 namespace Statusengine\Backends\PerfdataBackends;
 
 use Elasticsearch\ClientBuilder;
+use Statusengine\BulkInsertObjectStore;
 use Statusengine\Config;
 use Statusengine\Syslog;
 use Statusengine\ValueObjects\Gauge;
@@ -51,6 +52,16 @@ class ElasticsearchPerfdata {
      */
     private $index;
 
+    /**
+     * @var string
+     */
+    private $pattern;
+
+    /**
+     * @var BulkInsertObjectStore
+     */
+    private $BulkInsertObjectStore;
+
 
     /**
      * GraphitePerfdata constructor.
@@ -64,6 +75,13 @@ class ElasticsearchPerfdata {
         $this->address = $this->Config->getElasticsearchAddress();
         $this->port = $this->Config->getElasticsearchPort();
         $this->index = $this->Config->getElasticsearchIndex();
+        $this->pattern = $this->Config->getElasticsearchPattern();
+
+        $BulkConfig = $this->Config->getBulkSettings();
+        $this->BulkInsertObjectStore = new BulkInsertObjectStore(
+            $BulkConfig['max_bulk_delay'],
+            $BulkConfig['number_of_bulk_records']
+        );
     }
 
     /**
@@ -71,27 +89,19 @@ class ElasticsearchPerfdata {
      * @return bool
      */
     public function savePerfdata(Gauge $Gauge) {
-        try {
-            $Client = ClientBuilder::create()->setHosts($this->getHosts())->build();
-
-            $data = [
-                'index' => $this->index,
-                'type' => 'metric',
-                'body' => [
-                    '@timestamp' => ($Gauge->getTimestamp() * 1000),
-                    'value' => $Gauge->getValue(),
-                    'hostname' => $Gauge->getHostName(),
-                    'service_description' => $Gauge->getServiceDescription(),
-                    'metric' => $Gauge->getLabel()
-                ]
-            ];
-
-            $response = $Client->index($data);
-        } catch (\Exception $e) {
-            $this->Syslog->error('Elasticsearch error!');
-            $this->Syslog->error($e->getMessage());
-        }
-
+        $this->BulkInsertObjectStore->addObject([
+            'index' => [
+                '_index' => $this->getIndex(),
+                '_type' => 'metric',
+            ],
+            [
+                '@timestamp' => ($Gauge->getTimestamp() * 1000),
+                'value' => $Gauge->getValue(),
+                'hostname' => $Gauge->getHostName(),
+                'service_description' => $Gauge->getServiceDescription(),
+                'metric' => $Gauge->getLabel()
+            ]
+        ]);
         return true;
     }
 
@@ -103,9 +113,111 @@ class ElasticsearchPerfdata {
     }
 
     /**
+     * @param null|int $timestamp
+     * @return string
+     */
+    private function getIndex($timestamp = null) {
+        return sprintf('%s%s', $this->index, $this->parsePattern($timestamp));
+    }
+
+    /**
+     * @param null|int $timestamp
+     * @return string
+     */
+    private function parsePattern($timestamp = null) {
+        if ($timestamp === null) {
+            $timestamp = time();
+        }
+
+        if ($this->pattern === 'none') {
+            return '';
+        }
+
+        switch ($this->pattern) {
+            case 'daily':
+                return date('Y.m.d', $timestamp);
+            case 'weekly':
+                return date('W', $timestamp);
+            case 'monthly':
+                return date('Y.m', $timestamp);
+            default:
+                return '';
+        }
+    }
+
+    /**
      * @return true
      */
     public function connect() {
+        try {
+
+            //Fix forks
+            usleep(rand(100000, 250000));
+
+            $tempalteConfig = $this->Config->getElasticsearchTemplate();
+            $Client = ClientBuilder::create()->setHosts($this->getHosts())->build();
+
+            $templateExists = $Client->indices()->existsTemplate([
+                'name' => $tempalteConfig['name']
+            ]);
+
+            if ($templateExists === false) {
+                $this->Syslog->info('Elasticsearch index template missing - I will create it');
+
+                $Client->indices()->putTemplate([
+                    'name' => $tempalteConfig['name'],
+                    'create' => false,
+                    'body' => [
+                        'template' => sprintf('%s*', $this->index),
+                        'settings' => [
+                            'number_of_shards' => $tempalteConfig['number_of_shards'],
+                            'number_of_replicas' => $tempalteConfig['number_of_replicas'],
+                            'refresh_interval' => $tempalteConfig['refresh_interval'],
+                            'codec' => $tempalteConfig['codec'],
+                            'mapper.dynamic' => false
+
+                        ],
+                        'mappings' => [
+                            '_default_' => [
+                                '_all' => [
+                                    'enabled' => 'false'
+                                ],
+                                '_source' => [
+                                    'enabled' => 'true'
+                                ]
+                            ],
+                            'metric' => [
+                                'properties' => [
+                                    '@timestamp' => [
+                                        'type' => 'date'
+                                    ],
+                                    'value' => [
+                                        'type' => 'double',
+                                        'index' => 'no'
+                                    ],
+                                    'hostname' => [
+                                        'type' => 'string',
+                                        'index' => 'not_analyzed'
+                                    ],
+                                    'service_description' => [
+                                        'type' => 'string',
+                                        'index' => 'not_analyzed'
+                                    ],
+                                    'metric' => [
+                                        'type' => 'string',
+                                        'index' => 'not_analyzed'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->Syslog->error('Elasticsearch error!');
+            $this->Syslog->error($e->getMessage());
+        }
+
         return true;
     }
 
@@ -114,6 +226,22 @@ class ElasticsearchPerfdata {
      * @return true
      */
     public function dispatch() {
+        if ($this->BulkInsertObjectStore->hasRaisedTimeout()) {
+            $bulkData = $this->BulkInsertObjectStore->getObjects();
+            $this->BulkInsertObjectStore->reset();
+            try {
+                $Client = ClientBuilder::create()->setHosts($this->getHosts())->build();
+
+                $response = $Client->bulk([
+                    'body' => $bulkData
+                ]);
+            } catch (\Exception $e) {
+                $this->Syslog->error('Elasticsearch error!');
+                $this->Syslog->error($e->getMessage());
+            }
+
+
+        }
         return true;
     }
 
@@ -122,6 +250,43 @@ class ElasticsearchPerfdata {
      * @return bool
      */
     public function deletePerfdataOlderThan($timestamp) {
+        if ($this->pattern === 'none') {
+            return true;
+        }
+
+        $Client = ClientBuilder::create()->setHosts($this->getHosts())->build();
+        try {
+            $allIndices = $Client->indices()->get([
+                'index' => sprintf('%s*', $this->index)
+            ]);
+
+            if (empty($allIndices)) {
+                return true;
+            }
+
+            foreach ($allIndices as $indexName => $index) {
+                //Is this index older than allowed by age_perfdata?
+                if ($index['settings']['index']['creation_date'] < $timestamp) {
+                    $Client->indices()->delete([
+                        'index' => $indexName
+                    ]);
+                }
+
+            }
+
+        } catch (\Exception $e) {
+            $this->Syslog->error($e->getMessage());
+        }
+        return true;
+
+        $indexToCheck = $this->getIndex();
+        $indexExists = $Client->indices()->exists(['index' => $indexToCheck]);
+        if ($indexExists) {
+            $indexData =
+                debug($indexData);
+        }
+
+
         return true;
     }
 

@@ -528,6 +528,67 @@ class Config {
     /**
      * @return string
      */
+    public function getElasticsearchPattern() {
+        $default = 'none';
+        $patterns = [
+            'none',
+            'daily',
+            'weekly',
+            'monthly'
+        ];
+        if (isset($this->config['elasticsearch_pattern'])) {
+            if (in_array($this->config['elasticsearch_pattern'], $patterns, true)) {
+                return $this->config['elasticsearch_pattern'];
+            }
+        }
+        return $default;
+    }
+
+    /**
+     * @return array
+     */
+    public function getElasticsearchTemplate() {
+        $defaults = [
+            'name' => 'statusengine-metric',
+            'number_of_shards' => 1,
+            'number_of_replicas' => 0,
+            'refresh_interval' => '15s',
+            'codec' => 'best_compression',
+            'enable_all' => 0,
+            'enable_source' => 1
+        ];
+
+        if (!isset($this->config['elasticsearch_template']) || !is_array($this->config['elasticsearch_template'])) {
+            return $defaults;
+        }
+
+
+        $config = [];
+        foreach ($defaults as $key => $defaultValue) {
+            if (!isset($this->config['elasticsearch_template'][$key])) {
+                $config[$key] = $defaultValue;
+                continue;
+            }
+
+            //Use config value
+            $config[$key] = $this->config['elasticsearch_template'][$key];
+
+            //Replace integers
+            if (in_array($key, ['number_of_shards', 'number_of_replicas'], true)) {
+                $config[$key] = (int)$this->config['elasticsearch_template'][$key];
+            }
+
+            //Replace booleans
+            if (in_array($key, ['enable_all', 'enable_source'], true)) {
+                $config[$key] = (bool)$this->config['elasticsearch_template'][$key];
+            }
+        }
+        return $config;
+    }
+
+    /**
+     * @return string
+     */
     public function getElasticsearchAddress() {
         $default = '127.0.0.1';
         if (isset($this->config['elasticsearch_address'])) {
