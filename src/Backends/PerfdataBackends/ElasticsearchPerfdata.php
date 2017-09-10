@@ -137,7 +137,7 @@ class ElasticsearchPerfdata {
             case 'daily':
                 return date('Y.m.d', $timestamp);
             case 'weekly':
-                return date('W', $timestamp);
+                return date('Y.W', $timestamp);
             case 'monthly':
                 return date('Y.m', $timestamp);
             default:
