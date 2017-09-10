@@ -278,16 +278,6 @@ class ElasticsearchPerfdata {
             $this->Syslog->error($e->getMessage());
         }
         return true;
-
-        $indexToCheck = $this->getIndex();
-        $indexExists = $Client->indices()->exists(['index' => $indexToCheck]);
-        if ($indexExists) {
-            $indexData =
-                debug($indexData);
-        }
-
-
-        return true;
     }
 
 }
