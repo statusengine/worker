@@ -178,7 +178,7 @@ elasticsearch_index: statusengine-metric-
 # index: statusengine-metric-
 #
 # Available patterns:
-# - none     => All data in one index, this will also disable the data clenup for Elasticsearch
+# - none     => All data in one index, this will also disable deletion of old records!
 # - daily    => statusengine-metric-YYYY.MM.DD
 # - weekly   => statusengine-metric-GGGG.WW
 # - monthly  => statusengine-metric-YYYY.MM
@@ -292,8 +292,11 @@ age_tasks: 1
 # - CrateDB
 # - MySQL
 # - Elasticsearch
+#    If you use Elasticsearch, don't set this value to less that your pattern is
+#    e.g.: daily => 2, weekly => 8, monthly => 32
+#    If your pattern is set to none, deletion of old records is disabled!
 #
-# Other backends to this by them self:
+# Other backends to this by them self, so the age_perfdata value has no effect:
 # - Graphite
 age_perfdata: 90
 
