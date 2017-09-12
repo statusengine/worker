@@ -93,15 +93,17 @@ class ElasticsearchPerfdata {
             'index' => [
                 '_index' => $this->getIndex(),
                 '_type' => 'metric',
-            ],
-            [
-                '@timestamp' => ($Gauge->getTimestamp() * 1000),
-                'value' => $Gauge->getValue(),
-                'hostname' => $Gauge->getHostName(),
-                'service_description' => $Gauge->getServiceDescription(),
-                'metric' => $Gauge->getLabel()
             ]
         ]);
+
+        $this->BulkInsertObjectStore->addObject([
+            '@timestamp' => ($Gauge->getTimestamp() * 1000),
+            'value' => $Gauge->getValue(),
+            'hostname' => $Gauge->getHostName(),
+            'service_description' => $Gauge->getServiceDescription(),
+            'metric' => $Gauge->getLabel()
+        ]);
+
         return true;
     }
 
@@ -231,10 +233,7 @@ class ElasticsearchPerfdata {
             $this->BulkInsertObjectStore->reset();
             try {
                 $Client = ClientBuilder::create()->setHosts($this->getHosts())->build();
-
-                $response = $Client->bulk([
-                    'body' => $bulkData
-                ]);
+                $response = $Client->bulk(['body' => $bulkData]);
             } catch (\Exception $e) {
                 $this->Syslog->error('Elasticsearch error!');
                 $this->Syslog->error($e->getMessage());
