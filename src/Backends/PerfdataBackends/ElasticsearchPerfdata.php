@@ -22,6 +22,7 @@ namespace Statusengine\Backends\PerfdataBackends;
 use Elasticsearch\ClientBuilder;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Config;
+use Statusengine\Elasticsearch\Template;
 use Statusengine\Syslog;
 use Statusengine\ValueObjects\Gauge;
 
@@ -165,55 +166,8 @@ class ElasticsearchPerfdata {
 
             if ($templateExists === false) {
                 $this->Syslog->info('Elasticsearch index template missing - I will create it');
-
-                $Client->indices()->putTemplate([
-                    'name' => $tempalteConfig['name'],
-                    'create' => false,
-                    'body' => [
-                        'template' => sprintf('%s*', $this->index),
-                        'settings' => [
-                            'number_of_shards' => $tempalteConfig['number_of_shards'],
-                            'number_of_replicas' => $tempalteConfig['number_of_replicas'],
-                            'refresh_interval' => $tempalteConfig['refresh_interval'],
-                            'codec' => $tempalteConfig['codec'],
-                            'mapper.dynamic' => false
-
-                        ],
-                        'mappings' => [
-                            '_default_' => [
-                                '_all' => [
-                                    'enabled' => $tempalteConfig['enable_all']
-                                ],
-                                '_source' => [
-                                    'enabled' => $tempalteConfig['enable_source']
-                                ]
-                            ],
-                            'metric' => [
-                                'properties' => [
-                                    '@timestamp' => [
-                                        'type' => 'date'
-                                    ],
-                                    'value' => [
-                                        'type' => 'double',
-                                        'index' => 'no'
-                                    ],
-                                    'hostname' => [
-                                        'type' => 'string',
-                                        'index' => 'not_analyzed'
-                                    ],
-                                    'service_description' => [
-                                        'type' => 'string',
-                                        'index' => 'not_analyzed'
-                                    ],
-                                    'metric' => [
-                                        'type' => 'string',
-                                        'index' => 'not_analyzed'
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]);
+                $Template = new Template($this->Config, $this->index);
+                $Client->indices()->putTemplate($Template->getTemplate());
             }
         } catch (\Exception $e) {
             $this->Syslog->error('Elasticsearch error!');
