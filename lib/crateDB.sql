@@ -344,4 +344,4 @@ create table statusengine_dbversion (
 ) CLUSTERED INTO 1 shards with (number_of_replicas = '1-all');
 
 
-INSERT INTO statusengine_dbversion (id, dbversion)VALUES(1, '3.0.0');
+INSERT INTO statusengine_dbversion (id, dbversion)VALUES(1, '3.1.0');
