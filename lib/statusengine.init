@@ -24,8 +24,8 @@
 set -e
 set -u
 i=0
-DAEMON="/opt/statusengine/worker/bin/StatusengineWorker.php"
-DAEMON_OPTS=""
+DAEMON="/usr/bin/php"
+DAEMON_OPTS="/opt/statusengine/worker/bin/StatusengineWorker.php"
 PIDFILE=/var/run/statusengine_worker.pid
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
