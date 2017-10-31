@@ -18,7 +18,7 @@
  */
 
 
-define('STATUSENGINE_WORKER_VERSION', '3.1.0');
+define('STATUSENGINE_WORKER_VERSION', '3.2.0');
 define('DS', DIRECTORY_SEPARATOR);
 
 require_once __DIR__ . DS . 'vendor' . DS . 'autoload.php';

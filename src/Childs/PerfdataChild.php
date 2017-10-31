@@ -105,6 +105,9 @@ class PerfdataChild extends Child {
                     unset($PerfdataParser);
 
                     foreach ($Perfdata as $label => $gaugeRaw) {
+                        if(!is_numeric($gaugeRaw['current'])){
+                            continue;
+                        }
                         $Gauge = new Gauge(
                             $PerfdataRaw->getHostName(),
                             $PerfdataRaw->getServiceDescription(),

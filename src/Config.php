@@ -157,6 +157,17 @@ class Config {
     /**
      * @return bool
      */
+    public function isElasticsearchPerfdataBackend() {
+        if (!isset($this->config['perfdata_backend']) || !is_array($this->config['perfdata_backend'])) {
+            return false;
+        }
+
+        return in_array('elasticsearch', $this->config['perfdata_backend'], true);
+    }
+
+    /**
+     * @return bool
+     */
     public function isOnePerfdataBackendEnabled() {
         if ($this->isCratePerfdataBackend()) {
             return true;
@@ -167,6 +178,10 @@ class Config {
         }
 
         if ($this->isMysqlPerfdataBackend()) {
+            return true;
+        }
+
+        if ($this->isElasticsearchPerfdataBackend()) {
             return true;
         }
 
@@ -495,6 +510,100 @@ class Config {
         $default = "statusengine";
         if (isset($this->config['graphite_prefix'])) {
             return (string)$this->config['graphite_prefix'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return string
+     */
+    public function getElasticsearchIndex() {
+        $default = 'statusengine-metric';
+        if (isset($this->config['elasticsearch_index'])) {
+            return (string)$this->config['elasticsearch_index'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return string
+     */
+    public function getElasticsearchPattern() {
+        $default = 'none';
+        $patterns = [
+            'none',
+            'daily',
+            'weekly',
+            'monthly'
+        ];
+        if (isset($this->config['elasticsearch_pattern'])) {
+            if (in_array($this->config['elasticsearch_pattern'], $patterns, true)) {
+                return $this->config['elasticsearch_pattern'];
+            }
+        }
+        return $default;
+    }
+
+    /**
+     * @return array
+     */
+    public function getElasticsearchTemplate() {
+        $defaults = [
+            'name' => 'statusengine-metric',
+            'number_of_shards' => 1,
+            'number_of_replicas' => 0,
+            'refresh_interval' => '15s',
+            'codec' => 'best_compression',
+            'enable_all' => 0,
+            'enable_source' => 1
+        ];
+
+        if (!isset($this->config['elasticsearch_template']) || !is_array($this->config['elasticsearch_template'])) {
+            return $defaults;
+        }
+
+
+        $config = [];
+        foreach ($defaults as $key => $defaultValue) {
+            if (!isset($this->config['elasticsearch_template'][$key])) {
+                $config[$key] = $defaultValue;
+                continue;
+            }
+
+            //Use config value
+            $config[$key] = $this->config['elasticsearch_template'][$key];
+
+            //Replace integers
+            if (in_array($key, ['number_of_shards', 'number_of_replicas'], true)) {
+                $config[$key] = (int)$this->config['elasticsearch_template'][$key];
+            }
+
+            //Replace booleans
+            if (in_array($key, ['enable_all', 'enable_source'], true)) {
+                $config[$key] = (bool)$this->config['elasticsearch_template'][$key];
+            }
+        }
+        return $config;
+    }
+
+    /**
+     * @return string
+     */
+    public function getElasticsearchAddress() {
+        $default = '127.0.0.1';
+        if (isset($this->config['elasticsearch_address'])) {
+            return (string)$this->config['elasticsearch_address'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getElasticsearchPort() {
+        $default = 9200;
+        if (isset($this->config['elasticsearch_port'])) {
+            return (int)$this->config['elasticsearch_port'];
         }
         return $default;
     }

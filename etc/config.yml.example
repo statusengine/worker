@@ -73,8 +73,10 @@ crate:
 
 # Performance settings
 # How many records get inserted in one statement
+# This value effects: CrateDB, MySQL and Elasticsearch
 number_of_bulk_records: 1000
 # Timeout in seconds Statusengine will wait that number_of_bulk_records is reached until a flush get forced
+# This value effects: CrateDB, MySQL and Elasticsearch
 max_bulk_delay: 5
 
 # Number of worker processes for service status records
@@ -125,6 +127,7 @@ perfdata_backend:
  - crate
 # - graphite
 # - mysql
+# - elasticsearch
 
 ############
 # GRAPHITE CONFIGURATION
@@ -144,6 +147,49 @@ graphite_port: 2003
 # Every characters in the key which not match the given regex
 # will be replace with an underscore _
 graphite_illegal_characters: /[^a-zA-Z^0-9\-\.]/
+
+############
+# ELASTICSEARCH CONFIGURATION
+############
+
+# Statusengine will create an index template to store performance data to
+# Elasticsearch.
+# The template is hardcoded and will be managed by Statusengine
+# automatically. How ever, you can still change
+# important settings.
+# If you change any template settings, you need to do this
+# BEFORE THE FIRST start of Statusengine Worker,
+# or you need to delete/edit the old template manually via Elasticsearch API
+elasticsearch_template:
+  name: statusengine-metric
+  number_of_shards: 2
+  number_of_replicas: 0
+  refresh_interval: 15s
+  codec: best_compression
+  enable_all: 0
+  enable_source: 1
+
+# Index that will be used to store data in Elasticsearch
+elasticsearch_index: statusengine-metric-
+
+# The value of elasticsearch_pattern will be added to the end of your
+# defiend elasticsearch_index. It is recommended to terminate
+# your elasticsearch_index with an dash, like the example
+# index: statusengine-metric-
+#
+# Available patterns:
+# - none     => All data in one index, this will also disable deletion of old records!
+# - daily    => statusengine-metric-YYYY.MM.DD
+# - weekly   => statusengine-metric-GGGG.WW
+# - monthly  => statusengine-metric-YYYY.MM
+elasticsearch_pattern: daily
+
+# Set the ip address or hostname for your Elasticsearch system or cluster
+# Statusengine will use the HTTP API
+elasticsearch_address: 127.0.0.1
+
+# Port where your Elasticsearch server is listening to
+elasticsearch_port: 9200
 
 ############
 # COMMAND ROUTER CONFIGURATION
@@ -242,8 +288,16 @@ age_logentries: 5
 # How long should unprocessed task in Statusengine's task queue be stored
 age_tasks: 1
 
-# For some perfdata backends, Statusengine is able to cleanup the database (CrateDB for example)
-# Other backends to this by them self (Graphite for example)
+# For some perfdata backends, Statusengine is able to cleanup the database:
+# - CrateDB
+# - MySQL
+# - Elasticsearch
+#    If you use Elasticsearch, don't set this value to less that your pattern is
+#    e.g.: daily => 2, weekly => 8, monthly => 32
+#    If your pattern is set to none, deletion of old records is disabled!
+#
+# Other backends to this by them self, so the age_perfdata value has no effect:
+# - Graphite
 age_perfdata: 90
 
 ############
