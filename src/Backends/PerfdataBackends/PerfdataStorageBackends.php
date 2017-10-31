@@ -41,11 +41,19 @@ class PerfdataStorageBackends {
     /**
      * @var BulkInsertObjectStore
      */
-    private $BulkInsertObjectStore;
+    private $MySQLBulkInsertObjectStore;
+
+    /**
+     * @var BulkInsertObjectStore
+     */
+    private $CrateBulkInsertObjectStore;
 
     public function __construct(Config $Config, BulkInsertObjectStore $BulkInsertObjectStore, Syslog $Syslog) {
         $this->Config = $Config;
-        $this->BulkInsertObjectStore = $BulkInsertObjectStore;
+
+        // todo remove clone, don't know how smart this is...
+        $this->MySQLBulkInsertObjectStore = clone $BulkInsertObjectStore;
+        $this->CrateBulkInsertObjectStore = clone $BulkInsertObjectStore;
         $this->Syslog = $Syslog;
     }
 
@@ -56,7 +64,7 @@ class PerfdataStorageBackends {
         $backends = [];
 
         if ($this->Config->isCratePerfdataBackend()) {
-            $backends['crate'] = new Crate($this->Config, $this->BulkInsertObjectStore, $this->Syslog);
+            $backends['crate'] = new Crate($this->Config, $this->CrateBulkInsertObjectStore, $this->Syslog);
         }
 
         if ($this->Config->isGraphitePerfdataBackend()) {
@@ -64,7 +72,7 @@ class PerfdataStorageBackends {
         }
 
         if ($this->Config->isMysqlPerfdataBackend()) {
-            $backends['mysql'] = new MySQL($this->Config, $this->BulkInsertObjectStore, $this->Syslog);
+            $backends['mysql'] = new MySQL($this->Config, $this->MySQLBulkInsertObjectStore, $this->Syslog);
         }
 
         if ($this->Config->isElasticsearchPerfdataBackend()) {
