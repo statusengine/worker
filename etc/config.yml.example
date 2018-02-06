@@ -67,7 +67,7 @@ use_crate: 1
 # So you will have a single ip address where Statusengine is going to connect to
 crate:
   nodes:
-    - 172.0.0.1:4200
+    - 127.0.0.1:4200
 #    - 192.168.56.101:4200
 #    - 192.168.56.102:4200
 
