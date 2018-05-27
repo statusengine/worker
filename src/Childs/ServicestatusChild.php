@@ -20,6 +20,8 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\ValueObjects\Servicestatus;
 use Statusengine\Redis\Statistics;
@@ -27,9 +29,9 @@ use Statusengine\Redis\Statistics;
 class ServicestatusChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $ServicetatusGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -82,6 +84,11 @@ class ServicestatusChild extends Child {
     private $Syslog;
 
     /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
+
+    /**
      * ServicestatusChild constructor.
      * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
@@ -112,8 +119,9 @@ class ServicestatusChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->ServicetatusGearmanWorker = new GearmanWorker($this->ServicestatusConfig, $Config);
-        $this->ServicetatusGearmanWorker->connect();
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->ServicestatusConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
 
         $this->ServicestatusRedis = new \Statusengine\Redis\Redis($Config, $this->Syslog);
         $this->ServicestatusRedis->connect();
@@ -135,7 +143,7 @@ class ServicestatusChild extends Child {
         }
 
         while (true) {
-            $jobData = $this->ServicetatusGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $Servicestatus = new Servicestatus($jobData);
 

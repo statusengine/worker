@@ -20,6 +20,8 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Logentry;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
@@ -27,9 +29,9 @@ use Statusengine\Redis\Statistics;
 class LogentryChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $LogentryGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -56,6 +58,10 @@ class LogentryChild extends Child {
      */
     private $StorageBackend;
 
+    /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
 
     /**
      * HoststatusChild constructor.
@@ -76,8 +82,9 @@ class LogentryChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->LogentryGearmanWorker = new GearmanWorker($this->LogentryConfig, $Config);
-        $this->LogentryGearmanWorker->connect();
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->LogentryConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
     }
 
 
@@ -91,7 +98,7 @@ class LogentryChild extends Child {
         $this->StorageBackend->connect();
 
         while (true) {
-            $jobData = $this->LogentryGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $Logentry = new Logentry($jobData);
                 $this->StorageBackend->saveLogentry(

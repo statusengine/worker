@@ -784,4 +784,28 @@ class Config {
         return $default;
     }
 
+    /**
+     * @return bool
+     */
+    public function isGearmanEnabled() {
+        $default = true;
+        if (isset($this->config['use_gearman'])) {
+            return (bool)$this->config['use_gearman'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRabbitMqEnabled() {
+        $default = false;
+        if (isset($this->config['use_rabbitmq'])) {
+            return (bool)$this->config['use_rabbitmq'];
+        }
+        return $default;
+    }
+
+
+
 }

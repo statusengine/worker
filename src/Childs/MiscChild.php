@@ -21,6 +21,7 @@ namespace Statusengine;
 
 use Statusengine\Config\Downtime;
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
 use Statusengine\ValueObjects\Acknowledgement;
 use Statusengine\ValueObjects\Notification;
 use Statusengine\ValueObjects\Pid;
@@ -30,9 +31,9 @@ use Statusengine\Redis\Statistics;
 class MiscChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueingEngines\QueueInterface
      */
-    private $MiscGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -70,6 +71,11 @@ class MiscChild extends Child {
     private $StorageBackend;
 
     /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
+
+    /**
      * MiscChild constructor.
      * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
@@ -103,10 +109,12 @@ class MiscChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->MiscGearmanWorker = new GearmanWorker($this->NotificationConfig, $Config);
-        $this->MiscGearmanWorker->addQueue($this->AcknowledgementConfig);
-        $this->MiscGearmanWorker->addQueue($this->DowntimeConfig);
-        $this->MiscGearmanWorker->connect();
+
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->NotificationConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->addQueue($this->AcknowledgementConfig);
+        $this->Queue->addQueue($this->DowntimeConfig);
+        $this->Queue->connect();
     }
 
 
@@ -120,7 +128,7 @@ class MiscChild extends Child {
         $this->StorageBackend->connect();
 
         while (true) {
-            $jobData = $this->MiscGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 if (property_exists($jobData, 'contactnotificationmethod')) {
                     $this->handleNotifications($jobData);

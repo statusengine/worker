@@ -20,8 +20,9 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueInterface;
 
-class GearmanWorker {
+class GearmanWorker implements QueueInterface {
     /**
      * @var WorkerConfig
      */
@@ -52,13 +53,13 @@ class GearmanWorker {
      * @param WorkerConfig $WorkerConfig
      * @param Config $Config
      */
-    public function __construct($WorkerConfig, Config $Config) {
+    public function __construct(WorkerConfig $WorkerConfig, Config $Config) {
         $this->WorkerConfig = $WorkerConfig;
         $this->Config = $Config;
         $this->addQueue($this->WorkerConfig);
     }
 
-    public function addQueue($WorkerConfig) {
+    public function addQueue(WorkerConfig $WorkerConfig) {
         $this->queues[] = $WorkerConfig->getQueueName();
     }
 

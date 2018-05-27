@@ -20,6 +20,8 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Hoststatus;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
@@ -27,9 +29,9 @@ use Statusengine\Redis\Statistics;
 class HoststatusChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $HoststatusGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -82,6 +84,11 @@ class HoststatusChild extends Child {
     private $Syslog;
 
     /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
+
+    /**
      * HoststatusChild constructor.
      * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
@@ -112,8 +119,10 @@ class HoststatusChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->HoststatusGearmanWorker = new GearmanWorker($this->HoststatusConfig, $Config);
-        $this->HoststatusGearmanWorker->connect();
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->HoststatusConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
+
 
         $this->HoststatusRedis = new \Statusengine\Redis\Redis($Config, $this->Syslog);
         $this->HoststatusRedis->connect();
@@ -136,7 +145,7 @@ class HoststatusChild extends Child {
         }
 
         while (true) {
-            $jobData = $this->HoststatusGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $Hoststatus = new Hoststatus($jobData);
 

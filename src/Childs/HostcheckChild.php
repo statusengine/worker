@@ -20,6 +20,8 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Hostcheck;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
@@ -27,9 +29,9 @@ use Statusengine\Redis\Statistics;
 class HostcheckChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $HostcheckGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -56,6 +58,10 @@ class HostcheckChild extends Child {
      */
     private $StorageBackend;
 
+    /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
 
     /**
      * HostcheckChild constructor.
@@ -76,8 +82,9 @@ class HostcheckChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->HostcheckGearmanWorker = new GearmanWorker($this->HostcheckConfig, $Config);
-        $this->HostcheckGearmanWorker->connect();
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->HostcheckConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
     }
 
 
@@ -91,7 +98,7 @@ class HostcheckChild extends Child {
         $this->StorageBackend->connect();
 
         while (true) {
-            $jobData = $this->HostcheckGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $Hostcheck = new Hostcheck($jobData);
                 $this->StorageBackend->saveHostcheck(

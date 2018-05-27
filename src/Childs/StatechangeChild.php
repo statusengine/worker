@@ -20,6 +20,8 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Statechange;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
@@ -27,9 +29,9 @@ use Statusengine\Redis\Statistics;
 class StatechangeChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $StatechangeGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -76,8 +78,9 @@ class StatechangeChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->StatechangeGearmanWorker = new GearmanWorker($this->StatechangeConfig, $Config);
-        $this->StatechangeGearmanWorker->connect();
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->StatechangeConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
     }
 
 
@@ -91,7 +94,7 @@ class StatechangeChild extends Child {
         $this->StorageBackend->connect();
 
         while (true) {
-            $jobData = $this->StatechangeGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $Statechange = new Statechange($jobData);
                 $this->StorageBackend->saveStatechange(

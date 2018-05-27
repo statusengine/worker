@@ -20,6 +20,8 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Servicecheck;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
@@ -27,9 +29,9 @@ use Statusengine\Redis\Statistics;
 class ServicecheckChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $ServicecheckGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -56,6 +58,10 @@ class ServicecheckChild extends Child {
      */
     private $StorageBackend;
 
+    /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
 
     /**
      * ServicecheckChild constructor.
@@ -76,8 +82,9 @@ class ServicecheckChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->ServicecheckGearmanWorker = new GearmanWorker($this->ServicecheckConfig, $Config);
-        $this->ServicecheckGearmanWorker->connect();
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->ServicecheckConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
     }
 
 
@@ -91,7 +98,7 @@ class ServicecheckChild extends Child {
         $this->StorageBackend->connect();
 
         while (true) {
-            $jobData = $this->ServicecheckGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $Servicecheck = new Servicecheck($jobData);
                 $this->StorageBackend->saveServicecheck(

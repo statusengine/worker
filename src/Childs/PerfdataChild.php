@@ -21,6 +21,8 @@ namespace Statusengine;
 
 use Statusengine\Backends\PerfdataBackends\PerfdataStorageBackends;
 use Statusengine\Config\Perfdata;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Gauge;
 use Statusengine\ValueObjects\PerfdataRaw;
 use Statusengine\ValueObjects\Pid;
@@ -29,9 +31,9 @@ use Statusengine\Redis\Statistics;
 class PerfdataChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $PerfdataGearmanWorker;
+    private $Queue;
 
     /**
      * @var Perfdata
@@ -58,6 +60,10 @@ class PerfdataChild extends Child {
      */
     private $PerfdataStorageBackends;
 
+    /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
 
     /**
      * PerfdataChild constructor.
@@ -78,8 +84,10 @@ class PerfdataChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->PerfdataGearmanWorker = new GearmanWorker($this->PerfdataConfig, $Config);
-        $this->PerfdataGearmanWorker->connect();
+
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->PerfdataConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
     }
 
 
@@ -96,7 +104,7 @@ class PerfdataChild extends Child {
         }
 
         while (true) {
-            $jobData = $this->PerfdataGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $PerfdataRaw = new PerfdataRaw($jobData);
                 if(!$PerfdataRaw->isEmpty()) {
