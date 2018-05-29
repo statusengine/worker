@@ -107,13 +107,13 @@ class PerfdataChild extends Child {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $PerfdataRaw = new PerfdataRaw($jobData);
-                if(!$PerfdataRaw->isEmpty()) {
+                if (!$PerfdataRaw->isEmpty()) {
                     $PerfdataParser = new PerfdataParser($PerfdataRaw->getPerfdata());
                     $Perfdata = $PerfdataParser->parse();
                     unset($PerfdataParser);
 
                     foreach ($Perfdata as $label => $gaugeRaw) {
-                        if(!is_numeric($gaugeRaw['current'])){
+                        if (!is_numeric($gaugeRaw['current'])) {
                             continue;
                         }
                         $Gauge = new Gauge(
@@ -140,6 +140,10 @@ class PerfdataChild extends Child {
             $this->Statistics->dispatch();
 
             $this->SignalHandler->dispatch();
+            if ($this->SignalHandler->shouldExit()) {
+                $this->Queue->disconnect();
+                exit(0);
+            }
             $this->checkIfParentIsAlive();
         }
     }

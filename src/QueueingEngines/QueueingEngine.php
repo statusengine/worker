@@ -21,6 +21,7 @@ namespace Statusengine\QueueingEngines;
 
 use Statusengine\Config;
 use Statusengine\GearmanWorker;
+use Statusengine\RabbitMqWorker;
 
 class QueueingEngine {
 
@@ -48,7 +49,7 @@ class QueueingEngine {
         }
 
         if($this->Config->isRabbitMqEnabled()){
-
+            return new RabbitMqWorker($this->WorkerConfig, $this->Config);
         }
     }
 

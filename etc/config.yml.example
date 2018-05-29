@@ -33,10 +33,14 @@ use_rabbitmq: 0
 
 rabbitmq:
   host: 127.0.0.1
-  port: 5673
+  port: 5672
   user: statusengine
-  passwort: statusengine
-  vhost: statusengine
+  password: statusengine
+  vhost: /
+  exchange: statusengine
+  durable_exchange: 0
+  durable_queues: 0
+
 
 ############
 # LIVE DATA CONFIGURATION

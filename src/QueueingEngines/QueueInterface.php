@@ -46,4 +46,9 @@ interface QueueInterface {
      */
     public function addQueue(Config\WorkerConfig $WorkerConfig);
 
+    /**
+     * @return void
+     */
+    public function disconnect();
+
 }

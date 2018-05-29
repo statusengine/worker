@@ -75,6 +75,10 @@ class GearmanWorker implements QueueInterface {
         }
     }
 
+    public function disconnect() {
+        unset($this->worker);
+    }
+
     /**
      * @return \stdObject|null
      */

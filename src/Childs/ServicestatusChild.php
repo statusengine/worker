@@ -106,7 +106,7 @@ class ServicestatusChild extends Child {
         Statistics $Statistics,
         StorageBackend $StorageBackend,
         Syslog $Syslog
-    ){
+    ) {
         $this->SignalHandler = $SignalHandler;
         $this->Config = $Config;
         $this->ServicestatusConfig = $ServicestatusConfig;
@@ -132,7 +132,7 @@ class ServicestatusChild extends Child {
 
     }
 
-    public function loop(){
+    public function loop() {
         $this->Statistics->setPid($this->Pid);
         $StatisticType = new Config\StatisticType();
         $StatisticType->isServicestatusStatistic();
@@ -176,6 +176,10 @@ class ServicestatusChild extends Child {
 
             $this->Statistics->dispatch();
             $this->SignalHandler->dispatch();
+            if ($this->SignalHandler->shouldExit()) {
+                $this->Queue->disconnect();
+                exit(0);
+            }
             $this->checkIfParentIsAlive();
         }
     }
