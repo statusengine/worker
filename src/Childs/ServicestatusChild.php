@@ -90,32 +90,35 @@ class ServicestatusChild extends Child {
 
     /**
      * ServicestatusChild constructor.
-     * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
-     * @param $ServicestatusConfig
      * @param Pid $Pid
-     * @param Statistics $Statistics
-     * @param StorageBackend $StorageBackend
      * @param Syslog $Syslog
      */
     public function __construct(
-        ChildSignalHandler $SignalHandler,
         Config $Config,
-        $ServicestatusConfig,
         Pid $Pid,
-        Statistics $Statistics,
-        StorageBackend $StorageBackend,
         Syslog $Syslog
     ) {
-        $this->SignalHandler = $SignalHandler;
         $this->Config = $Config;
-        $this->ServicestatusConfig = $ServicestatusConfig;
         $this->parentPid = $Pid->getPid();
-        $this->Statistics = $Statistics;
         $this->Syslog = $Syslog;
+    }
 
-        $this->isRedisEnabled = $Config->isRedisEnabled();
-        $this->storeLiveDateInArchive = $Config->storeLiveDateInArchive();
+    public function setup() {
+        $this->SignalHandler = new ChildSignalHandler();
+        $this->ServicestatusConfig = new \Statusengine\Config\Servicestatus();
+        $this->Statistics = new Statistics($this->Config, $this->Syslog);
+
+        $BulkConfig = $this->Config->getBulkSettings();
+        $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
+            $BulkConfig['max_bulk_delay'],
+            $BulkConfig['number_of_bulk_records']
+        );
+        $BackendSelector = new BackendSelector($this->Config, $BulkInsertObjectStore, $this->Syslog);
+        $this->StorageBackend = $BackendSelector->getStorageBackend();
+
+        $this->isRedisEnabled = $this->Config->isRedisEnabled();
+        $this->storeLiveDateInArchive = $this->Config->storeLiveDateInArchive();
 
         $this->SignalHandler->bind();
 
@@ -123,13 +126,10 @@ class ServicestatusChild extends Child {
         $this->Queue = $this->QueueingEngine->getQueue();
         $this->Queue->connect();
 
-        $this->ServicestatusRedis = new \Statusengine\Redis\Redis($Config, $this->Syslog);
+        $this->ServicestatusRedis = new \Statusengine\Redis\Redis($this->Config, $this->Syslog);
         $this->ServicestatusRedis->connect();
 
         $this->ServicestatusList = new ServicestatusList($this->ServicestatusRedis);
-
-        $this->StorageBackend = $StorageBackend;
-
     }
 
     public function loop() {

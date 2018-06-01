@@ -57,6 +57,8 @@ class Child {
             //We are the child
             $this->Pid = new Pid(getmypid());
 
+            $this->setup();
+
             //Go to while(true) loop and do your work :)
             $this->loop();
         }
@@ -73,5 +75,9 @@ class Child {
             throw new \Exception('My parent process is gone I guess I am orphaned and will exit now!');
             exit(); //Just to make clear that the process will exit here!
         }
+    }
+
+    public function setup(){
+        //Overwrite in child
     }
 }

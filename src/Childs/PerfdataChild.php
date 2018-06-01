@@ -66,21 +66,41 @@ class PerfdataChild extends Child {
     private $QueueingEngine;
 
     /**
-     * PerfdataChild constructor.
-     * @param ChildSignalHandler $SignalHandler
-     * @param Config $Config
-     * @param $PerfdataConfig
-     * @param Pid $Pid
-     * @param Statistics $Statistics
-     * @param PerfdataStorageBackends $PerfdataStorageBackends
+     * @var Syslog
      */
-    public function __construct(ChildSignalHandler $SignalHandler, Config $Config, $PerfdataConfig, Pid $Pid, Statistics $Statistics, PerfdataStorageBackends $PerfdataStorageBackends) {
-        $this->SignalHandler = $SignalHandler;
+    private $Syslog;
+
+    /**
+     * PerfdataChild constructor.
+     * @param Config $Config
+     * @param Pid $Pid
+     * @param Syslog $Syslog
+     */
+    public function __construct(
+        Config $Config,
+        Pid $Pid,
+        Syslog $Syslog
+    ) {
         $this->Config = $Config;
-        $this->PerfdataConfig = $PerfdataConfig;
         $this->parentPid = $Pid->getPid();
-        $this->Statistics = $Statistics;
-        $this->PerfdataStorageBackends = $PerfdataStorageBackends;
+        $this->Syslog = $Syslog;
+    }
+
+    public function setup(){
+        $this->SignalHandler = new ChildSignalHandler();
+        $this->PerfdataConfig = new Perfdata();
+        $this->Statistics = new Statistics($this->Config, $this->Syslog);
+
+        $BulkConfig = $this->Config->getBulkSettings();
+        $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
+            $BulkConfig['max_bulk_delay'],
+            $BulkConfig['number_of_bulk_records']
+        );
+        $this->PerfdataStorageBackends = new \Statusengine\Backends\PerfdataBackends\PerfdataStorageBackends(
+            $this->Config,
+            $BulkInsertObjectStore,
+            $this->Syslog
+        );
 
         $this->SignalHandler->bind();
 

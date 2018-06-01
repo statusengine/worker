@@ -76,36 +76,42 @@ class MiscChild extends Child {
     private $QueueingEngine;
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * MiscChild constructor.
-     * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
-     * @param \Statusengine\Config\Notification $NotificationConfig
-     * @param \Statusengine\Config\Acknowledgement $AcknowledgementConfig
-     * @param Downtime $DowntimeConfig
      * @param Pid $Pid
-     * @param Statistics $Statistics
-     * @param $StorageBackend
+     * @param Syslog $Syslog
      */
     public function __construct(
-        ChildSignalHandler $SignalHandler,
         Config $Config,
-        $NotificationConfig,
-        $AcknowledgementConfig,
-        $DowntimeConfig,
         Pid $Pid,
-        Statistics $Statistics,
-        $StorageBackend
+        Syslog $Syslog
     ) {
-        $this->SignalHandler = $SignalHandler;
         $this->Config = $Config;
-
-        $this->NotificationConfig = $NotificationConfig;
-        $this->AcknowledgementConfig = $AcknowledgementConfig;
-        $this->DowntimeConfig = $DowntimeConfig;
-
         $this->parentPid = $Pid->getPid();
-        $this->Statistics = $Statistics;
-        $this->StorageBackend = $StorageBackend;
+        $this->Syslog = $Syslog;
+    }
+
+    public function setup() {
+        $this->SignalHandler = new ChildSignalHandler();
+
+        $this->NotificationConfig = new \Statusengine\Config\Notification();
+        $this->AcknowledgementConfig = new \Statusengine\Config\Acknowledgement();
+        $this->DowntimeConfig = new Downtime();
+
+        $this->Statistics = new Statistics($this->Config, $this->Syslog);
+
+        $BulkConfig = $this->Config->getBulkSettings();
+        $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
+            $BulkConfig['max_bulk_delay'],
+            $BulkConfig['number_of_bulk_records']
+        );
+        $BackendSelector = new BackendSelector($this->Config, $BulkInsertObjectStore, $this->Syslog);
+        $this->StorageBackend = $BackendSelector->getStorageBackend();
 
         $this->SignalHandler->bind();
 

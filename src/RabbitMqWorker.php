@@ -76,20 +76,6 @@ class RabbitMqWorker implements QueueInterface {
         $this->queues[] = $WorkerConfig->getQueueName();
     }
 
-    /**
-     * @param \PhpAmqpLib\Channel\AMQPChannel $channel
-     * @param \PhpAmqpLib\Connection\AbstractConnection $connection
-     */
-    /*
-    public function shutdown($channel, $connection) {
-        try {
-            $channel->close();
-            $connection->close();
-        }catch (\Exception $e){
-            debug($e->getMessage());
-        }
-    }*/
-
     public function connect() {
         $config = $this->Config->getRabbitMqConfig();
         $this->connection = new AMQPStreamConnection(
@@ -110,8 +96,6 @@ class RabbitMqWorker implements QueueInterface {
         );
 
         $this->channel = $this->connection->channel();
-
-        //register_shutdown_function([$this, 'shutdown'], $this->channel, $this->connection);
 
         foreach ($this->queues as $queue) {
             $this->channel->queue_declare(
@@ -153,33 +137,34 @@ class RabbitMqWorker implements QueueInterface {
     }
 
     public function disconnect() {
-        try {
-            $this->channel->close();
-            $this->connection->close();
-        }catch (\Exception $e){
-            debug($e->getMessage());
-            debug($this->WorkerConfig);
-        }
+        $this->channel->close();
+        $this->connection->close();
     }
 
     /**
      * @return \stdObject|null
      */
     public function getJob() {
+        if (!count($this->channel->callbacks)) {
+            return null;
+        }
+
         $read = [$this->connection->getSocket()];
         $write = null;
         $except = null;
-        if (($changeStreamsCount = stream_select($read, $write, $except, 1)) === false) {
+
+        //Hide Warning Interrupted system call on SIGINT/SIGTERM
+        if (($changeStreamsCount = @stream_select($read, $write, $except, 1)) === false) {
             return null;
         } elseif ($changeStreamsCount > 0 || $this->channel->hasPendingMethods()) {
             $this->channel->wait();
         }
 
+
         $jobData = $this->lastJobData;
         $this->lastJobData = null;
         return $jobData;
     }
-
 
 
     /**

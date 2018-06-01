@@ -64,21 +64,34 @@ class LogentryChild extends Child {
     private $QueueingEngine;
 
     /**
-     * HoststatusChild constructor.
-     * @param ChildSignalHandler $SignalHandler
+     * LogentryChild constructor.
      * @param Config $Config
-     * @param $LogentryConfig
      * @param Pid $Pid
-     * @param \Statusengine\Redis\Statistics $Statistics
-     * @param $StorageBackend
+     * @param Syslog $Syslog
      */
-    public function __construct(ChildSignalHandler $SignalHandler, Config $Config, $LogentryConfig, Pid $Pid, Statistics $Statistics, $StorageBackend) {
-        $this->SignalHandler = $SignalHandler;
+    public function __construct(
+        Config $Config,
+        Pid $Pid,
+        Syslog $Syslog
+    ) {
         $this->Config = $Config;
-        $this->LogentryConfig = $LogentryConfig;
         $this->parentPid = $Pid->getPid();
-        $this->Statistics = $Statistics;
-        $this->StorageBackend = $StorageBackend;
+        $this->Syslog = $Syslog;
+    }
+
+    public function setup() {
+        $this->SignalHandler = new ChildSignalHandler();
+        $this->LogentryConfig = new \Statusengine\Config\Logentry();
+        $this->Statistics = new Statistics($this->Config, $this->Syslog);
+
+
+        $BulkConfig = $this->Config->getBulkSettings();
+        $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
+            $BulkConfig['max_bulk_delay'],
+            $BulkConfig['number_of_bulk_records']
+        );
+        $BackendSelector = new BackendSelector($this->Config, $BulkInsertObjectStore, $this->Syslog);
+        $this->StorageBackend = $BackendSelector->getStorageBackend();
 
         $this->SignalHandler->bind();
 
@@ -86,7 +99,6 @@ class LogentryChild extends Child {
         $this->Queue = $this->QueueingEngine->getQueue();
         $this->Queue->connect();
     }
-
 
     public function loop() {
         $this->Statistics->setPid($this->Pid);
