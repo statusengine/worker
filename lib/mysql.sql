@@ -43,7 +43,8 @@ CREATE TABLE `statusengine_service_statehistory` (
   `last_hard_state`       TINYINT(2) UNSIGNED DEFAULT 0,
   `output`                VARCHAR(1024),
   `long_output`           VARCHAR(8192),
-  KEY `servicename_time` (`hostname`, `service_description`, `state_time`)
+  KEY `host_servicename_time` (`hostname`, `service_description`, `state_time`),
+  KEY `servicename_time` (`service_description`, `state_time`)
 
 )
   ENGINE = InnoDB
@@ -67,7 +68,8 @@ CREATE TABLE `statusengine_hostchecks` (
   `current_check_attempt` TINYINT(3) UNSIGNED DEFAULT 0,
   `max_check_attempts`    TINYINT(3) UNSIGNED DEFAULT 0,
   `long_output`           VARCHAR(8192),
-  KEY `times` (`start_time`, `end_time`)
+  KEY `times` (`start_time`, `end_time`),
+  KEY `hostname` (`hostname`, `start_time`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -191,7 +193,8 @@ CREATE TABLE `statusengine_servicestatus` (
   `check_command`                 VARCHAR(255),
   PRIMARY KEY (`hostname`, `service_description`),
   KEY `current_state_node` (`current_state`, `node_name`),
-  KEY `issues` (`problem_has_been_acknowledged`, `scheduled_downtime_depth`, `current_state`)
+  KEY `issues` (`problem_has_been_acknowledged`, `scheduled_downtime_depth`, `current_state`),
+  KEY `service_description` (`service_description`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -232,7 +235,8 @@ CREATE TABLE `statusengine_host_notifications` (
   `output`       VARCHAR(1024),
   `ack_author`   VARCHAR(255),
   `ack_data`     VARCHAR(1024),
-  KEY `hostname` (`hostname`)
+  KEY `hostname` (`hostname`),
+  KEY `start_time` (`start_time`)
 
 )
   ENGINE = InnoDB
@@ -252,7 +256,8 @@ CREATE TABLE `statusengine_service_notifications` (
   `output`              VARCHAR(1024),
   `ack_author`          VARCHAR(255),
   `ack_data`            VARCHAR(1024),
-  KEY `servicename` (`hostname`, `service_description`)
+  KEY `servicename` (`hostname`, `service_description`),
+  KEY `start_time` (`start_time`)
 
 )
   ENGINE = InnoDB
@@ -289,8 +294,8 @@ CREATE TABLE `statusengine_service_acknowledgements` (
   `persistent_comment`   TINYINT(1) UNSIGNED DEFAULT 0,
   `notify_contacts`      TINYINT(1) UNSIGNED DEFAULT 0,
   KEY `servicename` (`hostname`, `service_description`),
-  KEY `entry_time` (`entry_time`)
-
+  KEY `entry_time` (`entry_time`),
+  KEY `servicedesc_time` (`service_description`, `entry_time`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -321,7 +326,8 @@ CREATE TABLE `statusengine_host_downtimehistory` (
   `actual_end_time`      BIGINT(13) NOT NULL,
   `was_cancelled`        TINYINT(1) UNSIGNED DEFAULT 0,
   `node_name`            VARCHAR(255),
-  PRIMARY KEY (`hostname`, `node_name`, `scheduled_start_time`, `internal_downtime_id`)
+  PRIMARY KEY (`hostname`, `node_name`, `scheduled_start_time`, `internal_downtime_id`),
+  KEY `list` (`hostname`, `scheduled_start_time`, `scheduled_end_time`, `was_cancelled`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
@@ -364,7 +370,8 @@ CREATE TABLE `statusengine_service_downtimehistory` (
   `actual_end_time`      BIGINT(13) NOT NULL,
   `was_cancelled`        TINYINT(1) UNSIGNED DEFAULT 0,
   `node_name`            VARCHAR(255),
-  PRIMARY KEY (`hostname`, `service_description`, `node_name`, `scheduled_start_time`, `internal_downtime_id`)
+  PRIMARY KEY (`hostname`, `service_description`, `node_name`, `scheduled_start_time`, `internal_downtime_id`),
+  KEY `report` (`service_description`, `scheduled_start_time`, `scheduled_end_time`, `was_cancelled`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8
