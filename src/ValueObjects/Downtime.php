@@ -27,6 +27,9 @@ class Downtime implements DataStructInterface {
     const NEBTYPE_DOWNTIME_LOAD = 1102;
     const NEBTYPE_DOWNTIME_START = 1103;
     const NEBTYPE_DOWNTIME_STOP = 1104;
+    
+    const NEBATTR_DOWNTIME_STOP_NORMAL = 1;
+    const NEBATTR_DOWNTIME_STOP_CANCELLED = 2;
 
     /**
      * @var int
@@ -300,11 +303,7 @@ class Downtime implements DataStructInterface {
      * @return bool
      */
     public function wasCancelled(){
-        if($this->wasDowntimeDeleted()){
-            return true;
-        }
-        return $this->attr === 2;
-
+        return $this->attr === self::NEBATTR_DOWNTIME_STOP_CANCELLED;
     }
 
     /**
@@ -312,6 +311,26 @@ class Downtime implements DataStructInterface {
      */
     public function wasStarted(){
         return $this->wasDowntimeStarted();
+    }
+
+    /**
+     * @return bool
+     */
+    public function wasDowntimeNeverStarted(){
+        if(!$this->wasDowntimeDeleted()){
+            //We can only check this inside of DELETE events
+            return false;
+        }
+        //This could happen, if you schedule a downtime for tomorrow
+        //And delete it right away
+        //In this case, the monitoring core will only give us a DELETE event. Not a Downtime STOP event.
+        
+        //Compare scheduled start time with the timestamp of the delete event
+        //If scheduled start time was not reached until the delete event was fired, the downtime never started
+        if($this->start_time > $this->timestamp){
+            return true;
+        }
+        return false;
     }
 
     /**

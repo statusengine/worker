@@ -106,19 +106,20 @@ class CrateServiceScheduleddowntime extends Crate\CrateModel {
      */
     public function deleteDowntime(Downtime $Downtime, $isRecursion = false){
         $sql = "DELETE FROM statusengine_service_scheduleddowntimes 
-        WHERE hostname=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=? AND duration=?";
+        WHERE hostname=? AND service_description=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=? AND duration=?";
 
         $query = $this->CrateDB->prepare($sql);
         $query->bindValue(1, $Downtime->getHostName());
-        $query->bindValue(2, $this->nodeName);
-        $query->bindValue(3, $Downtime->getScheduledStartTime());
-        $query->bindValue(4, $Downtime->getDowntimeId());
+        $query->bindValue(2, $Downtime->getServiceDescription());
+        $query->bindValue(3, $this->nodeName);
+        $query->bindValue(4, $Downtime->getScheduledStartTime());
+        $query->bindValue(5, $Downtime->getDowntimeId());
 
         //We add duration, because there is/was a bug in CrateDB
         //https://github.com/crate/crate/issues/5763
         //todo - check if this was fixed :)
         //last testet on CrateDB 1.1.5 - should be fixed in 1.1.6
-        $query->bindValue(5, $Downtime->getDuration());
+        $query->bindValue(6, $Downtime->getDuration());
 
         try {
             return $this->CrateDB->executeQuery($query);

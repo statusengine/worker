@@ -109,6 +109,31 @@ class MySQLHostDowntimehistory extends Mysql\MysqlModel {
             }
         }
     }
+    
+    /**
+     * @param Downtime $Downtime
+     * @param bool $isRecursion
+     * @return bool
+     */
+    public function deleteDowntime(Downtime $Downtime, $isRecursion = false){
+        $sql = "DELETE FROM statusengine_host_downtimehistory 
+        WHERE hostname=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=?";
+
+        $query = $this->MySQL->prepare($sql);
+        $query->bindValue(1, $Downtime->getHostName());
+        $query->bindValue(2, $this->nodeName);
+        $query->bindValue(3, $Downtime->getScheduledStartTime());
+        $query->bindValue(4, $Downtime->getDowntimeId());
+
+        try {
+            return $this->MySQL->executeQuery($query);
+        } catch (StorageBackendUnavailableExceptions $Exceptions) {
+            //Retry
+            if ($isRecursion === false) {
+                $this->deleteDowntime($Downtime, true);
+            }
+        }
+    }
 
     /**
      * @param Downtime $Downtime
