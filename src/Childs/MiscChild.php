@@ -182,8 +182,8 @@ class MiscChild extends Child {
             $ScheduleddowntimeBackend = $this->StorageBackend->getServiceScheduleddowntimeBackend();
         }
 
-        if (!$Downtime->wasDowntimeDeleted()) {
-            //Filter delete event
+        if (!$Downtime->wasDowntimeDeleted() && !$Downtime->wasRestoredFromRetentionDat()) {
+            //Filter delete and load events
             $DowntimehistoryBackend->saveDowntime($Downtime);
         }
 
@@ -198,8 +198,8 @@ class MiscChild extends Child {
             }
             
         } else {
-            if (!$Downtime->wasDowntimeDeleted()) {
-                //Filter delete event
+            if (!$Downtime->wasDowntimeDeleted() && !$Downtime->wasRestoredFromRetentionDat()) {
+                //Filter delete and load events
                 $ScheduleddowntimeBackend->saveDowntime($Downtime);
             }
         }
