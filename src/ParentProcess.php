@@ -21,6 +21,8 @@ namespace Statusengine;
 
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\StatisticCollector;
 
@@ -62,9 +64,9 @@ class ParentProcess {
     private $MonitoringRestartConfig;
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $MonitoringRestartWorker;
+    private $Queue;
 
     /**
      * @var StorageBackend
@@ -75,6 +77,11 @@ class ParentProcess {
      * @var bool
      */
     private $checkForCommands;
+
+    /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
 
     /**
      * ParentProcess constructor.
@@ -95,9 +102,9 @@ class ParentProcess {
         $this->MonitoringRestartConfig = $MonitoringRestartConfig;
         $this->StorageBackend = $StorageBackend;
 
-        $this->MonitoringRestartWorker = new GearmanWorker($this->MonitoringRestartConfig, $Config);
-        $this->MonitoringRestartWorker->connect();
-
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->MonitoringRestartConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
 
         $this->checkForCommands = $Config->checkForCommands();
     }
@@ -118,7 +125,7 @@ class ParentProcess {
             }
 
             //Also replaces sleep(1)
-            $jobData = $this->MonitoringRestartWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 //Monitoring engine was restarted
                 if($jobData->object_type == 102){
