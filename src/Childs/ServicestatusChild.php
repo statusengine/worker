@@ -20,6 +20,8 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\ValueObjects\Servicestatus;
 use Statusengine\Redis\Statistics;
@@ -27,9 +29,9 @@ use Statusengine\Redis\Statistics;
 class ServicestatusChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $ServicetatusGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -82,49 +84,55 @@ class ServicestatusChild extends Child {
     private $Syslog;
 
     /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
+
+    /**
      * ServicestatusChild constructor.
-     * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
-     * @param $ServicestatusConfig
      * @param Pid $Pid
-     * @param Statistics $Statistics
-     * @param StorageBackend $StorageBackend
      * @param Syslog $Syslog
      */
     public function __construct(
-        ChildSignalHandler $SignalHandler,
         Config $Config,
-        $ServicestatusConfig,
         Pid $Pid,
-        Statistics $Statistics,
-        StorageBackend $StorageBackend,
         Syslog $Syslog
-    ){
-        $this->SignalHandler = $SignalHandler;
+    ) {
         $this->Config = $Config;
-        $this->ServicestatusConfig = $ServicestatusConfig;
         $this->parentPid = $Pid->getPid();
-        $this->Statistics = $Statistics;
         $this->Syslog = $Syslog;
+    }
 
-        $this->isRedisEnabled = $Config->isRedisEnabled();
-        $this->storeLiveDateInArchive = $Config->storeLiveDateInArchive();
+    public function setup() {
+        $this->SignalHandler = new ChildSignalHandler();
+        $this->ServicestatusConfig = new \Statusengine\Config\Servicestatus();
+        $this->Statistics = new Statistics($this->Config, $this->Syslog);
+
+        $BulkConfig = $this->Config->getBulkSettings();
+        $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
+            $BulkConfig['max_bulk_delay'],
+            $BulkConfig['number_of_bulk_records']
+        );
+        $BackendSelector = new BackendSelector($this->Config, $BulkInsertObjectStore, $this->Syslog);
+        $this->StorageBackend = $BackendSelector->getStorageBackend();
+
+        $this->isRedisEnabled = $this->Config->isRedisEnabled();
+        $this->storeLiveDateInArchive = $this->Config->storeLiveDateInArchive();
 
         $this->SignalHandler->bind();
 
-        $this->ServicetatusGearmanWorker = new GearmanWorker($this->ServicestatusConfig, $Config);
-        $this->ServicetatusGearmanWorker->connect();
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->ServicestatusConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
 
-        $this->ServicestatusRedis = new \Statusengine\Redis\Redis($Config, $this->Syslog);
+        $this->ServicestatusRedis = new \Statusengine\Redis\Redis($this->Config, $this->Syslog);
         $this->ServicestatusRedis->connect();
 
         $this->ServicestatusList = new ServicestatusList($this->ServicestatusRedis);
-
-        $this->StorageBackend = $StorageBackend;
-
     }
 
-    public function loop(){
+    public function loop() {
         $this->Statistics->setPid($this->Pid);
         $StatisticType = new Config\StatisticType();
         $StatisticType->isServicestatusStatistic();
@@ -135,7 +143,7 @@ class ServicestatusChild extends Child {
         }
 
         while (true) {
-            $jobData = $this->ServicetatusGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $Servicestatus = new Servicestatus($jobData);
 
@@ -168,6 +176,10 @@ class ServicestatusChild extends Child {
 
             $this->Statistics->dispatch();
             $this->SignalHandler->dispatch();
+            if ($this->SignalHandler->shouldExit()) {
+                $this->Queue->disconnect();
+                exit(0);
+            }
             $this->checkIfParentIsAlive();
         }
     }

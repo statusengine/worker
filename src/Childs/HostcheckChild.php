@@ -20,6 +20,8 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Hostcheck;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
@@ -27,9 +29,9 @@ use Statusengine\Redis\Statistics;
 class HostcheckChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $HostcheckGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -56,30 +58,46 @@ class HostcheckChild extends Child {
      */
     private $StorageBackend;
 
+    /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
 
     /**
      * HostcheckChild constructor.
-     * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
-     * @param $HostcheckConfig
      * @param Pid $Pid
-     * @param Statistics $Statistics
-     * @param $StorageBackend
+     * @param Syslog $Syslog
      */
-    public function __construct(ChildSignalHandler $SignalHandler, Config $Config, $HostcheckConfig, Pid $Pid, Statistics $Statistics, $StorageBackend) {
-        $this->SignalHandler = $SignalHandler;
+    public function __construct(
+        Config $Config,
+        Pid $Pid,
+        Syslog $Syslog
+    ) {
         $this->Config = $Config;
-        $this->HostcheckConfig = $HostcheckConfig;
         $this->parentPid = $Pid->getPid();
-        $this->Statistics = $Statistics;
-        $this->StorageBackend = $StorageBackend;
+        $this->Syslog = $Syslog;
+    }
+
+    public function setup() {
+        $this->SignalHandler = new ChildSignalHandler();
+        $this->HostcheckConfig = new \Statusengine\Config\Hostcheck();
+        $this->Statistics = new Statistics($this->Config, $this->Syslog);
+
+        $BulkConfig = $this->Config->getBulkSettings();
+        $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
+            $BulkConfig['max_bulk_delay'],
+            $BulkConfig['number_of_bulk_records']
+        );
+        $BackendSelector = new BackendSelector($this->Config, $BulkInsertObjectStore, $this->Syslog);
+        $this->StorageBackend = $BackendSelector->getStorageBackend();
 
         $this->SignalHandler->bind();
 
-        $this->HostcheckGearmanWorker = new GearmanWorker($this->HostcheckConfig, $Config);
-        $this->HostcheckGearmanWorker->connect();
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->HostcheckConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
     }
-
 
     public function loop() {
         $this->Statistics->setPid($this->Pid);
@@ -91,7 +109,7 @@ class HostcheckChild extends Child {
         $this->StorageBackend->connect();
 
         while (true) {
-            $jobData = $this->HostcheckGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $Hostcheck = new Hostcheck($jobData);
                 $this->StorageBackend->saveHostcheck(
@@ -105,6 +123,10 @@ class HostcheckChild extends Child {
             $this->Statistics->dispatch();
 
             $this->SignalHandler->dispatch();
+            if ($this->SignalHandler->shouldExit()) {
+                $this->Queue->disconnect();
+                exit(0);
+            }
             $this->checkIfParentIsAlive();
         }
     }

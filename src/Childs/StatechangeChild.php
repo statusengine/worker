@@ -20,6 +20,8 @@
 namespace Statusengine;
 
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Statechange;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
@@ -27,9 +29,9 @@ use Statusengine\Redis\Statistics;
 class StatechangeChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $StatechangeGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -58,28 +60,40 @@ class StatechangeChild extends Child {
 
 
     /**
-     * HoststatusChild constructor.
-     * @param ChildSignalHandler $SignalHandler
+     * StatechangeChild constructor.
      * @param Config $Config
-     * @param $StatechangeConfig
      * @param Pid $Pid
-     * @param \Statusengine\Redis\Statistics $Statistics
-     * @param $StorageBackend
+     * @param Syslog $Syslog
      */
-    public function __construct(ChildSignalHandler $SignalHandler, Config $Config, $StatechangeConfig, Pid $Pid, Statistics $Statistics, $StorageBackend) {
-        $this->SignalHandler = $SignalHandler;
+    public function __construct(
+        Config $Config,
+        Pid $Pid,
+        Syslog $Syslog
+    ) {
         $this->Config = $Config;
-        $this->StatechangeConfig = $StatechangeConfig;
         $this->parentPid = $Pid->getPid();
-        $this->Statistics = $Statistics;
-        $this->StorageBackend = $StorageBackend;
+        $this->Syslog = $Syslog;
+    }
+
+    public function setup() {
+        $this->SignalHandler = new ChildSignalHandler();
+        $this->StatechangeConfig = new \Statusengine\Config\Statechange();
+        $this->Statistics = new Statistics($this->Config, $this->Syslog);
+
+        $BulkConfig = $this->Config->getBulkSettings();
+        $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
+            $BulkConfig['max_bulk_delay'],
+            $BulkConfig['number_of_bulk_records']
+        );
+        $BackendSelector = new BackendSelector($this->Config, $BulkInsertObjectStore, $this->Syslog);
+        $this->StorageBackend = $BackendSelector->getStorageBackend();
 
         $this->SignalHandler->bind();
 
-        $this->StatechangeGearmanWorker = new GearmanWorker($this->StatechangeConfig, $Config);
-        $this->StatechangeGearmanWorker->connect();
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->StatechangeConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
     }
-
 
     public function loop() {
         $this->Statistics->setPid($this->Pid);
@@ -91,7 +105,7 @@ class StatechangeChild extends Child {
         $this->StorageBackend->connect();
 
         while (true) {
-            $jobData = $this->StatechangeGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $Statechange = new Statechange($jobData);
                 $this->StorageBackend->saveStatechange(
@@ -105,6 +119,10 @@ class StatechangeChild extends Child {
             $this->Statistics->dispatch();
 
             $this->SignalHandler->dispatch();
+            if ($this->SignalHandler->shouldExit()) {
+                $this->Queue->disconnect();
+                exit(0);
+            }
             $this->checkIfParentIsAlive();
         }
     }

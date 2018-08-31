@@ -21,6 +21,8 @@ namespace Statusengine;
 
 use Statusengine\Backends\PerfdataBackends\PerfdataStorageBackends;
 use Statusengine\Config\Perfdata;
+use Statusengine\QueueingEngines\QueueingEngine;
+use Statusengine\QueueingEngines\QueueInterface;
 use Statusengine\ValueObjects\Gauge;
 use Statusengine\ValueObjects\PerfdataRaw;
 use Statusengine\ValueObjects\Pid;
@@ -29,9 +31,9 @@ use Statusengine\Redis\Statistics;
 class PerfdataChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueInterface
      */
-    private $PerfdataGearmanWorker;
+    private $Queue;
 
     /**
      * @var Perfdata
@@ -58,28 +60,54 @@ class PerfdataChild extends Child {
      */
     private $PerfdataStorageBackends;
 
+    /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
+
+    /**
+     * @var Syslog
+     */
+    private $Syslog;
 
     /**
      * PerfdataChild constructor.
-     * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
-     * @param $PerfdataConfig
      * @param Pid $Pid
-     * @param Statistics $Statistics
-     * @param PerfdataStorageBackends $PerfdataStorageBackends
+     * @param Syslog $Syslog
      */
-    public function __construct(ChildSignalHandler $SignalHandler, Config $Config, $PerfdataConfig, Pid $Pid, Statistics $Statistics, PerfdataStorageBackends $PerfdataStorageBackends) {
-        $this->SignalHandler = $SignalHandler;
+    public function __construct(
+        Config $Config,
+        Pid $Pid,
+        Syslog $Syslog
+    ) {
         $this->Config = $Config;
-        $this->PerfdataConfig = $PerfdataConfig;
         $this->parentPid = $Pid->getPid();
-        $this->Statistics = $Statistics;
-        $this->PerfdataStorageBackends = $PerfdataStorageBackends;
+        $this->Syslog = $Syslog;
+    }
+
+    public function setup(){
+        $this->SignalHandler = new ChildSignalHandler();
+        $this->PerfdataConfig = new Perfdata();
+        $this->Statistics = new Statistics($this->Config, $this->Syslog);
+
+        $BulkConfig = $this->Config->getBulkSettings();
+        $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
+            $BulkConfig['max_bulk_delay'],
+            $BulkConfig['number_of_bulk_records']
+        );
+        $this->PerfdataStorageBackends = new \Statusengine\Backends\PerfdataBackends\PerfdataStorageBackends(
+            $this->Config,
+            $BulkInsertObjectStore,
+            $this->Syslog
+        );
 
         $this->SignalHandler->bind();
 
-        $this->PerfdataGearmanWorker = new GearmanWorker($this->PerfdataConfig, $Config);
-        $this->PerfdataGearmanWorker->connect();
+
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->PerfdataConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->connect();
     }
 
 
@@ -96,16 +124,16 @@ class PerfdataChild extends Child {
         }
 
         while (true) {
-            $jobData = $this->PerfdataGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $PerfdataRaw = new PerfdataRaw($jobData);
-                if(!$PerfdataRaw->isEmpty()) {
+                if (!$PerfdataRaw->isEmpty()) {
                     $PerfdataParser = new PerfdataParser($PerfdataRaw->getPerfdata());
                     $Perfdata = $PerfdataParser->parse();
                     unset($PerfdataParser);
 
                     foreach ($Perfdata as $label => $gaugeRaw) {
-                        if(!is_numeric($gaugeRaw['current'])){
+                        if (!is_numeric($gaugeRaw['current'])) {
                             continue;
                         }
                         $Gauge = new Gauge(
@@ -132,6 +160,10 @@ class PerfdataChild extends Child {
             $this->Statistics->dispatch();
 
             $this->SignalHandler->dispatch();
+            if ($this->SignalHandler->shouldExit()) {
+                $this->Queue->disconnect();
+                exit(0);
+            }
             $this->checkIfParentIsAlive();
         }
     }

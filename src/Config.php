@@ -194,8 +194,8 @@ class Config {
      */
     public function getMysqlConfig() {
         $config = [
-            'host' => '127.0.0.1',
-            'port' => 3306,
+            'host'     => '127.0.0.1',
+            'port'     => 3306,
             'username' => 'statusengine',
             'password' => 'password',
             'database' => 'statusengine_data'
@@ -231,7 +231,7 @@ class Config {
     public function getGearmanConfig() {
         $config = [
             'address' => '127.0.0.1',
-            'port' => 4730,
+            'port'    => 4730,
             'timeout' => 1000
         ];
 
@@ -256,8 +256,8 @@ class Config {
     public function getRedisConfig() {
         $config = [
             'address' => '127.0.0.1',
-            'port' => 6379,
-            'db' => 0
+            'port'    => 6379,
+            'db'      => 0
         ];
 
         if (isset($this->config['redis']['address'])) {
@@ -385,7 +385,7 @@ class Config {
     public function getBulkSettings() {
         $config = [
             'number_of_bulk_records' => 1000,
-            'max_bulk_delay' => 15
+            'max_bulk_delay'         => 15
         ];
 
         if (isset($this->config['number_of_bulk_records'])) {
@@ -549,13 +549,13 @@ class Config {
      */
     public function getElasticsearchTemplate() {
         $defaults = [
-            'name' => 'statusengine-metric',
-            'number_of_shards' => 1,
+            'name'               => 'statusengine-metric',
+            'number_of_shards'   => 1,
             'number_of_replicas' => 0,
-            'refresh_interval' => '15s',
-            'codec' => 'best_compression',
-            'enable_all' => 0,
-            'enable_source' => 1
+            'refresh_interval'   => '15s',
+            'codec'              => 'best_compression',
+            'enable_all'         => 0,
+            'enable_source'      => 1
         ];
 
         if (!isset($this->config['elasticsearch_template']) || !is_array($this->config['elasticsearch_template'])) {
@@ -783,5 +783,78 @@ class Config {
         }
         return $default;
     }
+
+    /**
+     * @return bool
+     */
+    public function isGearmanEnabled() {
+        $default = true;
+        if (isset($this->config['use_gearman'])) {
+            return (bool)$this->config['use_gearman'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRabbitMqEnabled() {
+        $default = false;
+        if (isset($this->config['use_rabbitmq'])) {
+            return (bool)$this->config['use_rabbitmq'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRabbitMqConfig() {
+        $config = [
+            'host'             => '127.0.0.1',
+            'port'             => 5672,
+            'user'             => 'statusengine',
+            'password'         => 'statusengine',
+            'vhost'            => '/',
+            'exchange'         => 'statusengine',
+            'durable_exchange' => false,
+            'durable_queues'   => false,
+        ];
+
+        if (isset($this->config['rabbitmq']['host'])) {
+            $config['host'] = $this->config['rabbitmq']['host'];
+        }
+
+        if (isset($this->config['rabbitmq']['port'])) {
+            $config['port'] = $this->config['rabbitmq']['port'];
+        }
+
+        if (isset($this->config['rabbitmq']['user'])) {
+            $config['user'] = $this->config['rabbitmq']['user'];
+        }
+
+        if (isset($this->config['rabbitmq']['password'])) {
+            $config['password'] = $this->config['rabbitmq']['password'];
+        }
+
+        if (isset($this->config['rabbitmq']['vhost'])) {
+            $config['vhost'] = $this->config['rabbitmq']['vhost'];
+        }
+
+        if (isset($this->config['rabbitmq']['exchange'])) {
+            $config['exchange'] = $this->config['rabbitmq']['exchange'];
+        }
+
+        if (isset($this->config['rabbitmq']['durable_exchange'])) {
+            $config['durable_exchange'] = (bool)$this->config['rabbitmq']['durable_exchange'];
+        }
+
+        if (isset($this->config['rabbitmq']['durable_queues'])) {
+            $config['durable_queues'] = (bool)$this->config['rabbitmq']['durable_queues'];
+        }
+
+        return $config;
+    }
+
 
 }

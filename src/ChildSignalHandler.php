@@ -22,6 +22,11 @@ namespace Statusengine;
 
 class ChildSignalHandler {
 
+    /**
+     * @var bool
+     */
+    private $shouldExit = false;
+
     public function bind() {
         pcntl_signal(SIGTERM, [$this, 'handleSignal']);
         pcntl_signal(SIGINT, [$this, 'handleSignal']);
@@ -34,7 +39,7 @@ class ChildSignalHandler {
         switch ($signo) {
             case SIGTERM:
             case SIGINT:
-                exit(0);
+                $this->shouldExit = true;
                 break;
         }
         $this->bind();
@@ -42,6 +47,13 @@ class ChildSignalHandler {
 
     public function dispatch() {
         pcntl_signal_dispatch();
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldExit(){
+        return $this->shouldExit;
     }
 
 }

@@ -21,6 +21,7 @@ namespace Statusengine;
 
 use Statusengine\Config\Downtime;
 use Statusengine\Config\WorkerConfig;
+use Statusengine\QueueingEngines\QueueingEngine;
 use Statusengine\ValueObjects\Acknowledgement;
 use Statusengine\ValueObjects\Notification;
 use Statusengine\ValueObjects\Pid;
@@ -30,9 +31,9 @@ use Statusengine\Redis\Statistics;
 class MiscChild extends Child {
 
     /**
-     * @var GearmanWorker
+     * @var QueueingEngines\QueueInterface
      */
-    private $MiscGearmanWorker;
+    private $Queue;
 
     /**
      * @var WorkerConfig
@@ -70,43 +71,56 @@ class MiscChild extends Child {
     private $StorageBackend;
 
     /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
+
+    /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * MiscChild constructor.
-     * @param ChildSignalHandler $SignalHandler
      * @param Config $Config
-     * @param \Statusengine\Config\Notification $NotificationConfig
-     * @param \Statusengine\Config\Acknowledgement $AcknowledgementConfig
-     * @param Downtime $DowntimeConfig
      * @param Pid $Pid
-     * @param Statistics $Statistics
-     * @param $StorageBackend
+     * @param Syslog $Syslog
      */
     public function __construct(
-        ChildSignalHandler $SignalHandler,
         Config $Config,
-        $NotificationConfig,
-        $AcknowledgementConfig,
-        $DowntimeConfig,
         Pid $Pid,
-        Statistics $Statistics,
-        $StorageBackend
+        Syslog $Syslog
     ) {
-        $this->SignalHandler = $SignalHandler;
         $this->Config = $Config;
-
-        $this->NotificationConfig = $NotificationConfig;
-        $this->AcknowledgementConfig = $AcknowledgementConfig;
-        $this->DowntimeConfig = $DowntimeConfig;
-
         $this->parentPid = $Pid->getPid();
-        $this->Statistics = $Statistics;
-        $this->StorageBackend = $StorageBackend;
+        $this->Syslog = $Syslog;
+    }
+
+    public function setup() {
+        $this->SignalHandler = new ChildSignalHandler();
+
+        $this->NotificationConfig = new \Statusengine\Config\Notification();
+        $this->AcknowledgementConfig = new \Statusengine\Config\Acknowledgement();
+        $this->DowntimeConfig = new Downtime();
+
+        $this->Statistics = new Statistics($this->Config, $this->Syslog);
+
+        $BulkConfig = $this->Config->getBulkSettings();
+        $BulkInsertObjectStore = new \Statusengine\BulkInsertObjectStore(
+            $BulkConfig['max_bulk_delay'],
+            $BulkConfig['number_of_bulk_records']
+        );
+        $BackendSelector = new BackendSelector($this->Config, $BulkInsertObjectStore, $this->Syslog);
+        $this->StorageBackend = $BackendSelector->getStorageBackend();
 
         $this->SignalHandler->bind();
 
-        $this->MiscGearmanWorker = new GearmanWorker($this->NotificationConfig, $Config);
-        $this->MiscGearmanWorker->addQueue($this->AcknowledgementConfig);
-        $this->MiscGearmanWorker->addQueue($this->DowntimeConfig);
-        $this->MiscGearmanWorker->connect();
+
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->NotificationConfig);
+        $this->Queue = $this->QueueingEngine->getQueue();
+        $this->Queue->addQueue($this->AcknowledgementConfig);
+        $this->Queue->addQueue($this->DowntimeConfig);
+        $this->Queue->connect();
     }
 
 
@@ -120,7 +134,7 @@ class MiscChild extends Child {
         $this->StorageBackend->connect();
 
         while (true) {
-            $jobData = $this->MiscGearmanWorker->getJob();
+            $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 if (property_exists($jobData, 'contactnotificationmethod')) {
                     $this->handleNotifications($jobData);
@@ -138,6 +152,10 @@ class MiscChild extends Child {
             $this->Statistics->dispatch();
 
             $this->SignalHandler->dispatch();
+            if ($this->SignalHandler->shouldExit()) {
+                $this->Queue->disconnect();
+                exit(0);
+            }
             $this->checkIfParentIsAlive();
         }
     }

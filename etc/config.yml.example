@@ -13,6 +13,11 @@ node_name: Crowbar
 # DATA SOURCE CONFIGURATION
 ############
 
+# Determine if your Statusengine Broker Model exports all data to a
+# gearman-job-server or not.
+# Warning: Do not enable use_gearman and use_rabbitmq at the same time.
+use_gearman: 1
+
 # Configuration of your gearman-job-server
 # The Statusengine Broker Module exports all data as json encoded objects
 # to the a gearman-job-server
@@ -20,6 +25,29 @@ gearman:
   address: 127.0.0.1
   port: 4730
   timeout: 1000
+
+# Determine if your Statusengine Broker Model exports all data to
+# RabbitMQ or not.
+# Warning: Do not enable use_rabbitmq and use_gearman at the same time.
+#
+# NOTICE: RabbitMQ Support is for the new Statusengine Event Broker
+# which is in development at the moment.
+# See: https://github.com/statusengine/broker
+use_rabbitmq: 0
+
+# NOTICE: RabbitMQ Support is for the new Statusengine Event Broker
+# which is in development at the moment.
+# See: https://github.com/statusengine/broker
+rabbitmq:
+  host: 127.0.0.1
+  port: 5672
+  user: statusengine
+  password: statusengine
+  vhost: /
+  exchange: statusengine
+  durable_exchange: 0
+  durable_queues: 0
+
 
 ############
 # LIVE DATA CONFIGURATION
