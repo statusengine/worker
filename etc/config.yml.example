@@ -29,8 +29,15 @@ gearman:
 # Determine if your Statusengine Broker Model exports all data to
 # RabbitMQ or not.
 # Warning: Do not enable use_rabbitmq and use_gearman at the same time.
+#
+# NOTICE: RabbitMQ Support is for the new Statusengine Event Broker
+# which is in development at the moment.
+# See: https://github.com/statusengine/broker
 use_rabbitmq: 0
 
+# NOTICE: RabbitMQ Support is for the new Statusengine Event Broker
+# which is in development at the moment.
+# See: https://github.com/statusengine/broker
 rabbitmq:
   host: 127.0.0.1
   port: 5672
