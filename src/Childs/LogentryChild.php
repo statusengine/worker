@@ -1,7 +1,7 @@
 <?php
 /**
  * Statusengine Worker
- * Copyright (C) 2016-2017  Daniel Ziegler
+ * Copyright (C) 2016-2018  Daniel Ziegler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,6 +62,11 @@ class LogentryChild extends Child {
      * @var QueueingEngine
      */
     private $QueueingEngine;
+
+    /**
+     * @var string
+     */
+    protected $childName = 'LogentryChild';
 
     /**
      * LogentryChild constructor.

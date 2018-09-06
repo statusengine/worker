@@ -1,7 +1,7 @@
 <?php
 /**
  * Statusengine Worker
- * Copyright (C) 2016-2017  Daniel Ziegler
+ * Copyright (C) 2016-2018  Daniel Ziegler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -108,11 +108,20 @@ class MySQL implements \Statusengine\StorageBackend {
             $this->Connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\Exception $e) {
             $this->Syslog->error($e->getMessage());
+
+            //rethrow exception that the parent process will not die.
+            throw $e;
         }
 
         //Enable UTF-8
-        $query = $this->Connection->prepare('SET NAMES utf8');
-        $query->execute();
+        try {
+            $query = $this->Connection->prepare('SET NAMES utf8');
+            $query->execute();
+        } catch (\Exception $e) {
+            $this->Syslog->error($e->getMessage());
+            //rethrow exception that the parent process will not die.
+            throw $e;
+        }
 
         return $this->Connection;
     }
@@ -310,7 +319,7 @@ class MySQL implements \Statusengine\StorageBackend {
      * @param int $timestamp
      * @return bool
      */
-    public function deletePerfdataOlderThan($timestamp){
+    public function deletePerfdataOlderThan($timestamp) {
         $query = $this->prepare(
             'DELETE FROM statusengine_perfdata WHERE timestamp_unix < ?'
         );

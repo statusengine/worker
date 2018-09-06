@@ -2,7 +2,7 @@
 <?php
 /**
  * Statusengine Worker
- * Copyright (C) 2016-2017  Daniel Ziegler
+ * Copyright (C) 2016-2018  Daniel Ziegler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,16 +42,11 @@ $StorageBackend->saveNodeName();
 $pids = [];
 $ParentPid = new \Statusengine\ValueObjects\Pid(getmypid());
 
+$ChildFactory = new \Statusengine\ChildFactory($Config, $Syslog, $ParentPid);
+
 if ($Config->isRedisEnabled() || $Config->storeLiveDateInArchive()) {
     for ($i = 0; $i < $Config->getNumberOfHoststatusWorkers(); $i++) {
-        $Syslog->info('Fork new host status worker');
-        $HoststatusChild = new Statusengine\HoststatusChild(
-            $Config,
-            $ParentPid,
-            $Syslog
-        );
-        $hoststatusChildPid = $HoststatusChild->fork();
-        $pids[] = $hoststatusChildPid;
+        $pids[] = $ChildFactory->forkHoststatusChild();
     }
 }
 
@@ -70,74 +65,29 @@ if ($Config->isRedisEnabled() || $Config->storeLiveDateInArchive()) {
 
 if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
     for ($i = 0; $i < $Config->getNumberOfLogentryWorkers(); $i++) {
-        $Syslog->info('Fork new log entry worker');
-        $LogentryChild = new Statusengine\LogentryChild(
-            $Config,
-            $ParentPid,
-            $Syslog
-        );
-        $logentryChildPid = $LogentryChild->fork();
-        $pids[] = $logentryChildPid;
+        $pids[] = $ChildFactory->forkLogentryChild();
     }
 
     for ($i = 0; $i < $Config->getNumberOfStatechangeWorkers(); $i++) {
-        $Syslog->info('Fork new state change worker');
-        $StatechangeConfig = new Statusengine\Config\Statechange();
-        $StatechangeSignalHandler = new \Statusengine\ChildSignalHandler();
-        $StatechangeStatistics = new \Statusengine\Redis\Statistics($Config, $Syslog);
-        $StatechangeChild = new Statusengine\StatechangeChild(
-            $Config,
-            $ParentPid,
-            $Syslog
-        );
-        $statechangeChildPid = $StatechangeChild->fork();
-        $pids[] = $statechangeChildPid;
+        $pids[] = $ChildFactory->forkStatechangeChild();
     }
 
     for ($i = 0; $i < $Config->getNumberOfHostcheckWorkers(); $i++) {
-        $Syslog->info('Fork new host check worker');
-        $HostcheckChild = new Statusengine\HostcheckChild(
-            $Config,
-            $ParentPid,
-            $Syslog
-        );
-        $hostcheckChildPid = $HostcheckChild->fork();
-        $pids[] = $hostcheckChildPid;
+        $pids[] = $ChildFactory->forkHostcheckChild();
     }
 
     for ($i = 0; $i < $Config->getNumberOfServicecheckWorkers(); $i++) {
-        $Syslog->info('Fork new service check worker');
-        $ServicecheckChild = new Statusengine\ServicecheckChild(
-            $Config,
-            $ParentPid,
-            $Syslog
-        );
-        $servicecheckChildPid = $ServicecheckChild->fork();
-        $pids[] = $servicecheckChildPid;
+        $pids[] = $ChildFactory->forkServicecheckChild();
     }
 
     for ($i = 0; $i < $Config->getNumberOfMiscWorkers(); $i++) {
-        $Syslog->info('Fork new misc worker');
-        $MiscChild = new Statusengine\MiscChild(
-            $Config,
-            $ParentPid,
-            $Syslog
-        );
-        $miscChildPid = $MiscChild->fork();
-        $pids[] = $miscChildPid;
+        $pids[] = $ChildFactory->forkMiscChild();
     }
 }
 
 if ($Config->isProcessPerfdataEnabled() && $Config->isOnePerfdataBackendEnabled()) {
     for ($i = 0; $i < $Config->getNumberOfPerfdataWorkers(); $i++) {
-        $Syslog->info('Fork new performance data worker');
-        $PerfdataChild = new Statusengine\PerfdataChild(
-            $Config,
-            $ParentPid,
-            $Syslog
-        );
-        $perfdataChildPid = $PerfdataChild->fork();
-        $pids[] = $perfdataChildPid;
+        $pids[] = $ChildFactory->forkPerfdataChild();
     }
 }
 
@@ -160,7 +110,8 @@ $ParentProcess = new \Statusengine\ParentProcess(
     $TaskManager,
     $Syslog,
     $MonitoringRestartConfig,
-    $StorageBackend
+    $StorageBackend,
+    $ChildFactory
 );
 foreach ($pids as $Pid) {
     $ParentProcess->addChildPid($Pid);
