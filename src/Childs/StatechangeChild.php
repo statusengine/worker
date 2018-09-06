@@ -58,6 +58,11 @@ class StatechangeChild extends Child {
      */
     private $StorageBackend;
 
+    /**
+     * @var string
+     */
+    protected $childName = 'StatechangeChild';
+
 
     /**
      * StatechangeChild constructor.

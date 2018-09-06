@@ -81,6 +81,11 @@ class MiscChild extends Child {
     private $Syslog;
 
     /**
+     * @var string
+     */
+    protected $childName = 'MiscChild';
+
+    /**
      * MiscChild constructor.
      * @param Config $Config
      * @param Pid $Pid

@@ -64,6 +64,11 @@ class HostcheckChild extends Child {
     private $QueueingEngine;
 
     /**
+     * @var string
+     */
+    protected $childName = 'HostcheckChild';
+
+    /**
      * HostcheckChild constructor.
      * @param Config $Config
      * @param Pid $Pid

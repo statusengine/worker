@@ -64,6 +64,11 @@ class LogentryChild extends Child {
     private $QueueingEngine;
 
     /**
+     * @var string
+     */
+    protected $childName = 'LogentryChild';
+
+    /**
      * LogentryChild constructor.
      * @param Config $Config
      * @param Pid $Pid

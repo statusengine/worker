@@ -84,6 +84,16 @@ class ParentProcess {
     private $QueueingEngine;
 
     /**
+     * @var ChildFactory
+     */
+    private $ChildFactory;
+
+    /**
+     * @var array
+     */
+    private $deadChilds = [];
+
+    /**
      * ParentProcess constructor.
      * @param StatisticCollector $StatisticCollector
      */
@@ -93,7 +103,8 @@ class ParentProcess {
         TaskManager $TaskManager,
         Syslog $Syslog,
         $MonitoringRestartConfig,
-        StorageBackend $StorageBackend
+        StorageBackend $StorageBackend,
+        ChildFactory $ChildFactory
     ) {
         $this->StatisticCollector = $StatisticCollector;
         $this->Config = $Config;
@@ -101,6 +112,7 @@ class ParentProcess {
         $this->Syslog = $Syslog;
         $this->MonitoringRestartConfig = $MonitoringRestartConfig;
         $this->StorageBackend = $StorageBackend;
+        $this->ChildFactory = $ChildFactory;
 
         $this->QueueingEngine = new QueueingEngine($this->Config, $this->MonitoringRestartConfig);
         $this->Queue = $this->QueueingEngine->getQueue();
@@ -121,17 +133,42 @@ class ParentProcess {
             $this->checkForDeadChilds();
 
             if ($this->checkForCommands) {
-                $this->TaskManager->checkAndProcessTasks();
+                try {
+                    $this->TaskManager->checkAndProcessTasks();
+                }catch (\Exception $exception){
+                    $this->Syslog->error($exception->getMessage());
+                }
             }
 
             //Also replaces sleep(1)
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 //Monitoring engine was restarted
-                if($jobData->object_type == 102){
+                if ($jobData->object_type == 102) {
                     $this->Syslog->info('Catch monitoring restart. Trigger callbacks...');
                     $this->StorageBackend->monitoringengineWasRestarted();
                 }
+            }
+
+            //Check for dead childs
+            if (!empty($this->deadChilds)) {
+                /** @var Pid $deadChild */
+                foreach ($this->deadChilds as $deadChild) {
+                    $this->removePid($deadChild);
+                    if ($this->ChildFactory->canChildBeReborn($deadChild->getChildName())) {
+                        $this->Syslog->info('Respawn dead child');
+                        $newPid = $this->ChildFactory->respawn($deadChild->getChildName());
+                        $this->addChildPid($newPid);
+                    } else {
+                        $this->Syslog->error(sprintf(
+                            'Can not respawn child of type %s',
+                            $deadChild->getChildName()
+                        ));
+                    }
+                }
+                $this->deadChilds = [];
+                //Update StatisticCollector with the new PIDs
+                $this->StatisticCollector->setPids($this->getChildPids());
             }
         }
     }
@@ -150,8 +187,12 @@ class ParentProcess {
         return $this->pids;
     }
 
+    /**
+     * @return Pid
+     * @throws Exception\NotNumericValueException
+     */
     public function getPid() {
-        return new Pid(getmypid());
+        return new Pid(getmypid(), 'ParentProcess');
     }
 
     public function checkForDeadChilds() {
@@ -160,11 +201,21 @@ class ParentProcess {
             if (pcntl_waitpid($Pid->getPid(), $status, WNOHANG) == 0) {
                 //Child still alive
                 $pidsAlive[] = $Pid;
-            }else{
+            } else {
                 $this->Syslog->alert(sprintf('Child with pid %s is dead!!', $Pid->getPid()));
+                $this->deadChilds[] = $Pid;
             }
         }
         $this->pids = $pidsAlive;
+    }
+
+    private function removePid(Pid $PidToRemove) {
+        /** @var Pid $Pid */
+        foreach ($this->pids as $index => $Pid) {
+            if ($Pid->getPid() === $PidToRemove->getPid()) {
+                unset($this->pids[$index]);
+            }
+        }
     }
 
 }

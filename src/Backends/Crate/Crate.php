@@ -91,11 +91,11 @@ class Crate implements \Statusengine\StorageBackend {
      * @param null|int $startTime
      */
     public function saveNodeName($nodeName = null, $startTime = null) {
-        if($nodeName === null){
+        if ($nodeName === null) {
             $nodeName = $this->nodeName;
         }
 
-        if($startTime === null){
+        if ($startTime === null) {
             $startTime = time();
         }
 
@@ -119,7 +119,7 @@ class Crate implements \Statusengine\StorageBackend {
     /**
      * @return array
      */
-    public function getNodes(){
+    public function getNodes() {
         $this->connect();
         $query = $this->Connection->prepare('SELECT * FROM statusengine_nodes ORDER BY node_name ASC');
 
@@ -131,7 +131,7 @@ class Crate implements \Statusengine\StorageBackend {
         }
         $this->disconnect();
         $nodes = [];
-        foreach($result as $record){
+        foreach ($result as $record) {
             $nodes[] = NodeName::fromCrateDb($record);
         }
         return $nodes;
@@ -140,7 +140,7 @@ class Crate implements \Statusengine\StorageBackend {
     /**
      * @param string $nodeName
      */
-    public function deleteNodeByName($nodeName){
+    public function deleteNodeByName($nodeName) {
         $this->connect();
         $query = $this->Connection->prepare('DELETE FROM statusengine_nodes WHERE node_name=?');
         $query->bindValue(1, $nodeName);
@@ -172,6 +172,9 @@ class Crate implements \Statusengine\StorageBackend {
             $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (\Exception $e) {
             $this->Syslog->error($e->getMessage());
+
+            //rethrow exception that the parent process will not die.
+            throw $e;
         }
         return $this->Connection;
     }
@@ -179,7 +182,7 @@ class Crate implements \Statusengine\StorageBackend {
     /**
      * @param int $timeout in seconds
      */
-    public function setTimeout($timeout){
+    public function setTimeout($timeout) {
         $this->Connection->setAttribute(PDO::ATTR_TIMEOUT, $timeout);
     }
 
@@ -379,13 +382,13 @@ class Crate implements \Statusengine\StorageBackend {
     public function deleteHostchecksOlderThan($timestamp) {
         $partitions = $this->getPartitionsByTableName('statusengine_hostchecks');
         $daysToDelete = [];
-        foreach($partitions as $record){
-            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+        foreach ($partitions as $record) {
+            if (isset($record['values']['day']) && $record['values']['day'] < $timestamp) {
                 $daysToDelete[] = $record['values']['day'];
             }
         }
 
-        foreach($daysToDelete as $partition){
+        foreach ($daysToDelete as $partition) {
             $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_hostchecks', $partition);
         }
     }
@@ -408,13 +411,13 @@ class Crate implements \Statusengine\StorageBackend {
     public function deleteHostNotificationsOlderThan($timestamp) {
         $partitions = $this->getPartitionsByTableName('statusengine_host_notifications');
         $daysToDelete = [];
-        foreach($partitions as $record){
-            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+        foreach ($partitions as $record) {
+            if (isset($record['values']['day']) && $record['values']['day'] < $timestamp) {
                 $daysToDelete[] = $record['values']['day'];
             }
         }
 
-        foreach($daysToDelete as $partition){
+        foreach ($daysToDelete as $partition) {
             $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_host_notifications', $partition);
         }
     }
@@ -425,13 +428,13 @@ class Crate implements \Statusengine\StorageBackend {
     public function deleteHostStatehistoryOlderThan($timestamp) {
         $partitions = $this->getPartitionsByTableName('statusengine_host_statehistory');
         $daysToDelete = [];
-        foreach($partitions as $record){
-            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+        foreach ($partitions as $record) {
+            if (isset($record['values']['day']) && $record['values']['day'] < $timestamp) {
                 $daysToDelete[] = $record['values']['day'];
             }
         }
 
-        foreach($daysToDelete as $partition){
+        foreach ($daysToDelete as $partition) {
             $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_host_statehistory', $partition);
         }
     }
@@ -454,13 +457,13 @@ class Crate implements \Statusengine\StorageBackend {
     public function deleteServicechecksOlderThan($timestamp) {
         $partitions = $this->getPartitionsByTableName('statusengine_servicechecks');
         $daysToDelete = [];
-        foreach($partitions as $record){
-            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+        foreach ($partitions as $record) {
+            if (isset($record['values']['day']) && $record['values']['day'] < $timestamp) {
                 $daysToDelete[] = $record['values']['day'];
             }
         }
 
-        foreach($daysToDelete as $partition){
+        foreach ($daysToDelete as $partition) {
             $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_servicechecks', $partition);
         }
     }
@@ -483,13 +486,13 @@ class Crate implements \Statusengine\StorageBackend {
     public function deleteServiceNotificationsOlderThan($timestamp) {
         $partitions = $this->getPartitionsByTableName('statusengine_service_notifications');
         $daysToDelete = [];
-        foreach($partitions as $record){
-            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+        foreach ($partitions as $record) {
+            if (isset($record['values']['day']) && $record['values']['day'] < $timestamp) {
                 $daysToDelete[] = $record['values']['day'];
             }
         }
 
-        foreach($daysToDelete as $partition){
+        foreach ($daysToDelete as $partition) {
             $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_service_notifications', $partition);
         }
     }
@@ -531,13 +534,13 @@ class Crate implements \Statusengine\StorageBackend {
     public function deleteLogentriesOlderThan($timestamp) {
         $partitions = $this->getPartitionsByTableName('statusengine_logentries');
         $daysToDelete = [];
-        foreach($partitions as $record){
-            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
+        foreach ($partitions as $record) {
+            if (isset($record['values']['day']) && $record['values']['day'] < $timestamp) {
                 $daysToDelete[] = $record['values']['day'];
             }
         }
 
-        foreach($daysToDelete as $partition){
+        foreach ($daysToDelete as $partition) {
             $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_logentries', $partition);
         }
     }
@@ -558,18 +561,18 @@ class Crate implements \Statusengine\StorageBackend {
      * @param int $timestamp
      * @return bool
      */
-    public function deletePerfdataOlderThan($timestamp){
+    public function deletePerfdataOlderThan($timestamp) {
         $timestamp = $timestamp * 1000;
 
         $partitions = $this->getPartitionsByTableName('statusengine_perfdata');
         $daysToDelete = [];
-        foreach($partitions as $record){
-            if(isset($record['values']['day']) && $record['values']['day'] < $timestamp){
-               $daysToDelete[] = $record['values']['day'];
-           }
+        foreach ($partitions as $record) {
+            if (isset($record['values']['day']) && $record['values']['day'] < $timestamp) {
+                $daysToDelete[] = $record['values']['day'];
+            }
         }
 
-        foreach($daysToDelete as $partition){
+        foreach ($daysToDelete as $partition) {
             $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_perfdata', $partition);
         }
     }
@@ -578,7 +581,7 @@ class Crate implements \Statusengine\StorageBackend {
      * @param string $tablename
      * @return array
      */
-    public function getPartitionsByTableName($tablename){
+    public function getPartitionsByTableName($tablename) {
         $query = $this->prepare(
             'SELECT * FROM information_schema.table_partitions WHERE table_name=?'
         );
@@ -592,7 +595,7 @@ class Crate implements \Statusengine\StorageBackend {
      * @param int $dayValue
      * @return bool
      */
-    public function dropPartitionsFromTableByTableNameAndDayValue($tableName, $dayValue){
+    public function dropPartitionsFromTableByTableNameAndDayValue($tableName, $dayValue) {
         $query = $this->prepare(sprintf('DELETE FROM %s WHERE DAY = ?', $tableName));
         $query->bindValue(1, $dayValue);
         return $query->execute();
@@ -626,7 +629,7 @@ class Crate implements \Statusengine\StorageBackend {
         return new CrateServiceScheduleddowntime($this, $this->nodeName);
     }
 
-    public function monitoringengineWasRestarted(){
+    public function monitoringengineWasRestarted() {
         $this->connect();
         $Hoststatus = new CrateHoststatus($this, $this->BulkInsertObjectStore, $this->nodeName);
         $Hoststatus->truncate();

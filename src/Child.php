@@ -40,6 +40,11 @@ class Child {
     protected $parentPid;
 
     /**
+     * @var string
+     */
+    protected $childName = 'Unknown';
+
+    /**
      * Child constructor.
      * @param WorkerConfig $Config
      */
@@ -55,7 +60,7 @@ class Child {
         $pid = pcntl_fork();
         if (!$pid) {
             //We are the child
-            $this->Pid = new Pid(getmypid());
+            $this->Pid = new Pid(getmypid(), $this->childName);
 
             $this->setup();
 
@@ -64,7 +69,7 @@ class Child {
         }
 
         //Return back to the parent process
-        return new Pid($pid);
+        return new Pid($pid, $this->childName);
     }
 
     /**

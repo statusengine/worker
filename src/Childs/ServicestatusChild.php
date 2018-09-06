@@ -89,6 +89,11 @@ class ServicestatusChild extends Child {
     private $QueueingEngine;
 
     /**
+     * @var string
+     */
+    protected $childName = 'ServicestatusChild';
+
+    /**
      * ServicestatusChild constructor.
      * @param Config $Config
      * @param Pid $Pid

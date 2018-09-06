@@ -64,6 +64,11 @@ class ServicecheckChild extends Child {
     private $QueueingEngine;
 
     /**
+     * @var string
+     */
+    protected $childName = 'ServicecheckChild';
+
+    /**
      * ServicecheckChild constructor.
      * @param Config $Config
      * @param Pid $Pid

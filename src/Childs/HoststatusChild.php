@@ -89,6 +89,11 @@ class HoststatusChild extends Child {
     private $QueueingEngine;
 
     /**
+     * @var string
+     */
+    protected $childName = 'HoststatusChild';
+
+    /**
      * HoststatusChild constructor.
      * @param Config $Config
      * @param Pid $Pid

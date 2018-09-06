@@ -71,6 +71,11 @@ class PerfdataChild extends Child {
     private $Syslog;
 
     /**
+     * @var string
+     */
+    protected $childName = 'PerfdataChild';
+
+    /**
      * PerfdataChild constructor.
      * @param Config $Config
      * @param Pid $Pid

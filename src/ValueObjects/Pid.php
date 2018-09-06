@@ -29,15 +29,22 @@ class Pid {
     private $pid;
 
     /**
+     * @var string
+     */
+    private $childName = 'Unknown';
+
+    /**
      * Pid constructor.
      * @param int $pid
+     * @param string $childName
      * @throws NotNumericValueException
      */
-    public function __construct($pid) {
+    public function __construct($pid, $childName = 'Unknown') {
         if (!is_numeric($pid)) {
             throw new NotNumericValueException(sprintf('Given values %s is not numeric!', $pid));
         }
         $this->pid = $pid;
+        $this->childName = $childName;
     }
 
     /**
@@ -46,4 +53,12 @@ class Pid {
     public function getPid() {
         return $this->pid;
     }
+
+    /**
+     * @return string
+     */
+    public function getChildName() {
+        return $this->childName;
+    }
+
 }
