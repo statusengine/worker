@@ -91,7 +91,7 @@ class PerfdataChild extends Child {
         $this->Syslog = $Syslog;
     }
 
-    public function setup(){
+    public function setup() {
         $this->SignalHandler = new ChildSignalHandler();
         $this->PerfdataConfig = new Perfdata();
         $this->Statistics = new Statistics($this->Config, $this->Syslog);
@@ -131,30 +131,32 @@ class PerfdataChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
-                $PerfdataRaw = new PerfdataRaw($jobData);
-                if (!$PerfdataRaw->isEmpty()) {
-                    $PerfdataParser = new PerfdataParser($PerfdataRaw->getPerfdata());
-                    $Perfdata = $PerfdataParser->parse();
-                    unset($PerfdataParser);
+                foreach ($jobData->messages as $jobJson) {
+                    $PerfdataRaw = new PerfdataRaw($jobJson);
+                    if (!$PerfdataRaw->isEmpty()) {
+                        $PerfdataParser = new PerfdataParser($PerfdataRaw->getPerfdata());
+                        $Perfdata = $PerfdataParser->parse();
+                        unset($PerfdataParser);
 
-                    foreach ($Perfdata as $label => $gaugeRaw) {
-                        if (!is_numeric($gaugeRaw['current'])) {
-                            continue;
-                        }
-                        $Gauge = new Gauge(
-                            $PerfdataRaw->getHostName(),
-                            $PerfdataRaw->getServiceDescription(),
-                            $label,
-                            $gaugeRaw['current'],
-                            $PerfdataRaw->getTimestamp(),
-                            $gaugeRaw['unit']
-                        );
+                        foreach ($Perfdata as $label => $gaugeRaw) {
+                            if (!is_numeric($gaugeRaw['current'])) {
+                                continue;
+                            }
+                            $Gauge = new Gauge(
+                                $PerfdataRaw->getHostName(),
+                                $PerfdataRaw->getServiceDescription(),
+                                $label,
+                                $gaugeRaw['current'],
+                                $PerfdataRaw->getTimestamp(),
+                                $gaugeRaw['unit']
+                            );
 
-                        foreach ($perfdataStorageBackends as $key => $backend) {
-                            $perfdataStorageBackends[$key]->savePerfdata($Gauge);
+                            foreach ($perfdataStorageBackends as $key => $backend) {
+                                $perfdataStorageBackends[$key]->savePerfdata($Gauge);
+                            }
                         }
+                        $this->Statistics->increase();
                     }
-                    $this->Statistics->increase();
                 }
             }
 

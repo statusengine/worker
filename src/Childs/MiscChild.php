@@ -141,14 +141,29 @@ class MiscChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
-                if (property_exists($jobData, 'contactnotificationmethod')) {
-                    $this->handleNotifications($jobData);
-                }
-                if (property_exists($jobData, 'acknowledgement')) {
-                    $this->handleAcknowledgements($jobData);
-                }
-                if (property_exists($jobData, 'downtime')) {
-                    $this->handleDowntime($jobData);
+                if(property_exists($jobData, 'messages')){
+                    foreach($jobData->messages as $jobJson){
+                        if (property_exists($jobData, 'contactnotificationmethod')) {
+                            $this->handleNotifications($jobJson);
+                        }
+                        if (property_exists($jobData, 'acknowledgement')) {
+                            $this->handleAcknowledgements($jobJson);
+                        }
+                        if (property_exists($jobData, 'downtime')) {
+                            $this->handleDowntime($jobJson);
+                        }
+                    }
+                }else{
+                    //Non bulk data
+                    if (property_exists($jobData, 'contactnotificationmethod')) {
+                        $this->handleNotifications($jobData);
+                    }
+                    if (property_exists($jobData, 'acknowledgement')) {
+                        $this->handleAcknowledgements($jobData);
+                    }
+                    if (property_exists($jobData, 'downtime')) {
+                        $this->handleDowntime($jobData);
+                    }
                 }
             }
 

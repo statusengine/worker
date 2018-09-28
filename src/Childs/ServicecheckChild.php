@@ -116,11 +116,13 @@ class ServicecheckChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
-                $Servicecheck = new Servicecheck($jobData);
-                $this->StorageBackend->saveServicecheck(
-                    $Servicecheck
-                );
-                $this->Statistics->increase();
+                foreach ($jobData->messages as $jobJson) {
+                    $Servicecheck = new Servicecheck($jobJson);
+                    $this->StorageBackend->saveServicecheck(
+                        $Servicecheck
+                    );
+                    $this->Statistics->increase();
+                }
             }
 
             $this->StorageBackend->dispatch();
