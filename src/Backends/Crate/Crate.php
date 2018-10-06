@@ -101,7 +101,7 @@ class Crate implements \Statusengine\StorageBackend {
 
         $this->connect();
         $query = $this->Connection->prepare('INSERT INTO statusengine_nodes (node_name, node_version, node_start_time)
-          VALUES(?,?,?) ON CONFLICT (node_name) DO UPDATE SET node_version=VALUES(node_version), node_start_time=VALUES(node_start_time)');
+          VALUES(?,?,?) ON CONFLICT (node_name) DO UPDATE SET node_version = excluded.node_version, node_start_time = excluded.node_start_time');
         $query->bindValue(1, $nodeName);
         $query->bindValue(2, STATUSENGINE_WORKER_VERSION);
         $query->bindValue(3, $startTime);
