@@ -91,13 +91,13 @@ class CrateHostDowntimehistory extends Crate\CrateModel {
             }
         }
     }
-    
+
     /**
      * @param Downtime $Downtime
      * @param bool $isRecursion
      * @return bool
      */
-    public function deleteDowntime(Downtime $Downtime, $isRecursion = false){
+    public function deleteDowntime(Downtime $Downtime, $isRecursion = false) {
         $sql = "DELETE FROM statusengine_host_downtimehistory 
         WHERE hostname=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=? AND duration=?";
 
