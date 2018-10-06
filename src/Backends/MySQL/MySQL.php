@@ -161,7 +161,7 @@ class MySQL implements \Statusengine\StorageBackend {
         $this->connect();
         try {
             $query = $this->Connection->prepare('INSERT INTO statusengine_nodes (node_name, node_version, node_start_time)
-          VALUES(?,?,?) ON DUPLICATE KEY UPDATE node_version=VALUES(node_version), node_start_time=VALUES(node_start_time)');
+          VALUES(?,?,?) ON CONFLICT DO UPDATE SET node_version=VALUES(node_version), node_start_time=VALUES(node_start_time)');
             $query->bindValue(1, $nodeName);
             $query->bindValue(2, STATUSENGINE_WORKER_VERSION);
             $query->bindValue(3, $startTime);
