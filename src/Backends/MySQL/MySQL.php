@@ -97,6 +97,7 @@ class MySQL implements \Statusengine\StorageBackend {
 
     /**
      * @return \PDO
+     * @throws \Exception
      */
     public function connect() {
         $config = $this->Config->getMysqlConfig();
@@ -135,6 +136,7 @@ class MySQL implements \Statusengine\StorageBackend {
 
     /**
      * @return \PDO
+     * @throws \Exception
      */
     public function reconnect() {
         $this->Connection = null;
@@ -146,8 +148,10 @@ class MySQL implements \Statusengine\StorageBackend {
     }
 
     /**
-     * @param null $nodeName
+     * @param null|string $nodeName
      * @param null $startTime
+     * @return mixed|void
+     * @throws \Exception
      */
     public function saveNodeName($nodeName = null, $startTime = null) {
         if ($nodeName === null) {
@@ -176,6 +180,7 @@ class MySQL implements \Statusengine\StorageBackend {
 
     /**
      * @return array
+     * @throws \Exception
      */
     public function getNodes() {
         $this->connect();
@@ -197,6 +202,8 @@ class MySQL implements \Statusengine\StorageBackend {
 
     /**
      * @param string $nodeName
+     * @return mixed|void
+     * @throws \Exception
      */
     public function deleteNodeByName($nodeName) {
         $this->connect();
@@ -294,6 +301,7 @@ class MySQL implements \Statusengine\StorageBackend {
 
     /**
      * @return array
+     * @throws \Exception
      */
     public function getTasks() {
         $this->connect();
@@ -306,6 +314,7 @@ class MySQL implements \Statusengine\StorageBackend {
     /**
      * @param array $uuids
      * @return array|bool
+     * @throws \Exception
      */
     public function deleteTaskByUuids($uuids = []) {
         $this->connect();
