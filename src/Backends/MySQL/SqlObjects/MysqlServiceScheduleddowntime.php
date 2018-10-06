@@ -32,7 +32,7 @@ class MysqlServiceScheduleddowntime extends Mysql\MysqlModel {
     (hostname, service_description, entry_time, author_name, comment_data, internal_downtime_id, triggered_by_id, is_fixed,
     duration, scheduled_start_time, scheduled_end_time, node_name %s)
     VALUES%s
-    ON CONFLICT DO UPDATE SET entry_time=VALUES(entry_time), author_name=VALUES(author_name), comment_data=VALUES(comment_data),
+    ON DUPLICATE KEY UPDATE entry_time=VALUES(entry_time), author_name=VALUES(author_name), comment_data=VALUES(comment_data),
     triggered_by_id=VALUES(triggered_by_id), is_fixed=VALUES(is_fixed), duration=VALUES(duration), scheduled_end_time=VALUES(scheduled_end_time) %s";
 
 
