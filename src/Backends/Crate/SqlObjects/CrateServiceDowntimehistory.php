@@ -154,10 +154,10 @@ class CrateServiceDowntimehistory extends Crate\CrateModel {
             $dynamicFields = [
                 'insert' => ['was_started', 'actual_start_time', 'actual_end_time', 'was_cancelled'],
                 'update' => [
-                    'was_started = excluded.was_started)',
-                    'actual_start_time = excluded.actual_start_time)',
-                    'actual_end_time = excluded.actual_end_time)',
-                    'was_cancelled = excluded.was_cancelled)'
+                    'was_started = excluded.was_started',
+                    'actual_start_time = excluded.actual_start_time',
+                    'actual_end_time = excluded.actual_end_time',
+                    'was_cancelled = excluded.was_cancelled'
                 ]
             ];
             return $this->buildQueryString($dynamicFields);
@@ -166,7 +166,7 @@ class CrateServiceDowntimehistory extends Crate\CrateModel {
         if ($Downtime->wasDowntimeStarted()) {
             $dynamicFields = [
                 'insert' => ['was_started', 'actual_start_time'],
-                'update' => ['was_started = excluded.was_started)', 'actual_start_time = excluded.actual_start_time)']
+                'update' => ['was_started = excluded.was_started', 'actual_start_time = excluded.actual_start_time']
             ];
             return $this->buildQueryString($dynamicFields);
         }
@@ -174,7 +174,7 @@ class CrateServiceDowntimehistory extends Crate\CrateModel {
         if ($Downtime->wasDowntimeStopped() || $Downtime->wasDowntimeDeleted()) {
             $dynamicFields = [
                 'insert' => ['actual_end_time', 'was_cancelled'],
-                'update' => ['actual_end_time = excluded.actual_end_time)', 'was_cancelled = excluded.was_cancelled)']
+                'update' => ['actual_end_time = excluded.actual_end_time', 'was_cancelled = excluded.was_cancelled']
             ];
             return $this->buildQueryString($dynamicFields);
         }
