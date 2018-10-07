@@ -55,9 +55,9 @@ class MysqlServiceDowntimehistory extends Mysql\MysqlModel {
     /**
      * MysqlServiceDowntimehistory constructor.
      * @param Mysql\MySQL $MySQL
-     * @param $nodeName
+     * @param string $nodeName
      */
-    public function __construct(Mysql\MySQL $MySQL, $nodeName){
+    public function __construct(Mysql\MySQL $MySQL, $nodeName) {
         $this->MySQL = $MySQL;
         $this->nodeName = $nodeName;
     }
@@ -67,39 +67,19 @@ class MysqlServiceDowntimehistory extends Mysql\MysqlModel {
      * @param Downtime $Downtime
      * @param bool $isRecursion
      * @return bool
+     * @throws UnknownTypeException
      */
     public function saveDowntime(Downtime $Downtime, $isRecursion = false) {
-        $query = $this->MySQL->prepare($this->getQuery($Downtime));
-        $i = 1;
-        $query->bindValue($i++, $Downtime->getHostName());
-        $query->bindValue($i++, $Downtime->getServiceDescription());
-        $query->bindValue($i++, $Downtime->getEntryTime());
-        $query->bindValue($i++, $Downtime->getAuthorName());
-        $query->bindValue($i++, $Downtime->getCommentData());
-        $query->bindValue($i++, $Downtime->getDowntimeId());
-        $query->bindValue($i++, $Downtime->getTriggeredBy());
-        $query->bindValue($i++, (int)$Downtime->isFixed());
-        $query->bindValue($i++, $Downtime->getDuration());
-        $query->bindValue($i++, $Downtime->getScheduledStartTime());
-        $query->bindValue($i++, $Downtime->getScheduledEndTime());
-        $query->bindValue($i++, $this->nodeName);
-
-
         if ($Downtime->wasDowntimeAdded() || $Downtime->wasRestoredFromRetentionDat()) {
-            $query->bindValue($i++, (int)$Downtime->wasStarted());
-            $query->bindValue($i++, $Downtime->getActualStartTime());
-            $query->bindValue($i++, $Downtime->getActualEndTime());
-            $query->bindValue($i++, (int)$Downtime->wasCancelled());
+            $query = $this->getQueryForCreatedOrLoadedDowntime($Downtime);
         }
 
         if ($Downtime->wasDowntimeStarted()) {
-            $query->bindValue($i++, (int)$Downtime->wasStarted());
-            $query->bindValue($i++, $Downtime->getActualStartTime());
+            $query = $this->getQueryForStartedDowntime($Downtime);
         }
 
         if ($Downtime->wasDowntimeStopped() || $Downtime->wasDowntimeDeleted()) {
-            $query->bindValue($i++, $Downtime->getActualEndTime());
-            $query->bindValue($i++, (int)$Downtime->wasCancelled());
+            $query = $this->getQueryForStoppedOrDeletedDowntime($Downtime);
         }
 
         try {
@@ -111,13 +91,13 @@ class MysqlServiceDowntimehistory extends Mysql\MysqlModel {
             }
         }
     }
-    
+
     /**
      * @param Downtime $Downtime
      * @param bool $isRecursion
      * @return bool
      */
-    public function deleteDowntime(Downtime $Downtime, $isRecursion = false){
+    public function deleteDowntime(Downtime $Downtime, $isRecursion = false) {
         $sql = "DELETE FROM statusengine_service_downtimehistory 
         WHERE hostname=? AND service_description=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=?";
 
@@ -140,6 +120,86 @@ class MysqlServiceDowntimehistory extends Mysql\MysqlModel {
 
     /**
      * @param Downtime $Downtime
+     * @return bool|\PDOStatement
+     * @throws UnknownTypeException
+     */
+    private function getQueryForCreatedOrLoadedDowntime(Downtime $Downtime) {
+        $query = $this->MySQL->prepare($this->getQuery($Downtime));
+        $i = 1;
+        $query->bindValue($i++, $Downtime->getHostName());
+        $query->bindValue($i++, $Downtime->getServiceDescription());
+        $query->bindValue($i++, $Downtime->getEntryTime());
+        $query->bindValue($i++, $Downtime->getAuthorName());
+        $query->bindValue($i++, $Downtime->getCommentData());
+        $query->bindValue($i++, $Downtime->getDowntimeId());
+        $query->bindValue($i++, $Downtime->getTriggeredBy());
+        $query->bindValue($i++, (int)$Downtime->isFixed());
+        $query->bindValue($i++, $Downtime->getDuration());
+        $query->bindValue($i++, $Downtime->getScheduledStartTime());
+        $query->bindValue($i++, $Downtime->getScheduledEndTime());
+        $query->bindValue($i++, $this->nodeName);
+
+        //Add dynamic fields
+        $query->bindValue($i++, (int)$Downtime->wasStarted());
+        $query->bindValue($i++, $Downtime->getActualStartTime());
+        $query->bindValue($i++, $Downtime->getActualEndTime());
+        $query->bindValue($i++, (int)$Downtime->wasCancelled());
+
+        return $query;
+    }
+
+    /**
+     * @param Downtime $Downtime
+     * @return bool|\PDOStatement
+     */
+    private function getQueryForStartedDowntime(Downtime $Downtime) {
+        $sql = "UPDATE statusengine_service_downtimehistory SET
+                was_started=?, actual_start_time=?
+                WHERE hostname=? AND service_description=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=?";
+
+
+        $query = $this->MySQL->prepare($sql);
+        //SET
+        $query->bindValue(1, (int)$Downtime->wasStarted());
+        $query->bindValue(2, $Downtime->getActualStartTime());
+
+        //WHERE
+        $query->bindValue(3, $Downtime->getHostName());
+        $query->bindValue(4, $Downtime->getServiceDescription());
+        $query->bindValue(5, $this->nodeName);
+        $query->bindValue(6, $Downtime->getScheduledStartTime());
+        $query->bindValue(7, $Downtime->getDowntimeId());
+
+        return $query;
+    }
+
+    /**
+     * @param Downtime $Downtime
+     * @return bool|\PDOStatement
+     */
+    private function getQueryForStoppedOrDeletedDowntime(Downtime $Downtime) {
+        $sql = "UPDATE statusengine_service_downtimehistory SET
+                actual_end_time=?, was_cancelled=?
+                WHERE hostname=? AND service_description=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=?";
+
+
+        $query = $this->MySQL->prepare($sql);
+        //SET
+        $query->bindValue(1, $Downtime->getActualEndTime());
+        $query->bindValue(2, (int)$Downtime->wasCancelled());
+
+        //WHERE
+        $query->bindValue(3, $Downtime->getHostName());
+        $query->bindValue(4, $Downtime->getServiceDescription());
+        $query->bindValue(5, $this->nodeName);
+        $query->bindValue(6, $Downtime->getScheduledStartTime());
+        $query->bindValue(7, $Downtime->getDowntimeId());
+
+        return $query;
+    }
+
+    /**
+     * @param Downtime $Downtime
      * @return string
      * @throws UnknownTypeException
      */
@@ -153,22 +213,6 @@ class MysqlServiceDowntimehistory extends Mysql\MysqlModel {
                     'actual_end_time=VALUES(actual_end_time)',
                     'was_cancelled=VALUES(was_cancelled)'
                 ]
-            ];
-            return $this->buildQueryString($dynamicFields);
-        }
-
-        if ($Downtime->wasDowntimeStarted()) {
-            $dynamicFields = [
-                'insert' => ['was_started', 'actual_start_time'],
-                'update' => ['was_started=VALUES(was_started)', 'actual_start_time=VALUES(actual_start_time)']
-            ];
-            return $this->buildQueryString($dynamicFields);
-        }
-
-        if ($Downtime->wasDowntimeStopped() || $Downtime->wasDowntimeDeleted()) {
-            $dynamicFields = [
-                'insert' => ['actual_end_time', 'was_cancelled'],
-                'update' => ['actual_end_time=VALUES(actual_end_time)', 'was_cancelled=VALUES(was_cancelled)']
             ];
             return $this->buildQueryString($dynamicFields);
         }

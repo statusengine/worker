@@ -191,7 +191,8 @@ class Crate implements \Statusengine\StorageBackend {
     }
 
     /**
-     * @return \Crate\PDO\PDO
+     * @return PDO
+     * @throws \Exception
      */
     public function reconnect() {
         $this->Connection = null;
@@ -208,7 +209,7 @@ class Crate implements \Statusengine\StorageBackend {
     /**
      * @param \PDOStatement $query
      * @return bool
-     * @throws StorageBackendUnavailableExceptions
+     * @throws \Exception
      */
     public function executeQuery(\PDOStatement $query) {
         $result = false;

@@ -137,7 +137,7 @@ class CrateHostScheduleddowntime extends Crate\CrateModel {
         if ($Downtime->wasDowntimeAdded() || $Downtime->wasRestoredFromRetentionDat() || $Downtime->wasDowntimeStarted()) {
             $dynamicFields = [
                 'insert' => ['was_started', 'actual_start_time'],
-                'update' => ['was_started=VALUES(was_started)', 'actual_start_time=VALUES(actual_start_time)']
+                'update' => ['was_started = excluded.was_started', 'actual_start_time = excluded.actual_start_time']
             ];
 
             $placeholdersToAdd = [];
