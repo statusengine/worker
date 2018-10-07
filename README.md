@@ -27,6 +27,12 @@ chmod +x worker/bin/*
 composer install
 ````
 
+## Docker
+* Have gearman, mysql, redis all up and running
+* Follow the official install guide's section on setting up mysql
+* Build the Docker container; this will pull in the example config file from etc/config.yml.example.
+* Run the docker container. You may also override the config file built into the container using the -v flag, like so: `docker run -v /path/config.yml:/opt/statusengine/worker/etc/config.yml <other arguments>`
+
 ## Config
 ````
 cp worker/etc/config.yml.example worker/etc/config.yml
@@ -43,7 +49,7 @@ php bin/Console.php cluster add --nodename NODENAME
 /opt/statusengine/worker/bin/StatusengineWorker.php
 ````
 
-## Proxy warnign
+## Proxy warning
 If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/environment`!
 
 ## Statusengine statistics
