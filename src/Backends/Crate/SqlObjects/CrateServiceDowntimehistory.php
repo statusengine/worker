@@ -34,8 +34,8 @@ class CrateServiceDowntimehistory extends Crate\CrateModel {
     (hostname, service_description, entry_time, author_name, comment_data, internal_downtime_id, triggered_by_id, is_fixed,
     duration, scheduled_start_time, scheduled_end_time, node_name %s)
     VALUES%s
-    ON DUPLICATE KEY UPDATE entry_time=VALUES(entry_time), author_name=VALUES(author_name), comment_data=VALUES(comment_data),
-    triggered_by_id=VALUES(triggered_by_id), is_fixed=VALUES(is_fixed), duration=VALUES(duration), scheduled_end_time=VALUES(scheduled_end_time) %s";
+    ON CONFLICT (hostname, service_description, node_name, scheduled_start_time, internal_downtime_id) DO UPDATE SET entry_time = excluded.entry_time, author_name = excluded.author_name, comment_data = excluded.comment_data,
+    triggered_by_id = excluded.triggered_by_id, is_fixed = excluded.is_fixed, duration = excluded.duration, scheduled_end_time = excluded.scheduled_end_time %s";
 
 
     /**
@@ -154,10 +154,10 @@ class CrateServiceDowntimehistory extends Crate\CrateModel {
             $dynamicFields = [
                 'insert' => ['was_started', 'actual_start_time', 'actual_end_time', 'was_cancelled'],
                 'update' => [
-                    'was_started=VALUES(was_started)',
-                    'actual_start_time=VALUES(actual_start_time)',
-                    'actual_end_time=VALUES(actual_end_time)',
-                    'was_cancelled=VALUES(was_cancelled)'
+                    'was_started = excluded.was_started',
+                    'actual_start_time = excluded.actual_start_time',
+                    'actual_end_time = excluded.actual_end_time',
+                    'was_cancelled = excluded.was_cancelled'
                 ]
             ];
             return $this->buildQueryString($dynamicFields);
@@ -166,7 +166,7 @@ class CrateServiceDowntimehistory extends Crate\CrateModel {
         if ($Downtime->wasDowntimeStarted()) {
             $dynamicFields = [
                 'insert' => ['was_started', 'actual_start_time'],
-                'update' => ['was_started=VALUES(was_started)', 'actual_start_time=VALUES(actual_start_time)']
+                'update' => ['was_started = excluded.was_started', 'actual_start_time = excluded.actual_start_time']
             ];
             return $this->buildQueryString($dynamicFields);
         }
@@ -174,7 +174,7 @@ class CrateServiceDowntimehistory extends Crate\CrateModel {
         if ($Downtime->wasDowntimeStopped() || $Downtime->wasDowntimeDeleted()) {
             $dynamicFields = [
                 'insert' => ['actual_end_time', 'was_cancelled'],
-                'update' => ['actual_end_time=VALUES(actual_end_time)', 'was_cancelled=VALUES(was_cancelled)']
+                'update' => ['actual_end_time = excluded.actual_end_time', 'was_cancelled = excluded.was_cancelled']
             ];
             return $this->buildQueryString($dynamicFields);
         }
