@@ -150,29 +150,32 @@ class ServicestatusChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
-                $Servicestatus = new Servicestatus($jobData);
+                $jobData = $this->convertJobToBulkJobObject($jobData);
+                foreach ($jobData->messages as $jobJson) {
+                    $Servicestatus = new Servicestatus($jobJson);
 
-                //Only save records that stay for more than 5 minutes in the queue
-                if ($Servicestatus->getStatusUpdateTime() < (time() - 500)) {
-                    continue;
+                    //Only save records that stay for more than 5 minutes in the queue
+                    if ($Servicestatus->getStatusUpdateTime() < (time() - 500)) {
+                        continue;
+                    }
+
+                    if ($this->isRedisEnabled) {
+                        $this->ServicestatusRedis->save(
+                            $Servicestatus->getKey(),
+                            $Servicestatus->serialize(),
+                            $Servicestatus->getExpires()
+                        );
+                        $this->ServicestatusList->updateList($Servicestatus);
+                    }
+
+                    if ($this->storeLiveDateInArchive) {
+                        $this->StorageBackend->saveServicestatus(
+                            $Servicestatus
+                        );
+                    }
+
+                    $this->Statistics->increase();
                 }
-
-                if ($this->isRedisEnabled) {
-                    $this->ServicestatusRedis->save(
-                        $Servicestatus->getKey(),
-                        $Servicestatus->serialize(),
-                        $Servicestatus->getExpires()
-                    );
-                    $this->ServicestatusList->updateList($Servicestatus);
-                }
-
-                if ($this->storeLiveDateInArchive) {
-                    $this->StorageBackend->saveServicestatus(
-                        $Servicestatus
-                    );
-                }
-
-                $this->Statistics->increase();
             }
 
             if ($this->storeLiveDateInArchive) {

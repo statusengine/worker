@@ -102,7 +102,10 @@ crate:
 # Performance settings
 # How many records get inserted in one statement
 # This value effects: CrateDB, MySQL and Elasticsearch
+# Recommendation for MySQL: 100
+# Recommendation for CrateDB: 10000
 number_of_bulk_records: 1000
+
 # Timeout in seconds Statusengine will wait that number_of_bulk_records is reached until a flush get forced
 # This value effects: CrateDB, MySQL and Elasticsearch
 max_bulk_delay: 5

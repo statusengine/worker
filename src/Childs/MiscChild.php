@@ -141,14 +141,17 @@ class MiscChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
-                if (property_exists($jobData, 'contactnotificationmethod')) {
-                    $this->handleNotifications($jobData);
-                }
-                if (property_exists($jobData, 'acknowledgement')) {
-                    $this->handleAcknowledgements($jobData);
-                }
-                if (property_exists($jobData, 'downtime')) {
-                    $this->handleDowntime($jobData);
+                $jobData = $this->convertJobToBulkJobObject($jobData);
+                foreach ($jobData->messages as $jobJson) {
+                    if (property_exists($jobJson, 'contactnotificationmethod')) {
+                        $this->handleNotifications($jobJson);
+                    }
+                    if (property_exists($jobJson, 'acknowledgement')) {
+                        $this->handleAcknowledgements($jobJson);
+                    }
+                    if (property_exists($jobJson, 'downtime')) {
+                        $this->handleDowntime($jobJson);
+                    }
                 }
             }
 
@@ -213,13 +216,13 @@ class MiscChild extends Child {
         if ($Downtime->wasDowntimeStopped() || $Downtime->wasDowntimeDeleted()) {
             //User delete the downtime or it is expired
             $ScheduleddowntimeBackend->deleteDowntime($Downtime);
-            
-            if($Downtime->wasDowntimeNeverStarted()) {
+
+            if ($Downtime->wasDowntimeNeverStarted()) {
                 //Downtime got deleted, before scheduled start_time was reached.
                 //Downtime had no effect - delete from downtime history
                 $DowntimehistoryBackend->deleteDowntime($Downtime);
             }
-            
+
         } else {
             if (!$Downtime->wasDowntimeDeleted() && !$Downtime->wasRestoredFromRetentionDat()) {
                 //Filter delete and load events

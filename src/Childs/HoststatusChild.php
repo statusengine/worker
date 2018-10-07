@@ -152,29 +152,32 @@ class HoststatusChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
-                $Hoststatus = new Hoststatus($jobData);
+                $jobData = $this->convertJobToBulkJobObject($jobData);
+                foreach ($jobData->messages as $jobJson) {
+                    $Hoststatus = new Hoststatus($jobJson);
 
-                //Only save records that stay for more than 5 minutes in the queue
-                if ($Hoststatus->getStatusUpdateTime() < (time() - 500)) {
-                    continue;
+                    //Only save records that stay for more than 5 minutes in the queue
+                    if ($Hoststatus->getStatusUpdateTime() < (time() - 500)) {
+                        continue;
+                    }
+
+                    if ($this->isRedisEnabled) {
+                        $this->HoststatusRedis->save(
+                            $Hoststatus->getKey(),
+                            $Hoststatus->serialize(),
+                            $Hoststatus->getExpires()
+                        );
+                        $this->HoststatusList->updateList($Hoststatus);
+                    }
+
+                    if ($this->storeLiveDateInArchive) {
+                        $this->StorageBackend->saveHoststatus(
+                            $Hoststatus
+                        );
+                    }
+
+                    $this->Statistics->increase();
                 }
-
-                if ($this->isRedisEnabled) {
-                    $this->HoststatusRedis->save(
-                        $Hoststatus->getKey(),
-                        $Hoststatus->serialize(),
-                        $Hoststatus->getExpires()
-                    );
-                    $this->HoststatusList->updateList($Hoststatus);
-                }
-
-                if ($this->storeLiveDateInArchive) {
-                    $this->StorageBackend->saveHoststatus(
-                        $Hoststatus
-                    );
-                }
-
-                $this->Statistics->increase();
             }
 
             if ($this->storeLiveDateInArchive) {

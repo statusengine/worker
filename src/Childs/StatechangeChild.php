@@ -112,11 +112,14 @@ class StatechangeChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
-                $Statechange = new Statechange($jobData);
-                $this->StorageBackend->saveStatechange(
-                    $Statechange
-                );
-                $this->Statistics->increase();
+                $jobData = $this->convertJobToBulkJobObject($jobData);
+                foreach ($jobData->messages as $jobJson) {
+                    $Statechange = new Statechange($jobJson);
+                    $this->StorageBackend->saveStatechange(
+                        $Statechange
+                    );
+                    $this->Statistics->increase();
+                }
             }
 
             $this->StorageBackend->dispatch();

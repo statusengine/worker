@@ -116,11 +116,14 @@ class HostcheckChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
-                $Hostcheck = new Hostcheck($jobData);
-                $this->StorageBackend->saveHostcheck(
-                    $Hostcheck
-                );
-                $this->Statistics->increase();
+                $jobData = $this->convertJobToBulkJobObject($jobData);
+                foreach ($jobData->messages as $jobJson) {
+                    $Hostcheck = new Hostcheck($jobJson);
+                    $this->StorageBackend->saveHostcheck(
+                        $Hostcheck
+                    );
+                    $this->Statistics->increase();
+                }
             }
 
             $this->StorageBackend->dispatch();
