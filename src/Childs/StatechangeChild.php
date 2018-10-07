@@ -112,6 +112,7 @@ class StatechangeChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
+                $jobData = $this->convertJobToBulkJobObject($jobData);
                 foreach ($jobData->messages as $jobJson) {
                     $Statechange = new Statechange($jobJson);
                     $this->StorageBackend->saveStatechange(

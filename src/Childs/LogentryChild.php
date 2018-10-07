@@ -117,6 +117,7 @@ class LogentryChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
+                $jobData = $this->convertJobToBulkJobObject($jobData);
                 foreach ($jobData->messages as $jobJson) {
                     $Logentry = new Logentry($jobJson);
                     $this->StorageBackend->saveLogentry(

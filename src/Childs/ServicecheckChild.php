@@ -116,6 +116,7 @@ class ServicecheckChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
+                $jobData = $this->convertJobToBulkJobObject($jobData);
                 foreach ($jobData->messages as $jobJson) {
                     $Servicecheck = new Servicecheck($jobJson);
                     $this->StorageBackend->saveServicecheck(

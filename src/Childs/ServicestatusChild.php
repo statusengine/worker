@@ -150,6 +150,7 @@ class ServicestatusChild extends Child {
         while (true) {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
+                $jobData = $this->convertJobToBulkJobObject($jobData);
                 foreach ($jobData->messages as $jobJson) {
                     $Servicestatus = new Servicestatus($jobJson);
 

@@ -55,6 +55,7 @@ class Child {
 
     /**
      * @return Pid
+     * @throws Exception\NotNumericValueException
      */
     public function fork() {
         $pid = pcntl_fork();
@@ -82,7 +83,23 @@ class Child {
         }
     }
 
-    public function setup(){
+    public function setup() {
         //Overwrite in child
+    }
+
+    /**
+     * @param $jobData
+     * @return \stdClass
+     */
+    public function convertJobToBulkJobObject($jobData) {
+        if (!property_exists($jobData, 'messages')) {
+            $jobDataObj = new \stdClass();
+            $jobDataObj->messages = [
+                $jobData
+            ];
+            return $jobDataObj;
+        }
+
+        return $jobData;
     }
 }
