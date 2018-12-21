@@ -269,10 +269,11 @@ class MySQL implements \Statusengine\StorageBackend {
 
     /**
      * @param \PDOStatement $query
+     * @param int $retry
      * @return bool
      * @throws StorageBackendUnavailableExceptions
      */
-    public function executeQuery(\PDOStatement $query) {
+    public function executeQuery(\PDOStatement $query, $retry = 0) {
         $result = false;
         try {
             $result = $query->execute();
@@ -286,6 +287,27 @@ class MySQL implements \Statusengine\StorageBackend {
                 $this->reconnect();
                 throw new StorageBackendUnavailableExceptions($errorString);
             }
+
+            if ($errorString == 'Connection timed out') {
+                $this->reconnect();
+                throw new StorageBackendUnavailableExceptions($errorString);
+            }
+
+            if ($errorNo == 1213 && $Exception->errorInfo[0] == 40001) {
+                //[1213] Deadlock found when trying to get lock; try restarting transaction
+                if ($retry < 10) {
+                    $retry++;
+                    $sleep = 50000 + rand(0, 450000);
+                    $this->Syslog->info(sprintf(
+                        'Try to resolve Deadlock %s/10. Next retry in %sms',
+                        $retry,
+                        floor($sleep / 1000)
+                    ));
+                    usleep($sleep);
+                    $this->executeQuery($query, $retry);
+                }
+            }
+
         }
         return $result;
     }
