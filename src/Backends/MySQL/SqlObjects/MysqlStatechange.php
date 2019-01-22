@@ -114,7 +114,10 @@ class MysqlStatechange extends Mysql\MysqlModel {
 
         $i = 1;
         foreach ($hostStatechangeCache as $Statechange) {
-            $query->bindValue($i++, $Statechange->getHostname());
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Statechange->getHostname())
+            );
             $query->bindValue($i++, $Statechange->getStateTime());
             $query->bindValue($i++, $Statechange->getState());
             $query->bindValue($i++, $Statechange->getStateChange());
@@ -152,8 +155,14 @@ class MysqlStatechange extends Mysql\MysqlModel {
 
         $i = 1;
         foreach ($serviceStatechangeCache as $Statechange) {
-            $query->bindValue($i++, $Statechange->getHostname());
-            $query->bindValue($i++, $Statechange->getServiceDescription());
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Statechange->getHostname())
+            );
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Statechange->getServiceDescription())
+            );
             $query->bindValue($i++, $Statechange->getStateTime());
             $query->bindValue($i++, $Statechange->getState());
             $query->bindValue($i++, $Statechange->getStateChange());

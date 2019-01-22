@@ -114,7 +114,10 @@ class MysqlNotification extends Mysql\MysqlModel {
 
         $i = 1;
         foreach ($hostNotificationCache as $Notification) {
-            $query->bindValue($i++, $Notification->getHostName());
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Notification->getHostName())
+            );
             $query->bindValue($i++, $Notification->getContactName());
             $query->bindValue($i++, $Notification->getCommandName());
             $query->bindValue($i++, $Notification->getCommandArgs());
@@ -152,8 +155,14 @@ class MysqlNotification extends Mysql\MysqlModel {
 
         $i = 1;
         foreach ($serviceNotificationCache as $Notification) {
-            $query->bindValue($i++, $Notification->getHostName());
-            $query->bindValue($i++, $Notification->getServiceDescription());
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Notification->getHostName())
+            );
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Notification->getServiceDescription())
+            );
             $query->bindValue($i++, $Notification->getContactName());
             $query->bindValue($i++, $Notification->getCommandName());
             $query->bindValue($i++, $Notification->getCommandArgs());

@@ -69,6 +69,11 @@ class MySQL implements \Statusengine\StorageBackend {
     private $nodeName;
 
     /**
+     * @var bool
+     */
+    private $binaryUuidInMySQL = false;
+
+    /**
      * MySQL constructor.
      * @param \Statusengine\Config $Config
      * @param BulkInsertObjectStore $BulkInsertObjectStore
@@ -79,6 +84,7 @@ class MySQL implements \Statusengine\StorageBackend {
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
         $this->Syslog = $Syslog;
         $this->nodeName = $Config->getNodeName();
+        $this->binaryUuidInMySQL = $this->Config->useBinaryUuidInMySQL();
     }
 
 
@@ -281,6 +287,10 @@ class MySQL implements \Statusengine\StorageBackend {
             $errorNo = $Exception->errorInfo[1];
             $errorString = $Exception->errorInfo[2];
             $this->Syslog->error(sprintf('[%s] %s', $errorNo, $errorString));
+
+            if($Exception instanceof \PDOException){
+                $this->Syslog->error($Exception->getTraceAsString());
+            }
 
             if ($errorString == 'MySQL server has gone away') {
                 $this->reconnect();
@@ -592,6 +602,18 @@ class MySQL implements \Statusengine\StorageBackend {
         $Servicestatus = new MysqlServicestatus($this, $this->BulkInsertObjectStore, $this->nodeName);
         $Servicestatus->truncate();
         $this->disconnect();
+    }
+
+    /**
+     * @param $data
+     * @return bool|string
+     */
+    public function toBin($data) {
+        if ($this->binaryUuidInMySQL === false) {
+            return $data;
+        }
+
+        return hex2bin(str_replace('-', '', $data));
     }
 
 }

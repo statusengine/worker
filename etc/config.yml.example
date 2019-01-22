@@ -84,6 +84,11 @@ mysql:
     password: password
     database: statusengine
 
+# If you use UUID's (v4) for hostname and service_description
+# Statusengine will save them as binary data
+# dashes ("-") will be removed automatically
+mysql_use_binary_uuid: 0
+
 # If Statusengine should save historical data to CrateDB
 # WARNING: Do not set use_crate and use_mysql to 1 at the same time!
 use_crate: 1

@@ -102,7 +102,10 @@ class MySQLHostDowntimehistory extends Mysql\MysqlModel {
         WHERE hostname=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=?";
 
         $query = $this->MySQL->prepare($sql);
-        $query->bindValue(1, $Downtime->getHostName());
+        $query->bindValue(
+            1,
+            $this->MySQL->toBin($Downtime->getHostName())
+        );
         $query->bindValue(2, $this->nodeName);
         $query->bindValue(3, $Downtime->getScheduledStartTime());
         $query->bindValue(4, $Downtime->getDowntimeId());
@@ -125,7 +128,10 @@ class MySQLHostDowntimehistory extends Mysql\MysqlModel {
     private function getQueryForCreatedOrLoadedDowntime(Downtime $Downtime) {
         $query = $this->MySQL->prepare($this->getQuery($Downtime));
         $i = 1;
-        $query->bindValue($i++, $Downtime->getHostName());
+        $query->bindValue(
+            $i++,
+            $this->MySQL->toBin($Downtime->getHostName())
+        );
         $query->bindValue($i++, $Downtime->getEntryTime());
         $query->bindValue($i++, $Downtime->getAuthorName());
         $query->bindValue($i++, $Downtime->getCommentData());
@@ -160,7 +166,10 @@ class MySQLHostDowntimehistory extends Mysql\MysqlModel {
         $query->bindValue(2, $Downtime->getActualStartTime());
 
         //WHERE
-        $query->bindValue(3, $Downtime->getHostName());
+        $query->bindValue(
+            3,
+            $this->MySQL->toBin($Downtime->getHostName())
+        );
         $query->bindValue(4, $this->nodeName);
         $query->bindValue(5, $Downtime->getScheduledStartTime());
         $query->bindValue(6, $Downtime->getDowntimeId());
@@ -183,7 +192,10 @@ class MySQLHostDowntimehistory extends Mysql\MysqlModel {
         $query->bindValue(2, (int)$Downtime->wasCancelled());
 
         //WHERE
-        $query->bindValue(3, $Downtime->getHostName());
+        $query->bindValue(
+            3,
+            $this->MySQL->toBin($Downtime->getHostName())
+        );
         $query->bindValue(4, $this->nodeName);
         $query->bindValue(5, $Downtime->getScheduledStartTime());
         $query->bindValue(6, $Downtime->getDowntimeId());

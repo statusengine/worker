@@ -55,7 +55,7 @@ class MysqlHostcheck extends Mysql\MysqlModel {
      * @param Mysql\MySQL $MySQL
      * @param BulkInsertObjectStore $BulkInsertObjectStore
      */
-    public function __construct(Mysql\MySQL $MySQL, BulkInsertObjectStore $BulkInsertObjectStore){
+    public function __construct(Mysql\MySQL $MySQL, BulkInsertObjectStore $BulkInsertObjectStore) {
         $this->MySQL = $MySQL;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
     }
@@ -64,7 +64,7 @@ class MysqlHostcheck extends Mysql\MysqlModel {
      * @param bool $isRecursion
      * @return bool
      */
-    public function insert($isRecursion = false){
+    public function insert($isRecursion = false) {
         /**
          * @var Hostcheck $Hostcheck
          */
@@ -74,7 +74,10 @@ class MysqlHostcheck extends Mysql\MysqlModel {
 
         $i = 1;
         foreach ($this->BulkInsertObjectStore->getObjects() as $key => $Hostcheck) {
-            $query->bindValue($i++, $Hostcheck->getHostName());
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Hostcheck->getHostName())
+            );
             $query->bindValue($i++, $Hostcheck->getState());
             $query->bindValue($i++, $Hostcheck->getStateType());
             $query->bindValue($i++, $Hostcheck->getStartTime());

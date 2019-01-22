@@ -72,8 +72,14 @@ class MysqlPerfdata extends MysqlModel {
         $query = $this->MySQL->prepare($baseQuery);
         $i = 1;
         foreach ($this->BulkInsertObjectStore->getObjects() as $key => $Gauge) {
-            $query->bindValue($i++, $Gauge->getHostName());
-            $query->bindValue($i++, $Gauge->getServiceDescription());
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Gauge->getHostName())
+            );
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Gauge->getServiceDescription())
+            );
             $query->bindValue($i++, $Gauge->getLabel());
             $query->bindValue($i++, ($Gauge->getTimestamp() * 1000));
             $query->bindValue($i++, $Gauge->getTimestamp());

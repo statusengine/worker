@@ -72,6 +72,7 @@ class MysqlTask extends MysqlModel {
     /**
      * @param array $uuids
      * @return array|bool
+     * @throws \Statusengine\Exception\StorageBackendUnavailableExceptions
      */
     public function deleteTaskByUuids($uuids = []) {
         if (empty($uuids)) {

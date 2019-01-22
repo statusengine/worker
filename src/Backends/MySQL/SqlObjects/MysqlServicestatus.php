@@ -81,8 +81,14 @@ class MysqlServicestatus extends MysqlModel {
 
         $i = 1;
         foreach ($this->BulkInsertObjectStore->getObjects() as $key => $Servicestatus) {
-            $query->bindValue($i++, $Servicestatus->getHostname());
-            $query->bindValue($i++, $Servicestatus->getServicedescription());
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Servicestatus->getHostname())
+            );
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Servicestatus->getServicedescription())
+            );
             $query->bindValue($i++, $Servicestatus->getStatusUpdateTime());
             $query->bindValue($i++, trim($Servicestatus->getPluginOutput()));
             $query->bindValue($i++, trim($Servicestatus->getLongPluginOutput()));

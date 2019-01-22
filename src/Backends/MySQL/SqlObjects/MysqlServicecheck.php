@@ -53,7 +53,7 @@ class MysqlServicecheck extends Mysql\MysqlModel {
      * @param Mysql\MySQL $MySQL
      * @param BulkInsertObjectStore $BulkInsertObjectStore
      */
-    public function __construct(Mysql\MySQL $MySQL, BulkInsertObjectStore $BulkInsertObjectStore){
+    public function __construct(Mysql\MySQL $MySQL, BulkInsertObjectStore $BulkInsertObjectStore) {
         $this->MySQL = $MySQL;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
     }
@@ -62,7 +62,7 @@ class MysqlServicecheck extends Mysql\MysqlModel {
      * @param bool $isRecursion
      * @return bool
      */
-    public function insert($isRecursion = false){
+    public function insert($isRecursion = false) {
 
         /**
          * @var Servicecheck $Servicecheck
@@ -73,8 +73,14 @@ class MysqlServicecheck extends Mysql\MysqlModel {
 
         $i = 1;
         foreach ($this->BulkInsertObjectStore->getObjects() as $key => $Servicecheck) {
-            $query->bindValue($i++, $Servicecheck->getHostName());
-            $query->bindValue($i++, $Servicecheck->getServiceDescription());
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Servicecheck->getHostName())
+            );
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Servicecheck->getServiceDescription())
+            );
             $query->bindValue($i++, $Servicecheck->getState());
             $query->bindValue($i++, $Servicecheck->getStateType());
             $query->bindValue($i++, $Servicecheck->getStartTime());

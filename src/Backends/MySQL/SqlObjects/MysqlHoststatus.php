@@ -60,7 +60,7 @@ class MysqlHoststatus extends MysqlModel {
      * @param MySQL $MySQL
      * @param BulkInsertObjectStore $BulkInsertObjectStore
      */
-    public function __construct(MySQL $MySQL, BulkInsertObjectStore $BulkInsertObjectStore, $nodeName){
+    public function __construct(MySQL $MySQL, BulkInsertObjectStore $BulkInsertObjectStore, $nodeName) {
         $this->MySQL = $MySQL;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
         $this->nodeName = $nodeName;
@@ -70,7 +70,7 @@ class MysqlHoststatus extends MysqlModel {
      * @param bool $isRecursion
      * @return bool
      */
-    public function insert($isRecursion = false){
+    public function insert($isRecursion = false) {
         /**
          * @var Hoststatus $Hoststatus
          */
@@ -80,7 +80,10 @@ class MysqlHoststatus extends MysqlModel {
 
         $i = 1;
         foreach ($this->BulkInsertObjectStore->getObjects() as $key => $Hoststatus) {
-            $query->bindValue($i++, $Hoststatus->getHostname());
+            $query->bindValue(
+                $i++,
+                $this->MySQL->toBin($Hoststatus->getHostname())
+            );
             $query->bindValue($i++, $Hoststatus->getStatusUpdateTime());
             $query->bindValue($i++, $Hoststatus->getPluginOutput());
             $query->bindValue($i++, $Hoststatus->getLongPluginOutput());
@@ -139,7 +142,7 @@ class MysqlHoststatus extends MysqlModel {
      * @param bool $isRecursion
      * @return bool
      */
-    public function truncate($isRecursion = false){
+    public function truncate($isRecursion = false) {
         $query = $this->MySQL->prepare('DELETE FROM statusengine_hoststatus WHERE node_name=?');
         $query->bindValue(1, $this->nodeName);
         try {

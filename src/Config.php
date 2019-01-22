@@ -856,5 +856,17 @@ class Config {
         return $config;
     }
 
+    /**
+     * @return bool
+     */
+    public function useBinaryUuidInMySQL() {
+        $default = false;
+        if (isset($this->config['mysql_use_binary_uuid'])) {
+            return (bool)$this->config['mysql_use_binary_uuid'];
+        }
+
+        return $default;
+    }
+
 
 }

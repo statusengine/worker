@@ -66,8 +66,14 @@ class MysqlServiceAcknowledgement extends Mysql\MysqlModel {
         $query = $this->MySQL->prepare($baseQuery);
         $i = 1;
 
-        $query->bindValue($i++, $this->Acknowledgement->getHostName());
-        $query->bindValue($i++, $this->Acknowledgement->getServiceDescription());
+        $query->bindValue(
+            $i++,
+            $this->MySQL->toBin($this->Acknowledgement->getHostName())
+        );
+        $query->bindValue(
+            $i++,
+            $this->MySQL->toBin($this->Acknowledgement->getServiceDescription())
+        );
         $query->bindValue($i++, $this->Acknowledgement->getState());
         $query->bindValue($i++, $this->Acknowledgement->getAuthorName());
         $query->bindValue($i++, $this->Acknowledgement->getCommentData());

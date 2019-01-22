@@ -69,8 +69,14 @@ class MysqlServiceScheduleddowntime extends Mysql\MysqlModel {
     public function saveDowntime(Downtime $Downtime, $isRecursion = false) {
         $query = $this->MySQL->prepare($this->getQuery($Downtime));
         $i = 1;
-        $query->bindValue($i++, $Downtime->getHostName());
-        $query->bindValue($i++, $Downtime->getServiceDescription());
+        $query->bindValue(
+            $i++,
+            $this->MySQL->toBin($Downtime->getHostName())
+        );
+        $query->bindValue(
+            $i++,
+            $this->MySQL->toBin($Downtime->getServiceDescription())
+        );
         $query->bindValue($i++, $Downtime->getEntryTime());
         $query->bindValue($i++, $Downtime->getAuthorName());
         $query->bindValue($i++, $Downtime->getCommentData());
@@ -108,8 +114,14 @@ class MysqlServiceScheduleddowntime extends Mysql\MysqlModel {
         WHERE hostname=? AND service_description=? AND node_name=? AND scheduled_start_time=? AND internal_downtime_id=?";
 
         $query = $this->MySQL->prepare($sql);
-        $query->bindValue(1, $Downtime->getHostName());
-        $query->bindValue(2, $Downtime->getServiceDescription());
+        $query->bindValue(
+            1,
+            $this->MySQL->toBin($Downtime->getHostName())
+        );
+        $query->bindValue(
+            2,
+            $this->MySQL->toBin($Downtime->getServiceDescription())
+        );
         $query->bindValue(3, $this->nodeName);
         $query->bindValue(4, $Downtime->getScheduledStartTime());
         $query->bindValue(5, $Downtime->getDowntimeId());

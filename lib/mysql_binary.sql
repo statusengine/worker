@@ -406,7 +406,7 @@ CREATE TABLE `statusengine_perfdata` (
   `timestamp_unix`      BIGINT(13) UNSIGNED NOT NULL,
   `value`               DOUBLE,
   `unit`                VARCHAR(10),
-  PRIMARY KEY (`service_description`, `timestamp_unix`),
+  PRIMARY KEY (`service_description`, `label`, `timestamp_unix`),
   KEY `metric` (`hostname`, `service_description`, `label`, `timestamp_unix`),
   KEY `timestamp_unix` (`timestamp_unix`)
 )

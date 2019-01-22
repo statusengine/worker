@@ -66,7 +66,10 @@ class MysqlHostAcknowledgement extends Mysql\MysqlModel {
         $query = $this->MySQL->prepare($baseQuery);
         $i = 1;
 
-        $query->bindValue($i++, $this->Acknowledgement->getHostName());
+        $query->bindValue(
+            $i++,
+            $this->MySQL->toBin($this->Acknowledgement->getHostName())
+        );
         $query->bindValue($i++, $this->Acknowledgement->getState());
         $query->bindValue($i++, $this->Acknowledgement->getAuthorName());
         $query->bindValue($i++, $this->Acknowledgement->getCommentData());
@@ -89,7 +92,7 @@ class MysqlHostAcknowledgement extends Mysql\MysqlModel {
     /**
      * @return string
      */
-    public function buildQuery(){
+    public function buildQuery() {
         return sprintf($this->baseQuery, $this->baseValue);
     }
 
