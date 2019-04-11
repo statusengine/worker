@@ -241,7 +241,7 @@ external_command_file: /opt/naemon/var/naemon.cmd
 # NOTICE! At the moment only Naemon supports to pass external commands through the query handler!
 # If you are using Nagios, you need to use the nagios.cmd (External Command File)
 # See: https://github.com/NagiosEnterprises/nagioscore/issues/364
-query_hander: /opt/naemon/var/naemon.qh
+query_handler: /opt/naemon/var/naemon.qh
 
 # Pass external commands to the external commands file.
 # Naemon and Nagios

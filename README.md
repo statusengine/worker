@@ -13,17 +13,17 @@ Visit the [documentation](https://statusengine.org/) for more information about 
 - CrateDB or MySQL
 - Redis
 - php >= 5.5.9
-- Ubuntu 14.04, 16.04 or 16.10
+- Ubuntu 14.04, 16.04, 18.04, Debian 9 or CentOS 7.5
 
-## Install (Ubuntu 14.04)
+## Install (Ubuntu 18.04)
 ````
-apt-get install redis-server php5-redis git php5-gearman
+apt-get install git php-cli php-zip php-redis redis-server php-mysql php-json php-gearman php-bcmath php-mbstring unzip
 
 mkdir -p /opt/statusengine
 cd /opt/statusengine
-git clone https://github.com/statusengine/worker.git
-cd worker/
-chmod +x worker/bin/*
+git clone https://github.com/statusengine/worker.git worker
+cd /opt/statusengine/worker
+chmod +x bin/*
 composer install
 ````
 
@@ -32,6 +32,14 @@ composer install
 cp worker/etc/config.yml.example worker/etc/config.yml
 ````
 Change `node_name` to a unique name in your monitoring cluster!
+
+#### Environment variables
+
+Statusengine Worker could also read the configuration
+out of environment variables.
+This can be handy if you want to run Statusengine Worker inside of Docker.
+Read the [documentation](docs/Env.md) for more information.
+
 
 ## Add node to the cluster
 ````
@@ -44,7 +52,8 @@ php bin/Console.php cluster add --nodename NODENAME
 ````
 
 ## Proxy warnign
-If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/environment`!
+If you are behind a proxy, set `no_proxy=127.0.0.1,localhost` in your `/etc/environment`
+or make sure to set `disable_http_proxy=1` in `config.yml` or `export SE_DISABLE_HTTP_PROXY=1`
 
 ## Statusengine statistics
 ````

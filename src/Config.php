@@ -1,7 +1,7 @@
 <?php
 /**
  * Statusengine Worker
- * Copyright (C) 2016-2018  Daniel Ziegler
+ * Copyright (C) 2016-2019  Daniel Ziegler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 namespace Statusengine;
 
+use Statusengine\Config\Env;
 use Statusengine\Exception\FileNotFoundException;
 
 use Symfony\Component\Yaml\Parser;
@@ -38,7 +39,6 @@ class Config {
     /**
      * Config constructor.
      * @param null $path
-     * @throws FileNotFoundException
      */
     public function __construct($path = null) {
         //default path
@@ -48,11 +48,6 @@ class Config {
             $this->path = $path;
         }
 
-
-        if (!file_exists($this->path)) {
-            throw new FileNotFoundException(sprintf('Config file %s not found or not readable', $this->path));
-        }
-
         $this->parse();
     }
 
@@ -60,10 +55,17 @@ class Config {
      * @return void
      */
     public function parse() {
-        $yaml = new Parser();
-        $config = $yaml->parse(file_get_contents($this->path));
 
-        $this->config = $config;
+        if (!file_exists($this->path)) {
+            printf('Config file %s not found or not readable%s', $this->path, PHP_EOL);
+            printf('Fallback to environment variables or default values%s.', PHP_EOL);
+            $this->config = [];
+        } else {
+            $yaml = new Parser();
+            $config = $yaml->parse(file_get_contents($this->path));
+
+            $this->config = $config;
+        }
     }
 
     /**
@@ -71,6 +73,7 @@ class Config {
      */
     public function getNodeName() {
         $default = 'node_name NOT SET';
+        $default = Env::get('SE_NODE_NAME', $default);
         if (isset($this->config['node_name'])) {
             return $this->config['node_name'];
         }
@@ -82,6 +85,7 @@ class Config {
      */
     public function isRedisEnabled() {
         $default = true;
+        $default = Env::get('SE_USE_REDIS', $default, Env::VALUE_BOOL);
         if (isset($this->config['use_redis'])) {
             return (bool)$this->config['use_redis'];
         }
@@ -93,6 +97,7 @@ class Config {
      */
     public function isCrateEnabled() {
         $default = false;
+        $default = Env::get('SE_USE_CRATE', $default, Env::VALUE_BOOL);
         if (isset($this->config['use_crate'])) {
             return (bool)$this->config['use_crate'];
         }
@@ -104,6 +109,7 @@ class Config {
      */
     public function isMysqlEnabled() {
         $default = false;
+        $default = Env::get('SE_USE_MYSQL', $default);
         if (isset($this->config['use_mysql'])) {
             return (bool)$this->config['use_mysql'];
         }
@@ -115,6 +121,7 @@ class Config {
      */
     public function isProcessPerfdataEnabled() {
         $default = false;
+        $default = Env::get('SE_PROCESS_PERFDATA', $default, Env::VALUE_BOOL);
         if (isset($this->config['process_perfdata'])) {
             return (bool)$this->config['process_perfdata'];
         }
@@ -125,44 +132,48 @@ class Config {
      * @return bool
      */
     public function isCratePerfdataBackend() {
-        if (!isset($this->config['perfdata_backend']) || !is_array($this->config['perfdata_backend'])) {
-            return false;
+        if (isset($this->config['perfdata_backend']) && is_array($this->config['perfdata_backend'])) {
+            return in_array('crate', $this->config['perfdata_backend'], true);
         }
 
-        return in_array('crate', $this->config['perfdata_backend'], true);
+        $config = Env::get('SE_PERFDATA_BACKEND', [], Env::VALUE_ARRAY);
+        return in_array('crate', $config, true);
     }
 
     /**
      * @return bool
      */
     public function isGraphitePerfdataBackend() {
-        if (!isset($this->config['perfdata_backend']) || !is_array($this->config['perfdata_backend'])) {
-            return false;
+        if (isset($this->config['perfdata_backend']) && is_array($this->config['perfdata_backend'])) {
+            return in_array('graphite', $this->config['perfdata_backend'], true);
         }
 
-        return in_array('graphite', $this->config['perfdata_backend'], true);
+        $config = Env::get('SE_PERFDATA_BACKEND', [], Env::VALUE_ARRAY);
+        return in_array('graphite', $config, true);
     }
 
     /**
      * @return bool
      */
     public function isMysqlPerfdataBackend() {
-        if (!isset($this->config['perfdata_backend']) || !is_array($this->config['perfdata_backend'])) {
-            return false;
+        if (isset($this->config['perfdata_backend']) && is_array($this->config['perfdata_backend'])) {
+            return in_array('mysql', $this->config['perfdata_backend'], true);
         }
 
-        return in_array('mysql', $this->config['perfdata_backend'], true);
+        $config = Env::get('SE_PERFDATA_BACKEND', [], Env::VALUE_ARRAY);
+        return in_array('mysql', $config, true);
     }
 
     /**
      * @return bool
      */
     public function isElasticsearchPerfdataBackend() {
-        if (!isset($this->config['perfdata_backend']) || !is_array($this->config['perfdata_backend'])) {
-            return false;
+        if (isset($this->config['perfdata_backend']) && is_array($this->config['perfdata_backend'])) {
+            return in_array('elasticsearch', $this->config['perfdata_backend'], true);
         }
 
-        return in_array('elasticsearch', $this->config['perfdata_backend'], true);
+        $config = Env::get('SE_PERFDATA_BACKEND', [], Env::VALUE_ARRAY);
+        return in_array('elasticsearch', $config, true);
     }
 
     /**
@@ -194,11 +205,11 @@ class Config {
      */
     public function getMysqlConfig() {
         $config = [
-            'host'     => '127.0.0.1',
-            'port'     => 3306,
-            'username' => 'statusengine',
-            'password' => 'password',
-            'database' => 'statusengine_data'
+            'host'     => Env::get('SE_MYSQL_HOST', '127.0.0.1'),
+            'port'     => Env::get('SE_MYSQL_PORT', 3306, Env::VALUE_INT),
+            'username' => Env::get('SE_MYSQL_USER', 'statusengine'),
+            'password' => Env::get('SE_MYSQL_PASSWORD', 'password'),
+            'database' => Env::get('SE_MYSQL_DATABASE', 'statusengine_data')
         ];
 
         foreach ($config as $key => $value) {
@@ -214,7 +225,7 @@ class Config {
      * @return array
      */
     public function getCrateConfig() {
-        $default = ['127.0.0.1:4200'];
+        $default = Env::get('SE_CRATE_NODES', ['127.0.0.1:4200'], Env::VALUE_ARRAY);
 
         if (isset($this->config['crate']['nodes'])) {
             if (is_array($this->config['crate']['nodes']) && !empty($this->config['crate']['nodes'])) {
@@ -230,9 +241,9 @@ class Config {
      */
     public function getGearmanConfig() {
         $config = [
-            'address' => '127.0.0.1',
-            'port'    => 4730,
-            'timeout' => 1000
+            'address' => Env::get('SE_GEARMAN_ADDRESS', '127.0.0.1'),
+            'port'    => Env::get('SE_GEARMAN_PORT', 4730, Env::VALUE_INT),
+            'timeout' => Env::get('SE_GEARMAN_TIMEOUT', 1000, Env::VALUE_INT)
         ];
 
         if (isset($this->config['gearman']['address'])) {
@@ -255,9 +266,9 @@ class Config {
      */
     public function getRedisConfig() {
         $config = [
-            'address' => '127.0.0.1',
-            'port'    => 6379,
-            'db'      => 0
+            'address' => Env::get('SE_REDIS_ADDRESS', '127.0.0.1'),
+            'port'    => Env::get('SE_REDIS_PORT', 6379, Env::VALUE_INT),
+            'db'      => Env::get('SE_REDIS_DB', 0, Env::VALUE_INT)
         ];
 
         if (isset($this->config['redis']['address'])) {
@@ -279,7 +290,7 @@ class Config {
      * @return int
      */
     public function getNumberOfServicestatusWorkers() {
-        $default = 1;
+        $default = Env::get('SE_NUMBER_SERVICESTATUS_WORKER', 1, Env::VALUE_INT);
         if (isset($this->config['number_servicestatus_worker'])) {
             if (is_numeric($this->config['number_servicestatus_worker'])) {
                 return (int)$this->config['number_servicestatus_worker'];
@@ -292,7 +303,7 @@ class Config {
      * @return int
      */
     public function getNumberOfHoststatusWorkers() {
-        $default = 1;
+        $default = Env::get('SE_NUMBER_HOSTSTATUS_WORKER', 1, Env::VALUE_INT);
         if (isset($this->config['number_hoststatus_worker'])) {
             if (is_numeric($this->config['number_hoststatus_worker'])) {
                 return (int)$this->config['number_hoststatus_worker'];
@@ -305,7 +316,7 @@ class Config {
      * @return int
      */
     public function getNumberOfLogentryWorkers() {
-        $default = 1;
+        $default = Env::get('SE_NUMBER_LOGENTRY_WORKER', 1, Env::VALUE_INT);
         if (isset($this->config['number_logentry_worker'])) {
             if (is_numeric($this->config['number_logentry_worker'])) {
                 return (int)$this->config['number_logentry_worker'];
@@ -318,7 +329,7 @@ class Config {
      * @return int
      */
     public function getNumberOfStatechangeWorkers() {
-        $default = 1;
+        $default = Env::get('SE_NUMBER_STATECHANGE_WORKER', 1, Env::VALUE_INT);
         if (isset($this->config['number_statechange_worker'])) {
             if (is_numeric($this->config['number_statechange_worker'])) {
                 return (int)$this->config['number_statechange_worker'];
@@ -331,7 +342,7 @@ class Config {
      * @return int
      */
     public function getNumberOfHostcheckWorkers() {
-        $default = 1;
+        $default = Env::get('SE_NUMBER_HOSTCHECK_WORKER', 1, Env::VALUE_INT);
         if (isset($this->config['number_hostcheck_worker'])) {
             if (is_numeric($this->config['number_hostcheck_worker'])) {
                 return (int)$this->config['number_hostcheck_worker'];
@@ -344,8 +355,8 @@ class Config {
      * @return int
      */
     public function getNumberOfServicecheckWorkers() {
-        $default = 1;
-        if (isset($this->config['number_servicecheck_worker'])) {
+        $default = Env::get('SE_NUMBER_HOSTCHECK_WORKER', 1, Env::VALUE_INT);
+        if (isset($this->config['SE_NUMBER_SERVICECHECK_WORKER'])) {
             if (is_numeric($this->config['number_servicecheck_worker'])) {
                 return (int)$this->config['number_servicecheck_worker'];
             }
@@ -357,7 +368,7 @@ class Config {
      * @return int
      */
     public function getNumberOfPerfdataWorkers() {
-        $default = 1;
+        $default = Env::get('SE_NUMBER_PERFDATA_WORKER', 1, Env::VALUE_INT);
         if (isset($this->config['number_perfdata_worker'])) {
             if (is_numeric($this->config['number_perfdata_worker'])) {
                 return (int)$this->config['number_perfdata_worker'];
@@ -370,7 +381,7 @@ class Config {
      * @return int
      */
     public function getNumberOfMiscWorkers() {
-        $default = 1;
+        $default = Env::get('SE_NUMBER_MISC_WORKER', 1, Env::VALUE_INT);
         if (isset($this->config['number_misc_worker'])) {
             if (is_numeric($this->config['number_misc_worker'])) {
                 return (int)$this->config['number_misc_worker'];
@@ -384,8 +395,8 @@ class Config {
      */
     public function getBulkSettings() {
         $config = [
-            'number_of_bulk_records' => 1000,
-            'max_bulk_delay'         => 15
+            'number_of_bulk_records' => Env::get('SE_NUMBER_OF_BULK_RECORDS', 1000, Env::VALUE_INT),
+            'max_bulk_delay'         => Env::get('SE_MAX_BULK_DELAY', 15, Env::VALUE_INT)
         ];
 
         if (isset($this->config['number_of_bulk_records'])) {
@@ -404,6 +415,7 @@ class Config {
      */
     public function storeLiveDateInArchive() {
         $default = false;
+        $default = Env::get('SE_STORE_LIVE_DATA_IN_ARCHIVE_BACKEND', $default, Env::VALUE_BOOL);
         if (isset($this->config['store_live_data_in_archive_backend'])) {
             return (bool)$this->config['store_live_data_in_archive_backend'];
         }
@@ -415,6 +427,7 @@ class Config {
      */
     public function checkForCommands() {
         $default = false;
+        $default = Env::get('SE_CHECK_FOR_COMMANDS', $default, Env::VALUE_BOOL);
         if (isset($this->config['check_for_commands'])) {
             return (bool)$this->config['check_for_commands'];
         }
@@ -426,6 +439,7 @@ class Config {
      */
     public function getCommandCheckInterval() {
         $default = 10;
+        $default = Env::get('SE_COMMAND_CHECK_INTERVAL', $default, Env::VALUE_INT);
         if (isset($this->config['command_check_interval'])) {
             $interval = (int)$this->config['command_check_interval'];
             if ($interval <= 0) {
@@ -441,8 +455,12 @@ class Config {
      */
     public function getQueryHandler() {
         $default = '/opt/naemon/var/naemon.qh';
+        $default = Env::get('SE_QUERY_HANDLER', $default);
         if (isset($this->config['query_hander'])) {
             return $this->config['query_hander'];
+        }
+        if (isset($this->config['query_handler'])) {
+            return $this->config['query_handler'];
         }
         return $default;
     }
@@ -452,6 +470,7 @@ class Config {
      */
     public function getExternalCommandFile() {
         $default = '/opt/naemon/var/naemon.cmd';
+        $default = Env::get('SE_EXTERNAL_COMMAND_FILE', $default);
         if (isset($this->config['external_command_file'])) {
             return $this->config['external_command_file'];
         }
@@ -463,6 +482,7 @@ class Config {
      */
     public function getSubmitMethod() {
         $default = 'cmd';
+        $default = Env::get('SE_SUBMIT_METHOD', $default);
         if (isset($this->config['submit_method'])) {
             return $this->config['submit_method'];
         }
@@ -473,7 +493,8 @@ class Config {
      * @return string
      */
     public function getGraphiteAddress() {
-        $default = "localhost";
+        $default = 'localhost';
+        $default = Env::get('SE_GRAPHITE_ADDRESS', $default);
         if (isset($this->config['graphite_address'])) {
             return (string)$this->config['graphite_address'];
         }
@@ -485,6 +506,7 @@ class Config {
      */
     public function getGraphitePort() {
         $default = 2003;
+        $default = Env::get('SE_GRAPHITE_PORT', $default, Env::VALUE_INT);
         if (isset($this->config['graphite_port'])) {
             return (int)$this->config['graphite_port'];
         }
@@ -496,6 +518,7 @@ class Config {
      */
     public function getGraphiteIllegalCharacters() {
         $default = "/[^a-zA-Z^0-9\-\.]/";
+        $default = Env::get('SE_GRAPHITE_ILLEGAL_CHARACTERS', $default);
         if (isset($this->config['graphite_illegal_characters'])) {
             return (string)$this->config['graphite_illegal_characters'];
         }
@@ -507,7 +530,8 @@ class Config {
      * @return string
      */
     public function getGraphitePrefix() {
-        $default = "statusengine";
+        $default = 'statusengine';
+        $default = Env::get('SE_GRAPHITE_PREFIX', $default);
         if (isset($this->config['graphite_prefix'])) {
             return (string)$this->config['graphite_prefix'];
         }
@@ -519,6 +543,7 @@ class Config {
      */
     public function getElasticsearchIndex() {
         $default = 'statusengine-metric';
+        $default = Env::get('SE_ELASTICSEARCH_INDEX', $default);
         if (isset($this->config['elasticsearch_index'])) {
             return (string)$this->config['elasticsearch_index'];
         }
@@ -530,6 +555,7 @@ class Config {
      */
     public function getElasticsearchPattern() {
         $default = 'none';
+        $default = Env::get('SE_ELASTICSEARCH_PATTERN', $default);
         $patterns = [
             'none',
             'daily',
@@ -549,13 +575,13 @@ class Config {
      */
     public function getElasticsearchTemplate() {
         $defaults = [
-            'name'               => 'statusengine-metric',
-            'number_of_shards'   => 1,
-            'number_of_replicas' => 0,
-            'refresh_interval'   => '15s',
-            'codec'              => 'best_compression',
-            'enable_all'         => 0,
-            'enable_source'      => 1
+            'name'               => Env::get('SE_ELASTICSEARCH_TEMPLATE_NAME', 'statusengine-metric'),
+            'number_of_shards'   => Env::get('SE_ELASTICSEARCH_TEMPLATE_NUMBER_OF_SHARDS', 1, Env::VALUE_INT),
+            'number_of_replicas' => Env::get('SE_ELASTICSEARCH_TEMPLATE_NUMBER_OF_REPLICAS', 0, Env::VALUE_INT),
+            'refresh_interval'   => Env::get('SE_ELASTICSEARCH_TEMPLATE_REFRESH_INTERVAL', '15s'),
+            'codec'              => Env::get('SE_ELASTICSEARCH_TEMPLATE_CODEC', 'best_compression'),
+            'enable_all'         => Env::get('SE_ELASTICSEARCH_TEMPLATE_ENABLE_ALL', 0, Env::VALUE_BOOL),
+            'enable_source'      => Env::get('SE_ELASTICSEARCH_TEMPLATE_ENABLE_SOURCE', 1, Env::VALUE_BOOL)
         ];
 
         if (!isset($this->config['elasticsearch_template']) || !is_array($this->config['elasticsearch_template'])) {
@@ -591,6 +617,7 @@ class Config {
      */
     public function getElasticsearchAddress() {
         $default = '127.0.0.1';
+        $default = Env::get('SE_ELASTICSEARCH_ADDRESS', $default);
         if (isset($this->config['elasticsearch_address'])) {
             return (string)$this->config['elasticsearch_address'];
         }
@@ -602,6 +629,7 @@ class Config {
      */
     public function getElasticsearchPort() {
         $default = 9200;
+        $default = Env::get('SE_ELASTICSEARCH_PORT', $default, Env::VALUE_INT);
         if (isset($this->config['elasticsearch_port'])) {
             return (int)$this->config['elasticsearch_port'];
         }
@@ -613,6 +641,7 @@ class Config {
      */
     public function isSyslogEnabled() {
         $default = true;
+        $default = Env::get('SE_SYSLOG_ENABLED', $default, Env::VALUE_BOOL);
         if (isset($this->config['syslog_enabled'])) {
             return (bool)$this->config['syslog_enabled'];
         }
@@ -623,7 +652,8 @@ class Config {
      * @return string
      */
     public function getSyslogTag() {
-        $default = "statusengine-worker";
+        $default = 'statusengine-worker';
+        $default = Env::get('SE_SYSLOG_TAG', $default);
         if (isset($this->config['syslog_tag'])) {
             return (string)$this->config['syslog_tag'];
         }
@@ -635,6 +665,7 @@ class Config {
      */
     public function getAgeHostchecks() {
         $default = 5;
+        $default = Env::get('SE_AGE_HOSTCHECKS', $default, Env::VALUE_INT);
         if (isset($this->config['age_hostchecks'])) {
             return (int)$this->config['age_hostchecks'];
         }
@@ -646,6 +677,7 @@ class Config {
      */
     public function getAgeHostAcknowledgements() {
         $default = 60;
+        $default = Env::get('SE_AGE_HOST_ACKNOWLEDGEMENTS', $default, Env::VALUE_INT);
         if (isset($this->config['age_host_acknowledgements'])) {
             return (int)$this->config['age_host_acknowledgements'];
         }
@@ -657,6 +689,7 @@ class Config {
      */
     public function getAgeHostNotifications() {
         $default = 5;
+        $default = Env::get('SE_AGE_HOST_NOTIFICATIONS', $default, Env::VALUE_INT);
         if (isset($this->config['age_host_notifications'])) {
             return (int)$this->config['age_host_notifications'];
         }
@@ -668,6 +701,7 @@ class Config {
      */
     public function getAgeHostStatehistory() {
         $default = 365;
+        $default = Env::get('SE_AGE_HOST_STATEHISTORY', $default, Env::VALUE_INT);
         if (isset($this->config['age_host_statehistory'])) {
             return (int)$this->config['age_host_statehistory'];
         }
@@ -679,6 +713,7 @@ class Config {
      */
     public function getAgeServicechecks() {
         $default = 5;
+        $default = Env::get('SE_AGE_SERVICECHECKS', $default, Env::VALUE_INT);
         if (isset($this->config['age_servicechecks'])) {
             return (int)$this->config['age_servicechecks'];
         }
@@ -690,6 +725,7 @@ class Config {
      */
     public function getAgeServiceAcknowledgements() {
         $default = 60;
+        $default = Env::get('SE_AGE_SERVICE_ACKNOWLEDGEMENTS', $default, Env::VALUE_INT);
         if (isset($this->config['age_service_acknowledgements'])) {
             return (int)$this->config['age_service_acknowledgements'];
         }
@@ -701,6 +737,7 @@ class Config {
      */
     public function getAgeServiceNotifications() {
         $default = 60;
+        $default = Env::get('SE_AGE_SERVICE_NOTIFICATIONS', $default, Env::VALUE_INT);
         if (isset($this->config['age_service_notifications'])) {
             return (int)$this->config['age_service_notifications'];
         }
@@ -712,6 +749,7 @@ class Config {
      */
     public function getAgeServiceStatehistory() {
         $default = 365;
+        $default = Env::get('SE_AGE_SERVICE_STATEHISTORY', $default, Env::VALUE_INT);
         if (isset($this->config['age_service_statehistory'])) {
             return (int)$this->config['age_service_statehistory'];
         }
@@ -723,6 +761,7 @@ class Config {
      */
     public function getAgeLogentries() {
         $default = 5;
+        $default = Env::get('SE_AGE_LOGENTRIES', $default, Env::VALUE_INT);
         if (isset($this->config['age_logentries'])) {
             return (int)$this->config['age_logentries'];
         }
@@ -734,6 +773,7 @@ class Config {
      */
     public function getAgeTasks() {
         $default = 5;
+        $default = Env::get('SE_AGE_TASKS', $default, Env::VALUE_INT);
         if (isset($this->config['age_tasks'])) {
             return (int)$this->config['age_tasks'];
         }
@@ -745,6 +785,7 @@ class Config {
      */
     public function getAgePerfdata() {
         $default = 90;
+        $default = Env::get('SE_AGE_PERFDATA', $default, Env::VALUE_INT);
         if (isset($this->config['age_perfdata'])) {
             return (int)$this->config['age_perfdata'];
         }
@@ -756,6 +797,7 @@ class Config {
      */
     public function getAgeHostDowntimes() {
         $default = 60;
+        $default = Env::get('SE_AGE_HOST_DOWNTIMES', $default, Env::VALUE_INT);
         if (isset($this->config['age_host_downtimes'])) {
             return (int)$this->config['age_host_downtimes'];
         }
@@ -767,6 +809,7 @@ class Config {
      */
     public function getAgeServiceDowntimes() {
         $default = 60;
+        $default = Env::get('SE_AGE_SERVICE_DOWNTIMES', $default, Env::VALUE_INT);
         if (isset($this->config['age_service_downtimes'])) {
             return (int)$this->config['age_service_downtimes'];
         }
@@ -778,6 +821,7 @@ class Config {
      */
     public function getDisableHttpProxy() {
         $default = true;
+        $default = Env::get('SE_DISABLE_HTTP_PROXY', $default, Env::VALUE_BOOL);
         if (isset($this->config['disable_http_proxy'])) {
             return (bool)$this->config['disable_http_proxy'];
         }
@@ -789,6 +833,7 @@ class Config {
      */
     public function isGearmanEnabled() {
         $default = true;
+        $default = Env::get('SE_USE_GEARMAN', $default, Env::VALUE_BOOL);
         if (isset($this->config['use_gearman'])) {
             return (bool)$this->config['use_gearman'];
         }
@@ -800,6 +845,7 @@ class Config {
      */
     public function isRabbitMqEnabled() {
         $default = false;
+        $default = Env::get('SE_USE_RABBITMQ', $default, Env::VALUE_BOOL);
         if (isset($this->config['use_rabbitmq'])) {
             return (bool)$this->config['use_rabbitmq'];
         }
@@ -811,14 +857,14 @@ class Config {
      */
     public function getRabbitMqConfig() {
         $config = [
-            'host'             => '127.0.0.1',
-            'port'             => 5672,
-            'user'             => 'statusengine',
-            'password'         => 'statusengine',
-            'vhost'            => '/',
-            'exchange'         => 'statusengine',
-            'durable_exchange' => false,
-            'durable_queues'   => false,
+            'host'             => Env::get('SE_RABBITMQ_HOST', '127.0.0.1'),
+            'port'             => Env::get('SE_RABBITMQ_PORT', 5672, Env::VALUE_INT),
+            'user'             => Env::get('SE_RABBITMQ_USER', 'statusengine'),
+            'password'         => Env::get('SE_RABBITMQ_PASSWORD', 'statusengine'),
+            'vhost'            => Env::get('SE_RABBITMQ_VHOST', '/'),
+            'exchange'         => Env::get('SE_RABBITMQ_EXCHANGE', 'statusengine'),
+            'durable_exchange' => Env::get('SE_RABBITMQ_DURABLE_EXCHANGE', false, Env::VALUE_BOOL),
+            'durable_queues'   => Env::get('SE_RABBITMQ_DURABLE_QUEUES', false, Env::VALUE_BOOL),
         ];
 
         if (isset($this->config['rabbitmq']['host'])) {
