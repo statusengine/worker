@@ -91,11 +91,11 @@ Even if its possible, I don't recommend to use a mix of both.
 
 ## Default values
 All variables have a predefined default value.
-Search in the file [src/Config.php](src/Config.php) for a variable name to get the default value.
+Search in the file [src/Config.php](/src/Config.php) for a variable name to get the default value.
 
 ## Documentation for each variable
 More information about each variable can be found in
-[etc/config.yml.example](etc/config.yml.example).
+[etc/config.yml.example](/etc/config.yml.example).
 Search for a variable without the `SE_` prefix.
 
 ## Data types
