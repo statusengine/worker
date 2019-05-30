@@ -109,7 +109,7 @@ class Config {
      */
     public function isMysqlEnabled() {
         $default = false;
-        $default = Env::get('SE_USE_MYSQL', $default);
+        $default = Env::get('SE_USE_MYSQL', $default, Env::VALUE_BOOL);
         if (isset($this->config['use_mysql'])) {
             return (bool)$this->config['use_mysql'];
         }

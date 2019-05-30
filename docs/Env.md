@@ -1,5 +1,5 @@
 Statusengine Worker is able to read the configuration from a config file or environment variable.
-If both is present the values from the configuration gets used as preferred values.
+If both is present the values from the configuration file gets used as preferred values.
 
 | Priority | Source               | Comment                                                        |
 |----------|----------------------|----------------------------------------------------------------|
@@ -108,17 +108,32 @@ Search for a variable without the `SE_` prefix.
 
 
 ## Examples
-#### Docker
+
+This examples work without any config.yml file.
+
+### bash
 ````
-docker run \
-  -d \
-  --name=statusengine-worker \
-  -e "SE_NODE_NAME=Statusengine" \
-  -e "SE_USE_CRATE=1" \
-  -e "SE_USE_GEARMAN=1" \
-  -e "SE_GEARMAN_ADDRESS=192.168.10.6"
-  -e "SE_CRATE_NODES=192.168.10.5:4200" \  
-  statusengine/worker
+#!/bin/bash
+export SE_NODE_NAME="Statusengine"
+export SE_USE_GEARMAN=1
+
+export SE_USE_MYSQL=1
+export SE_STORE_LIVE_DATA_IN_ARCHIVE_BACKEND=1
+export SE_MYSQL_USER="statusengine"
+export SE_MYSQL_PASSWORD="password"
+export SE_MYSQL_DATABASE="statusengine_data"
+
+export SE_MAX_BULK_DELAY=2
+export SE_NUMBER_OF_BULK_RECORDS=100
+
+export SE_PROCESS_PERFDATA=1
+export SE_PERFDATA_BACKEND="mysql"
+
+export SE_CHECK_FOR_COMMANDS=1
+export SE_EXTERNAL_COMMAND_FILE="/opt/naemon/var/naemon.cmd"
+
+/opt/statusengine/worker/bin/StatusengineWorker.php 
+
 ````
 
 #### systemd
@@ -129,10 +144,22 @@ After=syslog.target network.target gearman-job-server.service crate.service
 
 [Service]
 Environment="SE_NODE_NAME=Statusengine"
-Environment="SE_USE_CRATE=1"
 Environment="SE_USE_GEARMAN=1"
-Environment="SE_GEARMAN_ADDRESS=192.168.10.6"
-Environment="SE_CRATE_NODES=192.168.10.5:4200"
+
+Environment="SE_USE_MYSQL=1"
+Environment="SE_STORE_LIVE_DATA_IN_ARCHIVE_BACKEND=1"
+Environment="SE_MYSQL_USER=statusengine"
+Environment="SE_MYSQL_PASSWORD=password"
+Environment="SE_MYSQL_DATABASE=statusengine_data"
+
+Environment="SE_MAX_BULK_DELAY=2"
+Environment="SE_NUMBER_OF_BULK_RECORDS=100"
+
+Environment="SE_PROCESS_PERFDATA=1"
+Environment="SE_PERFDATA_BACKEND=mysql"
+
+Environment="SE_CHECK_FOR_COMMANDS=1
+Environment="SE_EXTERNAL_COMMAND_FILE=/opt/naemon/var/naemon.cmd"
 
 User=root
 Type=simple
@@ -143,18 +170,23 @@ ExecStart=/opt/statusengine/worker/bin/StatusengineWorker.php
 WantedBy=multi-user.target
 ````
 
-### bash
+
+#### Docker 
 ````
-#!/bin/bash
-export SE_NODE_NAME="Statusengine"
-export SE_USE_MYSQL=1
-export SE_USE_GEARMAN=1
-export SE_MYSQL_USER="statusengine"
-export SE_MYSQL_PASSWORD="password"
-export SE_MYSQL_DATABASE="statusengine_data"
-export SE_PROCESS_PERFDATA=1
-export SE_PERFDATA_BACKEND="mysql"
-
-/opt/statusengine/worker/bin/StatusengineWorker.php 
-
+docker run \
+  -d \
+  --name=statusengine-worker \
+  -e "SE_NODE_NAME=Statusengine" \
+  -e "SE_USE_CRATE=1" \
+  -e "SE_USE_GEARMAN=1" \
+  -e "SE_GEARMAN_ADDRESS=192.168.10.6"
+  -e "SE_CRATE_NODES=192.168.10.5:4200" \
+  -e "SE_STORE_LIVE_DATA_IN_ARCHIVE_BACKEND=1" \
+  -e "SE_MAX_BULK_DELAY=2" \
+  -e "SE_NUMBER_OF_BULK_RECORDS=100" \
+  -e "SE_PROCESS_PERFDATA=1" \
+  -e "SE_PERFDATA_BACKEND=mysql" \
+  -e "SE_CHECK_FOR_COMMANDS=1 \
+  -e "SE_EXTERNAL_COMMAND_FILE=/opt/naemon/var/naemon.cmd" \
+  ...
 ````

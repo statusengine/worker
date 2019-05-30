@@ -38,7 +38,7 @@ Change `node_name` to a unique name in your monitoring cluster!
 Statusengine Worker could also read the configuration
 out of environment variables.
 This can be handy if you want to run Statusengine Worker inside of Docker.
-Read the [documentation](docs/Env.md) for more information.
+See the [list of environment variables](docs/Env.md) for more information.
 
 
 ## Add node to the cluster
