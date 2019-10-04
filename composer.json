@@ -21,6 +21,8 @@
     "ext-gearman": "*",
     "ext-mbstring": "*",
     "ext-bcmath": "*",
+    "ext-json": "*",
+    "ext-iconv": "*",
     "symfony/yaml": "2.8",
     "symfony/console": "2.8",
     "crate/crate-dbal":"*",

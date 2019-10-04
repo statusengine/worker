@@ -95,7 +95,7 @@ class StatechangeChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->QueueingEngine = new QueueingEngine($this->Config, $this->StatechangeConfig);
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->StatechangeConfig, $this->Syslog);
         $this->Queue = $this->QueueingEngine->getQueue();
         $this->Queue->connect();
     }

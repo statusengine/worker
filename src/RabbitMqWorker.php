@@ -59,13 +59,19 @@ class RabbitMqWorker implements QueueInterface {
     private $consumerId;
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * GearmanWorker constructor.
      * @param WorkerConfig $WorkerConfig
      * @param Config $Config
      */
-    public function __construct(WorkerConfig $WorkerConfig, Config $Config) {
+    public function __construct(WorkerConfig $WorkerConfig, Config $Config, Syslog $Syslog) {
         $this->WorkerConfig = $WorkerConfig;
         $this->Config = $Config;
+        $this->Syslog = $Syslog;
         $this->addQueue($this->WorkerConfig);
 
         //$this->consumerId = 'StatusengineWorker-' . getmygid();
@@ -156,7 +162,7 @@ class RabbitMqWorker implements QueueInterface {
         //Hide Warning Interrupted system call on SIGINT/SIGTERM
         if (($changeStreamsCount = @stream_select($read, $write, $except, 1)) === false) {
             return null;
-        } elseif ($changeStreamsCount > 0 || $this->channel->hasPendingMethods()) {
+        } else if ($changeStreamsCount > 0 || $this->channel->hasPendingMethods()) {
             $this->channel->wait();
         }
 
@@ -172,7 +178,11 @@ class RabbitMqWorker implements QueueInterface {
      */
     public function handleJob($message) {
         $this->lastJobData = null;
-        $this->lastJobData = json_decode($message->body);
+        $data = JSONUTF8::decodeJson($message->body, $this->Syslog);
+        if ($data) {
+            $this->lastJobData = $data;
+        }
+
         $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
     }
 

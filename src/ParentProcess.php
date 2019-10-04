@@ -114,7 +114,7 @@ class ParentProcess {
         $this->StorageBackend = $StorageBackend;
         $this->ChildFactory = $ChildFactory;
 
-        $this->QueueingEngine = new QueueingEngine($this->Config, $this->MonitoringRestartConfig);
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->MonitoringRestartConfig, $this->Syslog);
         $this->Queue = $this->QueueingEngine->getQueue();
         $this->Queue->connect();
 
