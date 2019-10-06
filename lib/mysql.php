@@ -15,7 +15,7 @@ $table->addOption("collation" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("id", "integer", array (
   'unsigned' => false,
-  'autoincrement' => false,
+  'autoincrement' => true,
   'notnull' => true,
   'default' => NULL,
 ));
