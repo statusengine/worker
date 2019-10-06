@@ -284,15 +284,19 @@ class Database extends Command {
 
         foreach ($sql as $query) {
             $output->writeln('<comment>' . $query . '</comment>');
-            if($dryrun === false) {
-                $stmt = $connection->query($query);
-                $stmt->execute();
+            if ($dryrun === false) {
+                try {
+                    $stmt = $connection->query($query);
+                } catch (\Exception $e) {
+                    $output->writeln('<error>' . $e->getMessage() . '</error>');
+                }
+                unset($stmt);
             }
         }
 
-        if($dryrun === false) {
+        if ($dryrun === false) {
             $output->writeln('<info>Database schema updated successfully</info>');
-        }else{
+        } else {
             $output->writeln('<info>No modifications where done to database!!!</info>');
         }
     }

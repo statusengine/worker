@@ -593,14 +593,14 @@ $table->addColumn("long_output", "string", array (
   'default' => NULL,
   'length' => 8192,
 ));
+$table->setPrimaryKey([
+    "hostname",
+    "start_time"
+]);
 $table->addIndex([
-    "start_time", 
+    "start_time",
     "end_time"
 ], "times");
-$table->addIndex([
-    "hostname", 
-    "start_time"
-], "hostname");
 
 
 
@@ -1012,9 +1012,9 @@ $table->addColumn("unit", "string", array (
   'length' => 10,
 ));
 $table->addIndex([
-    "hostname", 
-    "service_description", 
-    "label", 
+    "hostname",
+    "service_description",
+    "label",
     "timestamp_unix"
 ], "metric");
 $table->addIndex([
@@ -1320,7 +1320,7 @@ $table->addColumn("ack_data", "string", array (
   'length' => 1024,
 ));
 $table->addIndex([
-    "hostname", 
+    "hostname",
     "service_description"
 ], "servicename");
 $table->addIndex([
@@ -1518,16 +1518,11 @@ $table->addColumn("long_output", "string", array (
   'default' => NULL,
   'length' => 8192,
 ));
-$table->addIndex([
-    "service_description", 
+$table->setPrimaryKey([
+    "hostname",
+    "service_description",
     "state_time"
-], "servicename_time");
-$table->addIndex([
-    "hostname", 
-    "service_description", 
-    "state_time"
-], "host_servicename_time");
-
+]);
 
 
 /****************************************
@@ -1639,11 +1634,11 @@ $table->addColumn("long_output", "string", array (
   'default' => NULL,
   'length' => 8192,
 ));
-$table->addIndex([
+$table->setPrimaryKey([
     "hostname", 
     "service_description", 
     "start_time"
-], "servicename");
+]);
 
 
 
