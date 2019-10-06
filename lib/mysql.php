@@ -6,8 +6,6 @@ use Doctrine\DBAL\Schema\Schema;
 require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'bootstrap.php';
 $schema = new Schema();
 
-$tables = [];
-
 /****************************************
  * Define: statusengine_dbversion
  ***************************************/
@@ -31,9 +29,6 @@ $table->addColumn("dbversion", "string", array (
 $table->setPrimaryKey([
     "id"
 ]);
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -107,9 +102,6 @@ $table->addIndex([
 $table->addIndex([
     "hostname"
 ], "hostname");
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -227,9 +219,6 @@ $table->addIndex([
     "was_cancelled"
 ], "list");
 
-//Add table to collection
-$tables[] = $table;
-
 
 
 /****************************************
@@ -318,9 +307,6 @@ $table->addIndex([
 $table->addIndex([
     "hostname"
 ], "hostname");
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -420,9 +406,6 @@ $table->setPrimaryKey([
     "internal_downtime_id"
 ]);
 
-//Add table to collection
-$tables[] = $table;
-
 
 
 /****************************************
@@ -505,9 +488,6 @@ $table->setPrimaryKey([
     "hostname", 
     "state_time"
 ]);
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -621,9 +601,6 @@ $table->addIndex([
     "hostname", 
     "start_time"
 ], "hostname");
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -892,9 +869,6 @@ $table->setPrimaryKey([
     "hostname"
 ]);
 
-//Add table to collection
-$tables[] = $table;
-
 
 
 /****************************************
@@ -949,9 +923,6 @@ $table->addIndex([
     "entry_time"
 ], "logentry_data_time");
 
-//Add table to collection
-$tables[] = $table;
-
 
 
 /****************************************
@@ -984,9 +955,6 @@ $table->addColumn("node_start_time", "bigint", array (
 $table->setPrimaryKey([
     "node_name"
 ]);
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -1052,9 +1020,6 @@ $table->addIndex([
 $table->addIndex([
     "timestamp_unix"
 ], "timestamp_unix");
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -1140,9 +1105,6 @@ $table->addIndex([
 $table->addIndex([
     "entry_time"
 ], "entry_time");
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -1268,9 +1230,6 @@ $table->addIndex([
     "was_cancelled"
 ], "report");
 
-//Add table to collection
-$tables[] = $table;
-
 
 
 /****************************************
@@ -1367,9 +1326,6 @@ $table->addIndex([
 $table->addIndex([
     "start_time"
 ], "start_time");
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -1477,9 +1433,6 @@ $table->setPrimaryKey([
     "internal_downtime_id"
 ]);
 
-//Add table to collection
-$tables[] = $table;
-
 
 
 /****************************************
@@ -1574,9 +1527,6 @@ $table->addIndex([
     "service_description", 
     "state_time"
 ], "host_servicename_time");
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -1694,9 +1644,6 @@ $table->addIndex([
     "service_description", 
     "start_time"
 ], "servicename");
-
-//Add table to collection
-$tables[] = $table;
 
 
 
@@ -1991,9 +1938,6 @@ $table->addIndex([
     "current_state"
 ], "issues");
 
-//Add table to collection
-$tables[] = $table;
-
 
 
 /****************************************
@@ -2044,9 +1988,6 @@ $table->addIndex([
     "node_name"
 ], "node_name");
 
-//Add table to collection
-$tables[] = $table;
-
 
 
 /****************************************
@@ -2074,9 +2015,6 @@ $table->addIndex([
     "username", 
     "password"
 ], "username");
-
-//Add table to collection
-$tables[] = $table;
 
 
 

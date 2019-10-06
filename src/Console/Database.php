@@ -70,6 +70,7 @@ class Database extends Command {
 
         $this->addOption('dump', null, InputOption::VALUE_OPTIONAL, 'Will dump the current SQL schema fromm the database to a PHP file.', false);
         $this->addOption('update', null, InputOption::VALUE_OPTIONAL, 'Will the database schema.', false);
+        $this->addOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'Only print all queries but dont execute. (--update only)', false);
 
     }
 
@@ -139,7 +140,7 @@ class Database extends Command {
 
         if ($input->getOption('update') === null) {
             $output->writeln('Start updating your database...');
-            $this->updateDatabase($schema, $connection, $output);
+            $this->updateDatabase($schema, $connection, $output, $input->getOption('dry-run') === null);
         }
 
     }
@@ -258,7 +259,14 @@ class Database extends Command {
         throw new \RuntimeException("CrateDB driver don't have sharts and primary key implemented");
     }
 
-    public function updateDatabase(Schema $fromSchema, Connection $connection, OutputInterface $output) {
+    /**
+     * @param Schema $fromSchema
+     * @param Connection $connection
+     * @param OutputInterface $output
+     * @param bool $dryrun
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function updateDatabase(Schema $fromSchema, Connection $connection, OutputInterface $output, $dryrun = false) {
         if (!file_exists($this->getFullFileName())) {
             throw new \RuntimeException(
                 sprintf('File not found: %s', $this->getFullFileName())
@@ -276,11 +284,17 @@ class Database extends Command {
 
         foreach ($sql as $query) {
             $output->writeln('<comment>' . $query . '</comment>');
-            $stmt = $connection->query($query);
-            $stmt->execute();
+            if($dryrun === false) {
+                $stmt = $connection->query($query);
+                $stmt->execute();
+            }
         }
 
-        $output->writeln('<info>Database schema updated successfully</info>');
+        if($dryrun === false) {
+            $output->writeln('<info>Database schema updated successfully</info>');
+        }else{
+            $output->writeln('<info>No modifications where done to database!!!</info>');
+        }
     }
 
     /**
