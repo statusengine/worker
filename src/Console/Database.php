@@ -40,6 +40,16 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
+/**
+ * Class Database
+ * @package Statusengine\Console
+ *
+ * Dump current database schema to php file
+ * bin/Console.php database --dump
+ *
+ * Patch current database schema to schema defined in the php file
+ * bin/Console.php database --update --dry-run
+ */
 class Database extends Command {
 
     /**
