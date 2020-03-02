@@ -128,7 +128,7 @@ class HoststatusChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->QueueingEngine = new QueueingEngine($this->Config, $this->HoststatusConfig);
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->HoststatusConfig, $this->Syslog);
         $this->Queue = $this->QueueingEngine->getQueue();
         $this->Queue->connect();
 

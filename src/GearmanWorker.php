@@ -49,13 +49,20 @@ class GearmanWorker implements QueueInterface {
     private $queues = [];
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * GearmanWorker constructor.
      * @param WorkerConfig $WorkerConfig
      * @param Config $Config
+     * @param Syslog $Syslog
      */
-    public function __construct(WorkerConfig $WorkerConfig, Config $Config) {
+    public function __construct(WorkerConfig $WorkerConfig, Config $Config, Syslog $Syslog) {
         $this->WorkerConfig = $WorkerConfig;
         $this->Config = $Config;
+        $this->Syslog = $Syslog;
         $this->addQueue($this->WorkerConfig);
     }
 
@@ -93,12 +100,16 @@ class GearmanWorker implements QueueInterface {
     }
 
     /**
-     * @param $job
+     * @param \GearmanJob $job
      * @return void
      */
     public function handleJob($job) {
         $this->lastJobData = null;
-        $this->lastJobData = json_decode($job->workload());
+
+        $data = JSONUTF8::decodeJson($job->workload(), $this->Syslog);
+        if($data){
+            $this->lastJobData = $data;
+        }
     }
 
 }

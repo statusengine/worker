@@ -100,7 +100,7 @@ class LogentryChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->QueueingEngine = new QueueingEngine($this->Config, $this->LogentryConfig);
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->LogentryConfig, $this->Syslog);
         $this->Queue = $this->QueueingEngine->getQueue();
         $this->Queue->connect();
     }

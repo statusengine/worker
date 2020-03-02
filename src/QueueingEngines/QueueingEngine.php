@@ -22,6 +22,7 @@ namespace Statusengine\QueueingEngines;
 use Statusengine\Config;
 use Statusengine\GearmanWorker;
 use Statusengine\RabbitMqWorker;
+use Statusengine\Syslog;
 
 class QueueingEngine {
 
@@ -35,9 +36,15 @@ class QueueingEngine {
      */
     private $WorkerConfig;
 
-    public function __construct(Config $Config, Config\WorkerConfig $WorkerConfig) {
+    /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    public function __construct(Config $Config, Config\WorkerConfig $WorkerConfig, Syslog $Syslog) {
         $this->Config = $Config;
         $this->WorkerConfig = $WorkerConfig;
+        $this->Syslog = $Syslog;
     }
 
     /**
@@ -45,11 +52,11 @@ class QueueingEngine {
      */
     public function getQueue(){
         if($this->Config->isGearmanEnabled()){
-            return new GearmanWorker($this->WorkerConfig, $this->Config);
+            return new GearmanWorker($this->WorkerConfig, $this->Config, $this->Syslog);
         }
 
         if($this->Config->isRabbitMqEnabled()){
-            return new RabbitMqWorker($this->WorkerConfig, $this->Config);
+            return new RabbitMqWorker($this->WorkerConfig, $this->Config, $this->Syslog);
         }
     }
 
