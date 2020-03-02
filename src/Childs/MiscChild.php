@@ -121,7 +121,7 @@ class MiscChild extends Child {
         $this->SignalHandler->bind();
 
 
-        $this->QueueingEngine = new QueueingEngine($this->Config, $this->NotificationConfig);
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->NotificationConfig, $this->Syslog);
         $this->Queue = $this->QueueingEngine->getQueue();
         $this->Queue->addQueue($this->AcknowledgementConfig);
         $this->Queue->addQueue($this->DowntimeConfig);

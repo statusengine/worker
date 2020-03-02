@@ -1,7 +1,8 @@
 <?php
 /**
- * Statusengine UI
- * Copyright (C) 2018  Daniel Ziegler
+ * Statusengine Worker
+ * Copyright (C) 2016-2019  Daniel Ziegler
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,6 +21,7 @@ namespace Statusengine\QueueingEngines;
 
 
 use Statusengine\Config;
+use Statusengine\Syslog;
 
 interface QueueInterface {
 
@@ -28,7 +30,7 @@ interface QueueInterface {
      * @param Config\WorkerConfig $WorkerConfig
      * @param Config $Config
      */
-    public function __construct(Config\WorkerConfig $WorkerConfig, Config $Config);
+    public function __construct(Config\WorkerConfig $WorkerConfig, Config $Config, Syslog $Syslog);
 
     /**
      * @return void

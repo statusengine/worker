@@ -99,7 +99,7 @@ class HostcheckChild extends Child {
 
         $this->SignalHandler->bind();
 
-        $this->QueueingEngine = new QueueingEngine($this->Config, $this->HostcheckConfig);
+        $this->QueueingEngine = new QueueingEngine($this->Config, $this->HostcheckConfig, $this->Syslog);
         $this->Queue = $this->QueueingEngine->getQueue();
         $this->Queue->connect();
     }
