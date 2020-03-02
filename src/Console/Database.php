@@ -52,6 +52,8 @@ use Symfony\Component\Console\Input\InputArgument;
  */
 class Database extends Command {
 
+    const DB_VERSION = '3.7.0';
+
     /**
      * @var Config
      */
@@ -301,6 +303,16 @@ class Database extends Command {
                     $output->writeln('<error>' . $e->getMessage() . '</error>');
                 }
                 unset($stmt);
+            }
+        }
+
+        $query = 'INSERT INTO statusengine_dbversion (id, dbversion)VALUES(1, \'' . self::DB_VERSION . '\') ON DUPLICATE KEY UPDATE dbversion=\'' . self::DB_VERSION . '\'';
+        $output->writeln('<comment>' . $query . '</comment>');
+        if ($dryrun === false) {
+            try {
+                $stmt = $connection->query($query);
+            } catch (\Exception $e) {
+                $output->writeln('<error>' . $e->getMessage() . '</error>');
             }
         }
 
