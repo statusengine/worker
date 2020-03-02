@@ -1,5 +1,13 @@
 -- THIS IS NOT A CrateDB.sql FILE
 -- THIS FILE WAS CREATED FOR MySQL
+--
+-- The usage of this file is DEPRECATED and support for plain SQL dumps will be dropped soon!
+-- Please use the following command to create and update your database
+-- /opt/statusengine/worker/bin/Console.php database --update
+--
+-- Use the --dry-run option to see all SQL statements that will be executed without touching your live database
+-- /opt/statusengine/worker/bin/Console.php database --update --dry-run
+--
 
 CREATE TABLE IF NOT EXISTS `statusengine_logentries`
 (
