@@ -83,7 +83,7 @@ class Database extends Command {
         $this->addOption('dump', null, InputOption::VALUE_OPTIONAL, 'Will dump the current SQL schema fromm the database to a PHP file.', false);
         $this->addOption('update', null, InputOption::VALUE_OPTIONAL, 'Will the database schema.', false);
         $this->addOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'Only print all queries but dont execute. (--update only)', false);
-
+        $this->addOption('drop', null, InputOption::VALUE_OPTIONAL, 'Also execute DROP TABLE statements Disabled by default!. (--update only)', false);
     }
 
     public function execute(InputInterface $input, OutputInterface $output) {
@@ -152,7 +152,13 @@ class Database extends Command {
 
         if ($input->getOption('update') === null) {
             $output->writeln('Start updating your database...');
-            $this->updateDatabase($schema, $connection, $output, $input->getOption('dry-run') === null);
+            $this->updateDatabase(
+                $schema,
+                $connection,
+                $output,
+                $input->getOption('dry-run') === null,
+                $input->getOption('drop') === null
+            );
         }
 
     }
@@ -276,9 +282,10 @@ class Database extends Command {
      * @param Connection $connection
      * @param OutputInterface $output
      * @param bool $dryrun
+     * @param bool $drop
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function updateDatabase(Schema $fromSchema, Connection $connection, OutputInterface $output, $dryrun = false) {
+    public function updateDatabase(Schema $fromSchema, Connection $connection, OutputInterface $output, $dryrun = false, $drop = false) {
         if (!file_exists($this->getFullFileName())) {
             throw new \RuntimeException(
                 sprintf('File not found: %s', $this->getFullFileName())
@@ -295,6 +302,15 @@ class Database extends Command {
         }
 
         foreach ($sql as $query) {
+            if($drop === false){
+                if(preg_match('/drop table/', strtolower($query))){
+                    //Skip drop table queries
+                    $output->write('<question>Skipping:</question> ');
+                    $output->writeln($query);
+                    continue;
+                }
+            }
+
             $output->writeln('<comment>' . $query . '</comment>');
             if ($dryrun === false) {
                 try {
@@ -319,7 +335,10 @@ class Database extends Command {
         if ($dryrun === false) {
             $output->writeln('<info>Database schema updated successfully</info>');
         } else {
+            $output->writeln('');
+            $output->writeln('<info>****************************************</info>');
             $output->writeln('<info>No modifications where done to database!!!</info>');
+            $output->writeln('<info>****************************************</info>');
         }
     }
 
