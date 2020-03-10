@@ -192,7 +192,7 @@ class Database extends Command {
             $tableOptions = $table->getOptions();
 
             $data .= sprintf('$table->addOption("engine" , "%s");%s', $tableOptions['engine'], PHP_EOL);
-            $data .= sprintf('$table->addOption("collation" , "%s");%s', $tableOptions['collation'], PHP_EOL);
+            $data .= sprintf('$table->addOption("collate" , "%s");%s', $tableOptions['collation'], PHP_EOL);
             $data .= sprintf('$table->addOption("comment" , "%s");%s', $tableOptions['comment'], PHP_EOL);
 
 

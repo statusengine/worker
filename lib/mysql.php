@@ -11,7 +11,7 @@ $schema = new Schema();
  ***************************************/
 $table = $schema->createTable("statusengine_dbversion");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("id", "integer", array (
   'unsigned' => false,
@@ -37,7 +37,7 @@ $table->setPrimaryKey([
  ***************************************/
 $table = $schema->createTable("statusengine_host_acknowledgements");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -110,7 +110,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_host_downtimehistory");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -226,7 +226,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_host_notifications");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -315,7 +315,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_host_scheduleddowntimes");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -413,7 +413,7 @@ $table->setPrimaryKey([
  ***************************************/
 $table = $schema->createTable("statusengine_host_statehistory");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -496,7 +496,7 @@ $table->setPrimaryKey([
  ***************************************/
 $table = $schema->createTable("statusengine_hostchecks");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -609,7 +609,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_hoststatus");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -876,7 +876,7 @@ $table->setPrimaryKey([
  ***************************************/
 $table = $schema->createTable("statusengine_logentries");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("id", "bigint", array (
   'unsigned' => true,
@@ -930,7 +930,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_nodes");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("node_name", "string", array (
   'unsigned' => false,
@@ -963,7 +963,7 @@ $table->setPrimaryKey([
  ***************************************/
 $table = $schema->createTable("statusengine_perfdata");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -1028,7 +1028,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_service_acknowledgements");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -1113,7 +1113,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_service_downtimehistory");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -1237,7 +1237,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_service_notifications");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -1334,7 +1334,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_service_scheduleddowntimes");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -1440,7 +1440,7 @@ $table->setPrimaryKey([
  ***************************************/
 $table = $schema->createTable("statusengine_service_statehistory");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -1530,7 +1530,7 @@ $table->setPrimaryKey([
  ***************************************/
 $table = $schema->createTable("statusengine_servicechecks");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -1647,7 +1647,7 @@ $table->setPrimaryKey([
  ***************************************/
 $table = $schema->createTable("statusengine_servicestatus");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("hostname", "string", array (
   'unsigned' => false,
@@ -1940,7 +1940,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_tasks");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("uuid", "string", array (
   'unsigned' => false,
@@ -1990,7 +1990,7 @@ $table->addIndex([
  ***************************************/
 $table = $schema->createTable("statusengine_users");
 $table->addOption("engine" , "InnoDB");
-$table->addOption("collation" , "utf8mb4_general_ci");
+$table->addOption("collate" , "utf8mb4_general_ci");
 $table->addOption("comment" , "");
 $table->addColumn("username", "string", array (
   'unsigned' => false,
