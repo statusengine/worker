@@ -23,6 +23,7 @@
     "ext-bcmath": "*",
     "ext-json": "*",
     "ext-iconv": "*",
+    "ext-pdo": "*",
     "symfony/yaml": "^3.4",
     "symfony/console": "^3.4",
     "php-amqplib/php-amqplib": "^2.7",

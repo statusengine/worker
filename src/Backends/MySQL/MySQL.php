@@ -281,6 +281,7 @@ class MySQL implements \Statusengine\StorageBackend {
             $errorNo = $Exception->errorInfo[1];
             $errorString = $Exception->errorInfo[2];
             $this->Syslog->error(sprintf('[%s] %s', $errorNo, $errorString));
+            $this->Syslog->error($query->queryString);
 
             if ($errorString == 'MySQL server has gone away') {
                 $this->reconnect();
