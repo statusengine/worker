@@ -24,6 +24,7 @@ use Symfony\Component\Console\Application;
 use Statusengine\Console\Statistics;
 use Statusengine\Console\Cleanup;
 use Statusengine\Console\Cluster;
+use Statusengine\Console\Database;
 
 $Config = new \Statusengine\Config();
 if($Config->getDisableHttpProxy()){
@@ -36,6 +37,7 @@ $application = new Application();
 $application->add(new Statistics());
 $application->add(new Cleanup());
 $application->add(new Cluster());
+$application->add(new Database());
 $application->run();
 
 
