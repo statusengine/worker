@@ -107,6 +107,15 @@ class Servicecheck implements DataStructInterface {
      */
     private $perfdata;
 
+    /**
+     * @var
+     */
+    private $timestamp;
+
+    /**
+     * @var int
+     */
+    private $timestamp_usec;
 
     /**
      * Servicecheck constructor.
@@ -132,6 +141,9 @@ class Servicecheck implements DataStructInterface {
         $this->output = $servicecheck->servicecheck->output;
         $this->long_output = $servicecheck->servicecheck->long_output;
         $this->perfdata = $servicecheck->servicecheck->perf_data;
+
+        $this->timestamp = $servicecheck->timestamp;
+        $this->timestamp_usec = isset($servicecheck->timestamp_usec) ? (int)$servicecheck->timestamp_usec : 0;
     }
 
     public function getHostName() {
@@ -247,28 +259,45 @@ class Servicecheck implements DataStructInterface {
         return $this->perfdata;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getTimestamp() {
+        return $this->timestamp;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestampUsec() {
+        return $this->timestamp_usec;
+    }
+
 
     /**
      * @return array
      */
     public function serialize() {
         return [
-            'host_name' => $this->host_name,
+            'host_name'           => $this->host_name,
             'service_description' => $this->service_description,
 
             'current_check_attempt' => $this->current_check_attempt,
-            'max_check_attempts' => $this->max_check_attempts,
-            'state' => $this->state,
-            'state_type' => $this->state_type,
-            'command' => $this->command,
-            'timeout' => $this->timeout,
-            'early_timeout' => $this->early_timeout,
-            'execution_time' => $this->execution_time,
-            'latency' => $this->latency,
-            'return_code' => $this->return_code,
-            'output' => $this->output,
-            'long_output' => $this->long_output,
-            'perfdata' => $this->perfdata
+            'max_check_attempts'    => $this->max_check_attempts,
+            'state'                 => $this->state,
+            'state_type'            => $this->state_type,
+            'command'               => $this->command,
+            'timeout'               => $this->timeout,
+            'early_timeout'         => $this->early_timeout,
+            'execution_time'        => $this->execution_time,
+            'latency'               => $this->latency,
+            'return_code'           => $this->return_code,
+            'output'                => $this->output,
+            'long_output'           => $this->long_output,
+            'perfdata'              => $this->perfdata,
+
+            'timestamp'      => $this->timestamp,
+            'timestamp_usec' => $this->timestamp_usec
         ];
     }
 

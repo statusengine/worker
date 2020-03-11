@@ -1,5 +1,5 @@
 {
-  "name": "statusengine-worker",
+  "name": "statusengine/worker",
   "description": "The missing event broker + responsive web frontend for Nagios and Naemon",
   "version": "3",
   "homepage": "https://statusengine.org/",

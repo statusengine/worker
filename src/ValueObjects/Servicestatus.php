@@ -329,57 +329,57 @@ class Servicestatus implements StatusInterface {
     /**
      * @return string
      */
-    public function getDescription(){
+    public function getDescription() {
         return $this->description;
     }
 
     /**
      * @return string
      */
-    public function getPluginOutput(){
+    public function getPluginOutput() {
         return $this->plugin_output;
     }
 
     /**
      * @return string
      */
-    public function getLongPluginOutput(){
+    public function getLongPluginOutput() {
         return $this->long_plugin_output;
     }
 
     /**
      * @return int
      */
-    public function getCurrentAttempt(){
+    public function getCurrentAttempt() {
         return $this->current_attempt;
     }
 
     /**
      * @return int
      */
-    public function getMaxAttempts(){
+    public function getMaxAttempts() {
         return $this->max_attempts;
     }
 
     /**
      * @return int
      */
-    public function getLastCheck(){
+    public function getLastCheck() {
         return $this->last_check;
     }
 
     /**
      * @return int
      */
-    public function getNextCheck(){
+    public function getNextCheck() {
         return $this->next_check;
     }
 
     /**
      * @return bool
      */
-    public function getIsActiveCheckResult(){
-        if($this->check_type == 0){
+    public function getIsActiveCheckResult() {
+        if ($this->check_type == 0) {
             return true;
         }
         return false;
@@ -388,165 +388,165 @@ class Servicestatus implements StatusInterface {
     /**
      * @return int
      */
-    public function getLastStateChange(){
+    public function getLastStateChange() {
         return $this->last_state_change;
     }
 
     /**
      * @return int
      */
-    public function getLastHardStateChange(){
+    public function getLastHardStateChange() {
         return $this->last_hard_state_change;
     }
 
     /**
      * @return int
      */
-    public function getLastHardState(){
+    public function getLastHardState() {
         return $this->last_hard_state;
     }
 
     /**
      * @return boolean
      */
-    public function isNotificationsEnabled(){
+    public function isNotificationsEnabled() {
         return $this->notifications_enabled;
     }
 
     /**
      * @return boolean
      */
-    public function isProblemHasBeenAcknowledged(){
+    public function isProblemHasBeenAcknowledged() {
         return $this->problem_has_been_acknowledged;
     }
 
     /**
      * @return int
      */
-    public function getAcknowledgementType(){
+    public function getAcknowledgementType() {
         return $this->acknowledgement_type;
     }
 
     /**
      * @return boolean
      */
-    public function getAcceptPassiveChecks(){
+    public function getAcceptPassiveChecks() {
         return $this->accept_passive_checks;
     }
 
     /**
      * @return boolean
      */
-    public function getEventHandlerEnabled(){
+    public function getEventHandlerEnabled() {
         return $this->event_handler_enabled;
     }
 
     /**
      * @return boolean
      */
-    public function getChecksEnabled(){
+    public function getChecksEnabled() {
         return $this->checks_enabled;
     }
 
     /**
      * @return boolean
      */
-    public function getFlapDetectionEnabled(){
+    public function getFlapDetectionEnabled() {
         return $this->flap_detection_enabled;
     }
 
     /**
      * @return boolean
      */
-    public function getIsFlapping(){
+    public function getIsFlapping() {
         return $this->is_flapping;
     }
 
     /**
      * @return float
      */
-    public function getLatency(){
+    public function getLatency() {
         return $this->latency;
     }
 
     /**
      * @return float
      */
-    public function getExecutionTime(){
+    public function getExecutionTime() {
         return $this->execution_time;
     }
 
     /**
      * @return int
      */
-    public function getScheduledDowntimeDepth(){
+    public function getScheduledDowntimeDepth() {
         return $this->scheduled_downtime_depth;
     }
 
     /**
      * @return boolean
      */
-    public function isProcessPerformanceData(){
+    public function isProcessPerformanceData() {
         return $this->process_performance_data;
     }
 
     /**
      * @return boolean
      */
-    public function isObsess(){
+    public function isObsess() {
         return $this->obsess;
     }
 
     /**
      * @return float
      */
-    public function getCheckInterval(){
+    public function getCheckInterval() {
         return $this->check_interval;
     }
 
     /**
      * @return float
      */
-    public function getRetryInterval(){
+    public function getRetryInterval() {
         return $this->retry_interval;
     }
 
     /**
      * @return int
      */
-    public function getStatusUpdateTime(){
+    public function getStatusUpdateTime() {
         return $this->status_update_time;
     }
 
     /**
      * @return string
      */
-    public function getPerfdata(){
+    public function getPerfdata() {
         return $this->perf_data;
     }
 
     /**
      * @return int
      */
-    public function getNextNotification(){
+    public function getNextNotification() {
         return $this->next_notification;
     }
 
     /**
      * @return int
      */
-    public function getLastNotification(){
+    public function getLastNotification() {
         return $this->last_notification;
     }
 
     /**
      * @return bool
      */
-    public function isHardState(){
+    public function isHardState() {
         return $this->state_type;
     }
 
-    public function getCheckPeriod(){
+    public function getCheckPeriod() {
         return $this->check_period;
     }
 
@@ -611,40 +611,40 @@ class Servicestatus implements StatusInterface {
      */
     public function serialize() {
         return [
-            'plugin_output' => $this->plugin_output,
-            'long_plugin_output' => $this->long_plugin_output,
-            'current_state' => $this->current_state,
-            'current_attempt' => $this->current_attempt,
-            'max_attempts' => $this->max_attempts,
-            'last_check' => $this->last_check,
-            'next_check' => $this->next_check,
-            'last_state_change' => $this->last_state_change,
-            'last_hard_state_change' => $this->last_hard_state_change,
-            'last_hard_state' => $this->last_hard_state,
-            'notifications_enabled' => $this->notifications_enabled,
+            'plugin_output'                 => $this->plugin_output,
+            'long_plugin_output'            => $this->long_plugin_output,
+            'current_state'                 => $this->current_state,
+            'current_attempt'               => $this->current_attempt,
+            'max_attempts'                  => $this->max_attempts,
+            'last_check'                    => $this->last_check,
+            'next_check'                    => $this->next_check,
+            'last_state_change'             => $this->last_state_change,
+            'last_hard_state_change'        => $this->last_hard_state_change,
+            'last_hard_state'               => $this->last_hard_state,
+            'notifications_enabled'         => $this->notifications_enabled,
             'problem_has_been_acknowledged' => (int)$this->problem_has_been_acknowledged,
-            'acknowledgement_type' => $this->acknowledgement_type,
-            'accept_passive_checks' => (int)$this->accept_passive_checks,
-            'event_handler_enabled' => (int)$this->event_handler_enabled,
-            'checks_enabled' => (int)$this->checks_enabled,
-            'flap_detection_enabled' => (int)$this->flap_detection_enabled,
-            'is_flapping' => (int)$this->is_flapping,
-            'latency' => $this->latency,
-            'execution_time' => $this->execution_time,
-            'scheduled_downtime_depth' => $this->scheduled_downtime_depth,
-            'process_performance_data' => (int)$this->process_performance_data,
-            'obsess' => (int)$this->obsess,
-            'check_interval' => $this->check_interval,
-            'retry_interval' => $this->retry_interval,
-            'check_period' => $this->check_period,
-            'last_time_ok' => $this->last_time_ok,
-            'last_time_warning' => $this->last_time_warning,
-            'last_time_critical' => $this->last_time_critical,
-            'last_time_unknown' => $this->last_time_unknown,
-            'current_notification_number' => $this->current_notification_number,
-            'percent_state_change' => $this->percent_state_change,
-            'event_handler' => $this->event_handler,
-            'check_command' => $this->check_command
+            'acknowledgement_type'          => $this->acknowledgement_type,
+            'accept_passive_checks'         => (int)$this->accept_passive_checks,
+            'event_handler_enabled'         => (int)$this->event_handler_enabled,
+            'checks_enabled'                => (int)$this->checks_enabled,
+            'flap_detection_enabled'        => (int)$this->flap_detection_enabled,
+            'is_flapping'                   => (int)$this->is_flapping,
+            'latency'                       => $this->latency,
+            'execution_time'                => $this->execution_time,
+            'scheduled_downtime_depth'      => $this->scheduled_downtime_depth,
+            'process_performance_data'      => (int)$this->process_performance_data,
+            'obsess'                        => (int)$this->obsess,
+            'check_interval'                => $this->check_interval,
+            'retry_interval'                => $this->retry_interval,
+            'check_period'                  => $this->check_period,
+            'last_time_ok'                  => $this->last_time_ok,
+            'last_time_warning'             => $this->last_time_warning,
+            'last_time_critical'            => $this->last_time_critical,
+            'last_time_unknown'             => $this->last_time_unknown,
+            'current_notification_number'   => $this->current_notification_number,
+            'percent_state_change'          => $this->percent_state_change,
+            'event_handler'                 => $this->event_handler,
+            'check_command'                 => $this->check_command
         ];
     }
 }

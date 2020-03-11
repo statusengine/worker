@@ -52,7 +52,7 @@ class NodeName {
      * @param $record
      * @return NodeName
      */
-    public static function fromCrateDb($record){
+    public static function fromCrateDb($record) {
         return new self($record['node_name'], $record['node_version'], $record['node_start_time']);
     }
 
@@ -60,7 +60,7 @@ class NodeName {
      * @param $record
      * @return NodeName
      */
-    public static function fromMysqlDb($record){
+    public static function fromMysqlDb($record) {
         return new self($record['node_name'], $record['node_version'], $record['node_start_time']);
     }
 
@@ -89,7 +89,7 @@ class NodeName {
      * @return false|string
      */
     public function getNodeStartTimeHuman() {
-        if($this->nodeStartTime > 0){
+        if ($this->nodeStartTime > 0) {
             return date('Y-m-d H:i:s', $this->nodeStartTime);
         }
 

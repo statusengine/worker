@@ -27,6 +27,16 @@ class Notification implements DataStructInterface {
     /**
      * @var int
      */
+    private $timestamp;
+
+    /**
+     * @var int
+     */
+    private $timestamp_usec;
+
+    /**
+     * @var int
+     */
     private $type;
 
     /**
@@ -95,6 +105,8 @@ class Notification implements DataStructInterface {
      */
     public function __construct(\stdClass $notification) {
         $this->type = (int)$notification->type;
+        $this->timestamp = (int)$notification->timestamp;
+        $this->timestamp_usec = isset($notification->timestamp_usec) ? (int)$notification->timestamp_usec : 0;
         $this->host_name = $notification->contactnotificationmethod->host_name;
         $this->service_description = $notification->contactnotificationmethod->service_description;
         $this->output = $notification->contactnotificationmethod->output;
@@ -112,7 +124,7 @@ class Notification implements DataStructInterface {
     /**
      * @return bool
      */
-    public function isValidNotification(){
+    public function isValidNotification() {
         //Only process to avoid end_time = 0
         return $this->type === self::NEBTYPE_CONTACTNOTIFICATIONMETHOD_END;
     }
@@ -120,8 +132,8 @@ class Notification implements DataStructInterface {
     /**
      * @return bool
      */
-    public function isHostNotification(){
-        if($this->service_description === '' || $this->service_description === null){
+    public function isHostNotification() {
+        if ($this->service_description === '' || $this->service_description === null) {
             return true;
         }
         return false;
@@ -130,7 +142,7 @@ class Notification implements DataStructInterface {
     /**
      * @return bool
      */
-    public function isServiceNotification(){
+    public function isServiceNotification() {
         return !$this->isHostNotification();
     }
 
@@ -232,22 +244,38 @@ class Notification implements DataStructInterface {
     }
 
     /**
+     * @return int
+     */
+    public function getTimestamp() {
+        return $this->timestamp;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestampUsec() {
+        return $this->timestamp_usec;
+    }
+
+    /**
      * @return array
      */
     public function serialize() {
         return [
-            'host_name' => $this->host_name,
+            'host_name'           => $this->host_name,
             'service_description' => $this->service_description,
-            'output' => $this->output,
-            'ack_author' => $this->ack_author,
-            'ack_data' => $this->ack_data,
-            'contact_name' => $this->contact_name,
-            'command_name' => $this->command_name,
-            'command_args' => $this->command_args,
-            'reason_type' => $this->reason_type,
-            'state' => $this->state,
-            'start_time' => $this->start_time,
-            'end_time' => $this->end_time
+            'output'              => $this->output,
+            'ack_author'          => $this->ack_author,
+            'ack_data'            => $this->ack_data,
+            'contact_name'        => $this->contact_name,
+            'command_name'        => $this->command_name,
+            'command_args'        => $this->command_args,
+            'reason_type'         => $this->reason_type,
+            'state'               => $this->state,
+            'start_time'          => $this->start_time,
+            'end_time'            => $this->end_time,
+            'timestamp'           => $this->timestamp,
+            'timestamp_usec'      => $this->timestamp_usec
         ];
     }
 

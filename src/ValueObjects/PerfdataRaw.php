@@ -57,8 +57,8 @@ class PerfdataRaw implements DataStructInterface {
     /**
      * @return bool
      */
-    public function isEmpty(){
-        if($this->perfdata == ''){
+    public function isEmpty() {
+        if ($this->perfdata == '') {
             return true;
         }
         return false;
@@ -67,39 +67,39 @@ class PerfdataRaw implements DataStructInterface {
     /**
      * @return string
      */
-    public function getHostName(){
+    public function getHostName() {
         return $this->host_name;
     }
 
     /**
      * @return string
      */
-    public function getServiceDescription(){
+    public function getServiceDescription() {
         return $this->service_description;
     }
 
     /**
      * @return string
      */
-    public function getPerfdata(){
+    public function getPerfdata() {
         return $this->perfdata;
     }
 
     /**
      * @return int
      */
-    public function getTimestamp(){
+    public function getTimestamp() {
         return $this->timestamp;
     }
 
     /**
      * @return array
      */
-    public function serialize(){
+    public function serialize() {
         return [
-            'hostname' => $this->host_name,
+            'hostname'            => $this->host_name,
             'service_description' => $this->service_description,
-            'perfdata' => $this->perfdata
+            'perfdata'            => $this->perfdata
         ];
     }
 
