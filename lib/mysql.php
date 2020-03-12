@@ -58,8 +58,8 @@ $table->addColumn("entry_time_usec", "integer", array (
   'notnull' => true,
   'default' => '0',
 ));
-$table->addColumn("state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -78,26 +78,26 @@ $table->addColumn("comment_data", "string", array (
   'default' => NULL,
   'length' => 1024,
 ));
-$table->addColumn("acknowledgement_type", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("acknowledgement_type", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("is_sticky", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("persistent_comment", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("notify_contacts", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -108,11 +108,11 @@ $table->setPrimaryKey([
     "entry_time_usec"
 ]);
 $table->addIndex([
-    "hostname"
-], "hostname");
-$table->addIndex([
     "entry_time"
 ], "entry_time");
+$table->addIndex([
+    "hostname"
+], "hostname");
 
 
 
@@ -182,7 +182,7 @@ $table->addColumn("triggered_by_id", "integer", array (
   'default' => NULL,
 ));
 $table->addColumn("is_fixed", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -200,7 +200,7 @@ $table->addColumn("scheduled_end_time", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("was_started", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -218,7 +218,7 @@ $table->addColumn("actual_end_time", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("was_cancelled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -231,18 +231,18 @@ $table->setPrimaryKey([
 ]);
 $table->addIndex([
     "hostname", 
-    "scheduled_start_time", 
-    "scheduled_end_time", 
-    "was_cancelled"
-], "list");
-$table->addIndex([
-    "hostname", 
     "entry_time", 
     "entry_time_usec", 
     "scheduled_start_time", 
     "scheduled_end_time", 
     "was_cancelled"
 ], "reports");
+$table->addIndex([
+    "hostname", 
+    "scheduled_start_time", 
+    "scheduled_end_time", 
+    "was_cancelled"
+], "list");
 
 
 
@@ -293,8 +293,8 @@ $table->addColumn("command_args", "string", array (
   'default' => NULL,
   'length' => 1024,
 ));
-$table->addColumn("state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -306,7 +306,7 @@ $table->addColumn("end_time", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("reason_type", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -338,11 +338,11 @@ $table->setPrimaryKey([
     "start_time_usec"
 ]);
 $table->addIndex([
-    "hostname"
-], "hostname");
-$table->addIndex([
     "start_time"
 ], "start_time");
+$table->addIndex([
+    "hostname"
+], "hostname");
 
 
 
@@ -406,7 +406,7 @@ $table->addColumn("triggered_by_id", "integer", array (
   'default' => NULL,
 ));
 $table->addColumn("is_fixed", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -424,7 +424,7 @@ $table->addColumn("scheduled_end_time", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("was_started", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -476,38 +476,38 @@ $table->addColumn("state_change", "boolean", array (
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("is_hardstate", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("current_check_attempt", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("max_check_attempts", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("last_state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("last_state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("last_hard_state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("last_hard_state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -564,14 +564,14 @@ $table->addColumn("start_time_usec", "integer", array (
   'notnull' => true,
   'default' => '0',
 ));
-$table->addColumn("state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("is_hardstate", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -590,13 +590,13 @@ $table->addColumn("output", "string", array (
   'length' => 1024,
 ));
 $table->addColumn("timeout", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("early_timeout", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -628,13 +628,13 @@ $table->addColumn("command", "string", array (
   'length' => 1024,
 ));
 $table->addColumn("current_check_attempt", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("max_check_attempts", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -652,13 +652,13 @@ $table->setPrimaryKey([
     "start_time_usec"
 ]);
 $table->addIndex([
-    "hostname", 
-    "start_time"
-], "hostname");
-$table->addIndex([
     "start_time", 
     "end_time"
 ], "times");
+$table->addIndex([
+    "hostname", 
+    "start_time"
+], "hostname");
 
 
 
@@ -703,20 +703,20 @@ $table->addColumn("perfdata", "string", array (
   'default' => NULL,
   'length' => 1024,
 ));
-$table->addColumn("current_state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("current_state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("current_check_attempt", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("max_check_attempts", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -734,7 +734,7 @@ $table->addColumn("next_check", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("is_passive_check", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -751,14 +751,14 @@ $table->addColumn("last_hard_state_change", "bigint", array (
   'notnull' => true,
   'default' => NULL,
 ));
-$table->addColumn("last_hard_state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("last_hard_state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("is_hardstate", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -776,49 +776,49 @@ $table->addColumn("next_notification", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("notifications_enabled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("problem_has_been_acknowledged", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("acknowledgement_type", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("acknowledgement_type", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("passive_checks_enabled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("active_checks_enabled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("event_handler_enabled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("flap_detection_enabled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("is_flapping", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -835,20 +835,20 @@ $table->addColumn("execution_time", "float", array (
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("scheduled_downtime_depth", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("scheduled_downtime_depth", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("process_performance_data", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("obsess_over_host", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1114,8 +1114,8 @@ $table->addColumn("hostname", "string", array (
   'default' => NULL,
   'length' => 255,
 ));
-$table->addColumn("state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1134,26 +1134,26 @@ $table->addColumn("comment_data", "string", array (
   'default' => NULL,
   'length' => 1024,
 ));
-$table->addColumn("acknowledgement_type", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("acknowledgement_type", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("is_sticky", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("persistent_comment", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("notify_contacts", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1164,16 +1164,16 @@ $table->setPrimaryKey([
     "entry_time_usec"
 ]);
 $table->addIndex([
+    "service_description", 
     "entry_time"
-], "entry_time");
+], "servicedesc_time");
 $table->addIndex([
     "hostname", 
     "service_description"
 ], "servicename");
 $table->addIndex([
-    "service_description", 
     "entry_time"
-], "servicedesc_time");
+], "entry_time");
 
 
 
@@ -1250,7 +1250,7 @@ $table->addColumn("triggered_by_id", "integer", array (
   'default' => NULL,
 ));
 $table->addColumn("is_fixed", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1268,7 +1268,7 @@ $table->addColumn("scheduled_end_time", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("was_started", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1286,7 +1286,7 @@ $table->addColumn("actual_end_time", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("was_cancelled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1300,18 +1300,18 @@ $table->setPrimaryKey([
 ]);
 $table->addIndex([
     "service_description", 
-    "scheduled_start_time", 
-    "scheduled_end_time", 
-    "was_cancelled"
-], "report");
-$table->addIndex([
-    "service_description", 
     "entry_time", 
     "entry_time_usec", 
     "scheduled_start_time", 
     "scheduled_end_time", 
     "was_cancelled"
 ], "reports");
+$table->addIndex([
+    "service_description", 
+    "scheduled_start_time", 
+    "scheduled_end_time", 
+    "was_cancelled"
+], "report");
 
 
 
@@ -1369,8 +1369,8 @@ $table->addColumn("command_args", "string", array (
   'default' => NULL,
   'length' => 1024,
 ));
-$table->addColumn("state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1382,7 +1382,7 @@ $table->addColumn("end_time", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("reason_type", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1414,12 +1414,12 @@ $table->setPrimaryKey([
     "start_time_usec"
 ]);
 $table->addIndex([
-    "start_time"
-], "start_time");
-$table->addIndex([
     "hostname", 
     "service_description"
 ], "servicename");
+$table->addIndex([
+    "start_time"
+], "start_time");
 
 
 
@@ -1490,7 +1490,7 @@ $table->addColumn("triggered_by_id", "integer", array (
   'default' => NULL,
 ));
 $table->addColumn("is_fixed", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1508,7 +1508,7 @@ $table->addColumn("scheduled_end_time", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("was_started", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1568,38 +1568,38 @@ $table->addColumn("state_change", "boolean", array (
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("is_hardstate", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("current_check_attempt", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("max_check_attempts", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("last_state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("last_state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("last_hard_state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("last_hard_state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1624,14 +1624,14 @@ $table->setPrimaryKey([
     "state_time_usec"
 ]);
 $table->addIndex([
+    "service_description", 
+    "state_time"
+], "servicename_time");
+$table->addIndex([
     "hostname", 
     "service_description", 
     "state_time"
 ], "host_servicename_time");
-$table->addIndex([
-    "service_description", 
-    "state_time"
-], "servicename_time");
 
 
 
@@ -1668,14 +1668,14 @@ $table->addColumn("hostname", "string", array (
   'default' => NULL,
   'length' => 255,
 ));
-$table->addColumn("state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("is_hardstate", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1694,13 +1694,13 @@ $table->addColumn("output", "string", array (
   'length' => 1024,
 ));
 $table->addColumn("timeout", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("early_timeout", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1732,13 +1732,13 @@ $table->addColumn("command", "string", array (
   'length' => 1024,
 ));
 $table->addColumn("current_check_attempt", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("max_check_attempts", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1811,20 +1811,20 @@ $table->addColumn("perfdata", "string", array (
   'default' => NULL,
   'length' => 1024,
 ));
-$table->addColumn("current_state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("current_state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("current_check_attempt", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("max_check_attempts", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1842,7 +1842,7 @@ $table->addColumn("next_check", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("is_passive_check", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1859,14 +1859,14 @@ $table->addColumn("last_hard_state_change", "bigint", array (
   'notnull' => true,
   'default' => NULL,
 ));
-$table->addColumn("last_hard_state", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("last_hard_state", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("is_hardstate", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1884,49 +1884,49 @@ $table->addColumn("next_notification", "bigint", array (
   'default' => NULL,
 ));
 $table->addColumn("notifications_enabled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("problem_has_been_acknowledged", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("acknowledgement_type", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("passive_checks_enabled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("active_checks_enabled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("event_handler_enabled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("flap_detection_enabled", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("is_flapping", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -1943,20 +1943,20 @@ $table->addColumn("execution_time", "float", array (
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("scheduled_downtime_depth", "boolean", array (
-  'unsigned' => false,
+$table->addColumn("scheduled_downtime_depth", "smallint", array (
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("process_performance_data", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
 $table->addColumn("obsess_over_service", "boolean", array (
-  'unsigned' => false,
+  'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
@@ -2042,6 +2042,10 @@ $table->setPrimaryKey([
     "service_description"
 ]);
 $table->addIndex([
+    "current_state", 
+    "node_name"
+], "current_state_node");
+$table->addIndex([
     "problem_has_been_acknowledged", 
     "scheduled_downtime_depth", 
     "current_state"
@@ -2049,10 +2053,6 @@ $table->addIndex([
 $table->addIndex([
     "service_description"
 ], "service_description");
-$table->addIndex([
-    "current_state", 
-    "node_name"
-], "current_state_node");
 
 
 
