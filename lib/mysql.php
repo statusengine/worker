@@ -108,11 +108,11 @@ $table->setPrimaryKey([
     "entry_time_usec"
 ]);
 $table->addIndex([
-    "entry_time"
-], "entry_time");
-$table->addIndex([
     "hostname"
 ], "hostname");
+$table->addIndex([
+    "entry_time"
+], "entry_time");
 
 
 
@@ -305,7 +305,7 @@ $table->addColumn("end_time", "bigint", array (
   'notnull' => true,
   'default' => NULL,
 ));
-$table->addColumn("reason_type", "boolean", array (
+$table->addColumn("reason_type", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
@@ -338,11 +338,11 @@ $table->setPrimaryKey([
     "start_time_usec"
 ]);
 $table->addIndex([
-    "start_time"
-], "start_time");
-$table->addIndex([
     "hostname"
 ], "hostname");
+$table->addIndex([
+    "start_time"
+], "start_time");
 
 
 
@@ -488,13 +488,13 @@ $table->addColumn("is_hardstate", "boolean", array (
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("current_check_attempt", "boolean", array (
+$table->addColumn("current_check_attempt", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("max_check_attempts", "boolean", array (
+$table->addColumn("max_check_attempts", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
@@ -589,7 +589,7 @@ $table->addColumn("output", "string", array (
   'default' => NULL,
   'length' => 1024,
 ));
-$table->addColumn("timeout", "boolean", array (
+$table->addColumn("timeout", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
@@ -627,13 +627,13 @@ $table->addColumn("command", "string", array (
   'default' => NULL,
   'length' => 1024,
 ));
-$table->addColumn("current_check_attempt", "boolean", array (
+$table->addColumn("current_check_attempt", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("max_check_attempts", "boolean", array (
+$table->addColumn("max_check_attempts", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
@@ -709,13 +709,13 @@ $table->addColumn("current_state", "smallint", array (
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("current_check_attempt", "boolean", array (
+$table->addColumn("current_check_attempt", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("max_check_attempts", "boolean", array (
+$table->addColumn("max_check_attempts", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
@@ -972,14 +972,14 @@ $table->setPrimaryKey([
     "id"
 ]);
 $table->addIndex([
-    "logentry_data", 
-    "entry_time"
-], "logentry_data_time");
-$table->addIndex([
     "entry_time", 
     "logentry_data", 
     "node_name"
 ], "logentries");
+$table->addIndex([
+    "logentry_data", 
+    "entry_time"
+], "logentry_data_time");
 
 
 
@@ -1164,16 +1164,16 @@ $table->setPrimaryKey([
     "entry_time_usec"
 ]);
 $table->addIndex([
-    "service_description", 
-    "entry_time"
-], "servicedesc_time");
-$table->addIndex([
     "hostname", 
     "service_description"
 ], "servicename");
 $table->addIndex([
     "entry_time"
 ], "entry_time");
+$table->addIndex([
+    "service_description", 
+    "entry_time"
+], "servicedesc_time");
 
 
 
@@ -1381,7 +1381,7 @@ $table->addColumn("end_time", "bigint", array (
   'notnull' => true,
   'default' => NULL,
 ));
-$table->addColumn("reason_type", "boolean", array (
+$table->addColumn("reason_type", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
@@ -1580,13 +1580,13 @@ $table->addColumn("is_hardstate", "boolean", array (
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("current_check_attempt", "boolean", array (
+$table->addColumn("current_check_attempt", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("max_check_attempts", "boolean", array (
+$table->addColumn("max_check_attempts", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
@@ -1624,14 +1624,14 @@ $table->setPrimaryKey([
     "state_time_usec"
 ]);
 $table->addIndex([
-    "service_description", 
-    "state_time"
-], "servicename_time");
-$table->addIndex([
     "hostname", 
     "service_description", 
     "state_time"
 ], "host_servicename_time");
+$table->addIndex([
+    "service_description", 
+    "state_time"
+], "servicename_time");
 
 
 
@@ -1693,7 +1693,7 @@ $table->addColumn("output", "string", array (
   'default' => NULL,
   'length' => 1024,
 ));
-$table->addColumn("timeout", "boolean", array (
+$table->addColumn("timeout", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
@@ -1731,13 +1731,13 @@ $table->addColumn("command", "string", array (
   'default' => NULL,
   'length' => 1024,
 ));
-$table->addColumn("current_check_attempt", "boolean", array (
+$table->addColumn("current_check_attempt", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("max_check_attempts", "boolean", array (
+$table->addColumn("max_check_attempts", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
@@ -1817,13 +1817,13 @@ $table->addColumn("current_state", "smallint", array (
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("current_check_attempt", "boolean", array (
+$table->addColumn("current_check_attempt", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("max_check_attempts", "boolean", array (
+$table->addColumn("max_check_attempts", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
@@ -2042,6 +2042,9 @@ $table->setPrimaryKey([
     "service_description"
 ]);
 $table->addIndex([
+    "service_description"
+], "service_description");
+$table->addIndex([
     "current_state", 
     "node_name"
 ], "current_state_node");
@@ -2050,9 +2053,6 @@ $table->addIndex([
     "scheduled_downtime_depth", 
     "current_state"
 ], "issues");
-$table->addIndex([
-    "service_description"
-], "service_description");
 
 
 
@@ -2098,11 +2098,11 @@ $table->addColumn("payload", "string", array (
   'length' => 8192,
 ));
 $table->addIndex([
-    "node_name"
-], "node_name");
-$table->addIndex([
     "uuid"
 ], "uuid");
+$table->addIndex([
+    "node_name"
+], "node_name");
 
 
 
