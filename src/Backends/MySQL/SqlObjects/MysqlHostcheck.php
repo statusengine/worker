@@ -31,13 +31,13 @@ class MysqlHostcheck extends Mysql\MysqlModel {
      * @var string
      */
     protected $baseQuery = "INSERT INTO statusengine_hostchecks
-    (hostname, state, is_hardstate, start_time, end_time, output, timeout, early_timeout, latency, execution_time, perfdata, command, current_check_attempt, max_check_attempts, long_output)
+    (hostname, state, is_hardstate, start_time, start_time_usec, end_time, output, timeout, early_timeout, latency, execution_time, perfdata, command, current_check_attempt, max_check_attempts, long_output)
     VALUES%s";
 
     /**
      * @var string
      */
-    protected $baseValue = '(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+    protected $baseValue = '(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
     /**
      * @var \PDO
@@ -78,6 +78,7 @@ class MysqlHostcheck extends Mysql\MysqlModel {
             $query->bindValue($i++, $Hostcheck->getState());
             $query->bindValue($i++, $Hostcheck->getStateType());
             $query->bindValue($i++, $Hostcheck->getStartTime());
+            $query->bindValue($i++, $Hostcheck->getTimestampUsec());
             $query->bindValue($i++, $Hostcheck->getEndTime());
             $query->bindValue($i++, $Hostcheck->getOutput());
             $query->bindValue($i++, $Hostcheck->getTimeout());

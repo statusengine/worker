@@ -28,12 +28,12 @@ class MysqlHostAcknowledgement extends Mysql\MysqlModel {
     /**
      * @var string
      */
-    protected $baseQuery = 'INSERT INTO statusengine_host_acknowledgements (hostname, state, author_name, comment_data, entry_time, acknowledgement_type, is_sticky, persistent_comment, notify_contacts)VALUES%s';
+    protected $baseQuery = 'INSERT INTO statusengine_host_acknowledgements (hostname, state, author_name, comment_data, entry_time, entry_time_usec, acknowledgement_type, is_sticky, persistent_comment, notify_contacts)VALUES%s';
 
     /**
      * @var string
      */
-    protected $baseValue = '(?,?,?,?,?,?,?,?,?)';
+    protected $baseValue = '(?,?,?,?,?,?,?,?,?,?)';
 
     /**
      * @var Mysql\MySQL
@@ -71,6 +71,7 @@ class MysqlHostAcknowledgement extends Mysql\MysqlModel {
         $query->bindValue($i++, $this->Acknowledgement->getAuthorName());
         $query->bindValue($i++, $this->Acknowledgement->getCommentData());
         $query->bindValue($i++, $this->Acknowledgement->getTimestamp());
+        $query->bindValue($i++, $this->Acknowledgement->getTimestampUsec());
         $query->bindValue($i++, $this->Acknowledgement->getAcknowledgementType());
         $query->bindValue($i++, (int)$this->Acknowledgement->isSticky());
         $query->bindValue($i++, (int)$this->Acknowledgement->isPersistentComment());

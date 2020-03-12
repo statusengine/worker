@@ -31,26 +31,26 @@ class MysqlNotification extends Mysql\MysqlModel {
      */
     protected $baseQueryHost = "
       INSERT INTO statusengine_host_notifications
-      (hostname, contact_name, command_name, command_args, state, start_time, end_time, reason_type, output, ack_author, ack_data )
+      (hostname, contact_name, command_name, command_args, state, start_time, start_time_usec, end_time, reason_type, output, ack_author, ack_data )
       VALUES%s";
 
     /**
      * @var string
      */
-    protected $baseValueHost = '(?,?,?,?,?,?,?,?,?,?,?)';
+    protected $baseValueHost = '(?,?,?,?,?,?,?,?,?,?,?,?)';
 
     /**
      * @var string
      */
     protected $baseQueryService = "
       INSERT INTO statusengine_service_notifications
-      (hostname, service_description, contact_name, command_name, command_args, state, start_time, end_time, reason_type, output, ack_author, ack_data )
+      (hostname, service_description, contact_name, command_name, command_args, state, start_time, start_time_usec, end_time, reason_type, output, ack_author, ack_data )
       VALUES%s";
 
     /**
      * @var string
      */
-    protected $baseValueService = '(?,?,?,?,?,?,?,?,?,?,?,?)';
+    protected $baseValueService = '(?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
     /**
      * @var Mysql\MySQL
@@ -120,6 +120,7 @@ class MysqlNotification extends Mysql\MysqlModel {
             $query->bindValue($i++, $Notification->getCommandArgs());
             $query->bindValue($i++, $Notification->getState());
             $query->bindValue($i++, $Notification->getStartTime());
+            $query->bindValue($i++, $Notification->getTimestampUsec());
             $query->bindValue($i++, $Notification->getEndTime());
             $query->bindValue($i++, $Notification->getReasonType());
             $query->bindValue($i++, $Notification->getOutput());
@@ -159,6 +160,7 @@ class MysqlNotification extends Mysql\MysqlModel {
             $query->bindValue($i++, $Notification->getCommandArgs());
             $query->bindValue($i++, $Notification->getState());
             $query->bindValue($i++, $Notification->getStartTime());
+            $query->bindValue($i++, $Notification->getTimestampUsec());
             $query->bindValue($i++, $Notification->getEndTime());
             $query->bindValue($i++, $Notification->getReasonType());
             $query->bindValue($i++, $Notification->getOutput());

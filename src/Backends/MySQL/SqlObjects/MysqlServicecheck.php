@@ -30,13 +30,13 @@ class MysqlServicecheck extends Mysql\MysqlModel {
      * @var string
      */
     protected $baseQuery = "INSERT INTO statusengine_servicechecks
-    (hostname, service_description, state, is_hardstate, start_time, end_time, output, timeout, early_timeout, latency, execution_time, perfdata, command, current_check_attempt, max_check_attempts, long_output)
+    (hostname, service_description, state, is_hardstate, start_time, start_time_usec, end_time, output, timeout, early_timeout, latency, execution_time, perfdata, command, current_check_attempt, max_check_attempts, long_output)
     VALUES%s";
 
     /**
      * @var string
      */
-    protected $baseValue = '(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+    protected $baseValue = '(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
     /**
      * @var \PDO
@@ -78,6 +78,7 @@ class MysqlServicecheck extends Mysql\MysqlModel {
             $query->bindValue($i++, $Servicecheck->getState());
             $query->bindValue($i++, $Servicecheck->getStateType());
             $query->bindValue($i++, $Servicecheck->getStartTime());
+            $query->bindValue($i++, $Servicecheck->getTimestampUsec());
             $query->bindValue($i++, $Servicecheck->getEndTime());
             $query->bindValue($i++, $Servicecheck->getOutput());
             $query->bindValue($i++, $Servicecheck->getTimeout());
