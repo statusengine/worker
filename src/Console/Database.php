@@ -107,7 +107,7 @@ class Database extends Command {
                 'password' => $mysqlConfig['password'],
                 'host'     => $mysqlConfig['host'],
                 'port'     => $mysqlConfig['port'],
-                //'charset'  => 'UTF-8',
+                'charset'  => $mysqlConfig['encoding'],
                 'driver'   => 'pdo_mysql',
             ];
         }
@@ -168,6 +168,7 @@ class Database extends Command {
      * @return string
      */
     public function dumpMySQLSchema(Schema $schema) {
+        $mysqlConfig = $this->Config->getMysqlConfig();
         $file = fopen($this->getFullFileName(), 'w+');
 
         $data = '<?php' . PHP_EOL . PHP_EOL;
@@ -193,6 +194,7 @@ class Database extends Command {
 
             $data .= sprintf('$table->addOption("engine" , "%s");%s', $tableOptions['engine'], PHP_EOL);
             $data .= sprintf('$table->addOption("collate" , "%s");%s', $tableOptions['collation'], PHP_EOL);
+            $data .= sprintf('$table->addOption("charset" , "%s");%s', $mysqlConfig['encoding'], PHP_EOL);
             $data .= sprintf('$table->addOption("comment" , "%s");%s', $tableOptions['comment'], PHP_EOL);
 
 
