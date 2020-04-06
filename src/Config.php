@@ -209,7 +209,8 @@ class Config {
             'port'     => Env::get('SE_MYSQL_PORT', 3306, Env::VALUE_INT),
             'username' => Env::get('SE_MYSQL_USER', 'statusengine'),
             'password' => Env::get('SE_MYSQL_PASSWORD', 'password'),
-            'database' => Env::get('SE_MYSQL_DATABASE', 'statusengine_data')
+            'database' => Env::get('SE_MYSQL_DATABASE', 'statusengine_data'),
+            'encoding' => Env::get('SE_MYSQL_ENCODING', 'utf8')
         ];
 
         foreach ($config as $key => $value) {

@@ -114,9 +114,12 @@ class MySQL implements \Statusengine\StorageBackend {
             throw $e;
         }
 
-        //Enable UTF-8
+        //Enable UTF-8 / utf8 / encoding value
         try {
-            $query = $this->Connection->prepare('SET NAMES utf8');
+            
+            $config = $this->Config->getMysqlConfig();
+            
+            $query = $this->Connection->prepare('SET NAMES '.$config['encoding']);
             $query->execute();
         } catch (\Exception $e) {
             $this->Syslog->error($e->getMessage());
