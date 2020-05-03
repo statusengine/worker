@@ -65,9 +65,10 @@ class ElasticsearchPerfdata {
 
 
     /**
-     * GraphitePerfdata constructor.
+     * ElasticsearchPerfdata constructor.
      * @param Config $Config
      * @param Syslog $Syslog
+     * @throws \Statusengine\Exception\InvalidArgumentException
      */
     public function __construct(Config $Config, Syslog $Syslog) {
         $this->Config = $Config;
@@ -92,17 +93,16 @@ class ElasticsearchPerfdata {
     public function savePerfdata(Gauge $Gauge) {
         $this->BulkInsertObjectStore->addObject([
             'index' => [
-                '_index' => $this->getIndex(),
-                '_type' => 'metric',
+                '_index' => $this->getIndex()
             ]
         ]);
 
         $this->BulkInsertObjectStore->addObject([
-            '@timestamp' => ($Gauge->getTimestamp() * 1000),
-            'value' => $Gauge->getValue(),
-            'hostname' => $Gauge->getHostName(),
+            '@timestamp'          => ($Gauge->getTimestamp() * 1000),
+            'value'               => $Gauge->getValue(),
+            'hostname'            => $Gauge->getHostName(),
             'service_description' => $Gauge->getServiceDescription(),
-            'metric' => $Gauge->getLabel()
+            'metric'              => $Gauge->getLabel()
         ]);
 
         return true;

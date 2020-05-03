@@ -49,47 +49,40 @@ class Template {
     public function getTemplate() {
         $tempalteConfig = $this->Config->getElasticsearchTemplate();
         return [
-            'name' => $tempalteConfig['name'],
+            'name'   => $tempalteConfig['name'],
             'create' => false,
-            'body' => [
+            'body'   => [
                 'template' => sprintf('%s*', $this->index),
                 'settings' => [
-                    'number_of_shards' => $tempalteConfig['number_of_shards'],
+                    'number_of_shards'   => $tempalteConfig['number_of_shards'],
                     'number_of_replicas' => $tempalteConfig['number_of_replicas'],
-                    'refresh_interval' => $tempalteConfig['refresh_interval'],
-                    'codec' => $tempalteConfig['codec'],
-                    'mapper.dynamic' => false
-
+                    'refresh_interval'   => $tempalteConfig['refresh_interval'],
+                    'codec'              => $tempalteConfig['codec']
                 ],
                 'mappings' => [
-                    '_default_' => [
-                        '_all' => [
-                            'enabled' => $tempalteConfig['enable_all']
-                        ],
-                        '_source' => [
-                            'enabled' => $tempalteConfig['enable_source']
-                        ]
+                    '_source' => [
+                        'enabled' => $tempalteConfig['enable_source']
                     ],
-                    'metric' => [
-                        'properties' => [
-                            '@timestamp' => [
-                                'type' => 'date'
-                            ],
-                            'value' => [
-                                'type' => 'double',
-                                'index' => false
-                            ],
-                            'hostname' => [
-                                'type' => 'keyword'
-                            ],
-                            'service_description' => [
-                                'type' => 'keyword'
-                            ],
-                            'metric' => [
-                                'type' => 'keyword'
-                            ]
+
+                    'properties' => [
+                        '@timestamp'          => [
+                            'type' => 'date'
+                        ],
+                        'value'               => [
+                            'type'  => 'double',
+                            'index' => false
+                        ],
+                        'hostname'            => [
+                            'type' => 'keyword'
+                        ],
+                        'service_description' => [
+                            'type' => 'keyword'
+                        ],
+                        'metric'              => [
+                            'type' => 'keyword'
                         ]
                     ]
+
                 ]
             ]
         ];

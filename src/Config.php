@@ -580,7 +580,6 @@ class Config {
             'number_of_replicas' => Env::get('SE_ELASTICSEARCH_TEMPLATE_NUMBER_OF_REPLICAS', 0, Env::VALUE_INT),
             'refresh_interval'   => Env::get('SE_ELASTICSEARCH_TEMPLATE_REFRESH_INTERVAL', '15s'),
             'codec'              => Env::get('SE_ELASTICSEARCH_TEMPLATE_CODEC', 'best_compression'),
-            'enable_all'         => Env::get('SE_ELASTICSEARCH_TEMPLATE_ENABLE_ALL', 0, Env::VALUE_BOOL),
             'enable_source'      => Env::get('SE_ELASTICSEARCH_TEMPLATE_ENABLE_SOURCE', 1, Env::VALUE_BOOL)
         ];
 
@@ -605,7 +604,7 @@ class Config {
             }
 
             //Replace booleans
-            if (in_array($key, ['enable_all', 'enable_source'], true)) {
+            if (in_array($key, ['enable_source'], true)) {
                 $config[$key] = (bool)$this->config['elasticsearch_template'][$key];
             }
         }

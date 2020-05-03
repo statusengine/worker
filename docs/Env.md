@@ -60,7 +60,6 @@ Even if its possible, I don't recommend to use a mix of both.
 | SE_ELASTICSEARCH_TEMPLATE_NUMBER_OF_REPLICAS | int    | no       |                                                                                     |
 | SE_ELASTICSEARCH_TEMPLATE_REFRESH_INTERVAL   | string | no       |                                                                                     |
 | SE_ELASTICSEARCH_TEMPLATE_CODEC              | string | no       |                                                                                     |
-| SE_ELASTICSEARCH_TEMPLATE_ENABLE_ALL         | bool   | no       |                                                                                     |
 | SE_ELASTICSEARCH_TEMPLATE_ENABLE_SOURCE      | bool   | no       |                                                                                     |
 | SE_ELASTICSEARCH_ADDRESS                     | string | depends  | If `elasticsearch` is in `SE_PERFDATA_BACKEND`                                      |
 | SE_ELASTICSEARCH_PORT                        | int    | depends  | If `elasticsearch` is in `SE_PERFDATA_BACKEND`                                      |
