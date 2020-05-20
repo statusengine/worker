@@ -1913,7 +1913,7 @@ $table->addColumn("problem_has_been_acknowledged", "boolean", array (
   'notnull' => false,
   'default' => '0',
 ));
-$table->addColumn("acknowledgement_type", "boolean", array (
+$table->addColumn("acknowledgement_type", "smallint", array (
   'unsigned' => true,
   'autoincrement' => false,
   'notnull' => false,
