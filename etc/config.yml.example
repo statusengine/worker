@@ -198,7 +198,6 @@ elasticsearch_template:
   number_of_replicas: 0
   refresh_interval: 15s
   codec: best_compression
-  enable_all: 0
   enable_source: 1
 
 # Index that will be used to store data in Elasticsearch
