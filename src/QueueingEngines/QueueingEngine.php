@@ -23,6 +23,7 @@ use PhpAmqpLib\Exception\AMQPNotImplementedException;
 use Statusengine\Config;
 use Statusengine\GearmanClient;
 use Statusengine\GearmanWorker;
+use Statusengine\RabbitMqClient;
 use Statusengine\RabbitMqWorker;
 use Statusengine\Syslog;
 
@@ -74,9 +75,12 @@ class QueueingEngine {
             $GearmanClient->disconnect();
         }
 
-        // @todo implement rabbitmq
         if ($this->Config->isRabbitMqEnabled()) {
-            throw new AMQPNotImplementedException('RabbitMq Support is not implemented yet.');
+            $this->Syslog->info(sprintf('Execute external command (via RabbitMq Queue): %s', $payload));
+            $RabbitMqClient = new RabbitMqClient($this->WorkerConfig->getQueueName(), $this->Config, $this->Syslog);
+            $RabbitMqClient->connect();
+            $RabbitMqClient->sendBackgroundJob($payload);
+            $RabbitMqClient->disconnect();
         }
     }
 
