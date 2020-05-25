@@ -80,8 +80,8 @@ class Database extends Command {
             // the "--help" option
             ->setHelp("CLI command to create and update the statusengine database schema");
 
-        $this->addOption('dump', null, InputOption::VALUE_OPTIONAL, 'Will dump the current SQL schema fromm the database to a PHP file.', false);
-        $this->addOption('update', null, InputOption::VALUE_OPTIONAL, 'Will the database schema.', false);
+        $this->addOption('dump', null, InputOption::VALUE_OPTIONAL, 'Will dump the current SQL schema from the database to a PHP file.', false);
+        $this->addOption('update', null, InputOption::VALUE_OPTIONAL, 'Will update/patch the database schema.', false);
         $this->addOption('dry-run', null, InputOption::VALUE_OPTIONAL, 'Only print all queries but dont execute. (--update only)', false);
         $this->addOption('drop', null, InputOption::VALUE_OPTIONAL, 'Also execute DROP TABLE statements Disabled by default!. (--update only)', false);
     }
