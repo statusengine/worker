@@ -19,7 +19,9 @@
 namespace Statusengine\QueueingEngines;
 
 
+use PhpAmqpLib\Exception\AMQPNotImplementedException;
 use Statusengine\Config;
+use Statusengine\GearmanClient;
 use Statusengine\GearmanWorker;
 use Statusengine\RabbitMqWorker;
 use Statusengine\Syslog;
@@ -50,13 +52,31 @@ class QueueingEngine {
     /**
      * @return QueueInterface
      */
-    public function getQueue(){
-        if($this->Config->isGearmanEnabled()){
+    public function getQueue() {
+        if ($this->Config->isGearmanEnabled()) {
             return new GearmanWorker($this->WorkerConfig, $this->Config, $this->Syslog);
         }
 
-        if($this->Config->isRabbitMqEnabled()){
+        if ($this->Config->isRabbitMqEnabled()) {
             return new RabbitMqWorker($this->WorkerConfig, $this->Config, $this->Syslog);
+        }
+    }
+
+    /**
+     * @param string $payload
+     */
+    public function sendExternalCommand($payload) {
+        if ($this->Config->isGearmanEnabled()) {
+            $this->Syslog->info(sprintf('Execute external command (via Gearman Queue): %s', $payload));
+            $GearmanClient = new GearmanClient($this->WorkerConfig->getQueueName(), $this->Config, $this->Syslog);
+            $GearmanClient->connect();
+            $GearmanClient->sendBackgroundJob($payload);
+            $GearmanClient->disconnect();
+        }
+
+        // @todo implement rabbitmq
+        if ($this->Config->isRabbitMqEnabled()) {
+            throw new AMQPNotImplementedException('RabbitMq Support is not implemented yet.');
         }
     }
 

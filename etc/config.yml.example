@@ -251,6 +251,11 @@ submit_method: cmd
 # Naemon only at the moment, but i but i recommend to use this, with Naemon
 #submit_method: qh
 
+# Pass external commands through the Statusengine Broker using the statusngin_cmd queue
+# Requires to use the C++ Statusengine Broker: https://github.com/statusengine/broker
+# Supports Naemon and Nagios
+#submit_method: broker
+
 ############
 # SYSLOG CONFIGURATION
 ############
