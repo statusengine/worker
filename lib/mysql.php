@@ -1171,6 +1171,7 @@ $table->addColumn("notify_contacts", "boolean", array (
   'default' => '0',
 ));
 $table->setPrimaryKey([
+    "hostname",
     "service_description", 
     "entry_time", 
     "entry_time_usec"
@@ -1423,6 +1424,7 @@ $table->addColumn("ack_data", "string", array (
   'length' => 1024,
 ));
 $table->setPrimaryKey([
+    "hostname",
     "service_description", 
     "start_time", 
     "start_time_usec"
@@ -1635,6 +1637,7 @@ $table->addColumn("long_output", "string", array (
   'length' => 8192,
 ));
 $table->setPrimaryKey([
+    "hostname",
     "service_description", 
     "state_time", 
     "state_time_usec"
@@ -1768,6 +1771,7 @@ $table->addColumn("long_output", "string", array (
   'length' => 8192,
 ));
 $table->setPrimaryKey([
+    "hostname",
     "service_description", 
     "start_time", 
     "start_time_usec"
