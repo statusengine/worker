@@ -275,8 +275,92 @@ class Database extends Command {
      * @return string
      */
     public function dumpCrateDBSchema(Schema $schema) {
-        //https://github.com/crate/crate-dbal/issues/75
+        // Many thanks for the great support and help by the CrateDB devs!!!
+        // https://github.com/crate/crate-dbal/issues/75 - resolved
+        // https://github.com/crate/crate-dbal/issues/84 - resolved
+        // https://github.com/crate/crate-dbal/issues/92 - open
+
         throw new \RuntimeException("CrateDB driver don't have sharts and primary key implemented");
+
+
+        $file = fopen($this->getFullFileName(), 'w+');
+
+        $data = '<?php' . PHP_EOL . PHP_EOL;
+        $data .= 'use Doctrine\DBAL\Schema\Schema;' . PHP_EOL;
+
+        $data .= PHP_EOL . PHP_EOL;
+
+
+        $data .= 'require_once __DIR__ . DIRECTORY_SEPARATOR . \'..\' . DIRECTORY_SEPARATOR . \'bootstrap.php\';' . PHP_EOL;
+        $data .= '$schema = new Schema();' . PHP_EOL . PHP_EOL;
+
+
+        foreach ($schema->getTables() as $table) {
+            /** @var $table \Doctrine\DBAL\Schema\Table */
+
+            $data .= sprintf('/****************************************%s', PHP_EOL);
+            $data .= sprintf(' * Define: %s%s', $table->getName(), PHP_EOL);
+            $data .= sprintf(' ***************************************/%s', PHP_EOL);
+
+            $data .= sprintf('$table = $schema->createTable("%s");%s', $table->getName(), PHP_EOL);
+
+            $tableOptions = $table->getOptions();
+
+            // number_of_replicas can be int like 1 2 3 or an string like 1-all etc...
+            $data .= sprintf('$table->addOption("table_options", ["number_of_replicas" => "%s"]);%s', $tableOptions['table_options']['number_of_replicas'], PHP_EOL);
+            $data .= sprintf('$table->addOption("sharding_num_shards" , %s);%s', $tableOptions['sharding_num_shards'], PHP_EOL);
+            if (!empty($tableOptions['partition_columns'])) {
+                $data .= sprintf('$table->addOption("partition_columns" , "%s");%s', var_export($tableOptions['partition_columns'], true), PHP_EOL);
+            }
+
+
+            foreach ($table->getColumns() as $column) {
+                $default = null;
+                print_r($column->getCustomSchemaOptions()); //empty array
+                print_r($column->getPlatformOptions()); //empty array
+                if (is_numeric($column->getDefault())) {
+                    $default = $column->getDefault();
+                } else if ($column->getDefault() !== null) {
+                    $default = $column->getDefault();
+                }
+
+                $options = [
+                    'notnull' => $column->getNotnull(),
+                    'default' => $default
+                ];
+
+                if ($column->getLength()) {
+                    $options['length'] = $column->getLength();
+                }
+
+                $data .= sprintf('$table->addColumn("%s", "%s", %s);%s',
+                    $column->getName(),
+                    $column->getType()->getName(),
+                    var_export($options, true),
+                    PHP_EOL
+                );
+
+            }
+
+            $primaryKey = $table->getPrimaryKey();
+            if ($primaryKey) {
+                $columns = $this->makeArrayIfString($primaryKey->getColumns());
+                $data .= sprintf('$table->setPrimaryKey(%s);%s',
+                    '[' . PHP_EOL . '    "' . implode('", ' . PHP_EOL . '    "', $columns) . '"' . PHP_EOL . ']',
+                    PHP_EOL
+                );
+            }
+
+            $data .= PHP_EOL . PHP_EOL . PHP_EOL;
+        }
+
+        $data .= 'return $schema;' . PHP_EOL;
+
+        fwrite($file, $data);
+        fclose($file);
+
+        return $this->getFullFileName();
+
     }
 
     /**
@@ -304,8 +388,8 @@ class Database extends Command {
         }
 
         foreach ($sql as $query) {
-            if($drop === false){
-                if(preg_match('/drop table/', strtolower($query))){
+            if ($drop === false) {
+                if (preg_match('/drop table/', strtolower($query))) {
                     //Skip drop table queries
                     $output->write('<question>Skipping:</question> ');
                     $output->writeln($query);
