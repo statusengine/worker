@@ -41,4 +41,4 @@ ALTER TABLE `statusengine_service_downtimehistory` ADD `entry_time_usec` INT UNS
 UPDATE `statusengine_service_downtimehistory` SET `entry_time_usec`=FLOOR(RAND() * 100000000);
 ALTER TABLE `statusengine`.`statusengine_service_downtimehistory` ADD INDEX `reports` (`hostname`, `service_description`, `entry_time`, `entry_time_usec`, `scheduled_start_time`, `scheduled_end_time`, `was_cancelled`);
 
-INSERT INTO statusengine_dbversion (id, dbversion)VALUES(1, '3.7.0') ON DUPLICATE KEY UPDATE dbversion='3.7.0'
+INSERT INTO statusengine_dbversion (id, dbversion)VALUES(1, '3.7.0') ON DUPLICATE KEY UPDATE dbversion='3.7.0';
