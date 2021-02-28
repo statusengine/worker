@@ -43,11 +43,17 @@ class Logentry implements DataStructInterface {
     private $logentry_data;
 
     /**
+     * @var int
+     */
+    private $timestamp_usec;
+
+    /**
      * Logentry constructor.
      * @param \stdClass $logentry
      */
     public function __construct(\stdClass $logentry) {
         $this->logentry_time = (int)$logentry->timestamp;
+        $this->timestamp_usec = isset($logentry->timestamp_usec) ? (int)$logentry->timestamp_usec : 0;
         $this->entry_time = (int)$logentry->logentry->entry_time;
         $this->logentry_type = (int)$logentry->logentry->data_type;
         $this->logentry_data = $logentry->logentry->data;
@@ -83,14 +89,22 @@ class Logentry implements DataStructInterface {
     }
 
     /**
+     * @return int
+     */
+    public function getTimestampUsec() {
+        return $this->timestamp_usec;
+    }
+
+    /**
      * @return array
      */
     public function serialize() {
         return [
-            'logentry_time' => $this->logentry_time,
-            'entry_time' => $this->entry_time,
-            'logentry_type' => $this->logentry_type,
-            'logentry_data' => $this->logentry_data
+            'logentry_time'  => $this->logentry_time,
+            'timestamp_usec' => $this->timestamp_usec,
+            'entry_time'     => $this->entry_time,
+            'logentry_type'  => $this->logentry_type,
+            'logentry_data'  => $this->logentry_data
         ];
     }
 

@@ -1,8 +1,7 @@
-#!/usr/bin/php
 <?php
 /**
  * Statusengine Worker
- * Copyright (C) 2016-2018  Daniel Ziegler
+ * Copyright (C) 2016-2019  Daniel Ziegler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,26 +17,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once __DIR__ . '/../bootstrap.php';
+namespace Statusengine\QueueingEngines;
 
-use Symfony\Component\Console\Application;
-use Statusengine\Console\Statistics;
-use Statusengine\Console\Cleanup;
-use Statusengine\Console\Cluster;
-use Statusengine\Console\Database;
 
-$Config = new \Statusengine\Config();
-if($Config->getDisableHttpProxy()){
-    \Statusengine\ProxySettings::disableAllProxySettings();
+use Statusengine\Config;
+use Statusengine\Syslog;
+
+interface QueueClientInterface {
+
+    /**
+     * QueueInterface constructor.
+     * @param string $queueName
+     * @param Config\WorkerConfig $WorkerConfig
+     * @param Config $Config
+     */
+    public function __construct($queueName, Config $Config, Syslog $Syslog);
+
+    /**
+     * @return void
+     */
+    public function connect();
+
+    /**
+     * @param string $playload
+     */
+    public function sendBackgroundJob($playload);
+
+    /**
+     * @return void
+     */
+    public function disconnect();
+
 }
-
-$application = new Application();
-
-
-$application->add(new Statistics());
-$application->add(new Cleanup());
-$application->add(new Cluster());
-$application->add(new Database());
-$application->run();
-
-

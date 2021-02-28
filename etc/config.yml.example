@@ -83,6 +83,7 @@ mysql:
     username: statusengine
     password: password
     database: statusengine
+    encoding: utf8
 
 # If Statusengine should save historical data to CrateDB
 # WARNING: Do not set use_crate and use_mysql to 1 at the same time!
@@ -197,7 +198,6 @@ elasticsearch_template:
   number_of_replicas: 0
   refresh_interval: 15s
   codec: best_compression
-  enable_all: 0
   enable_source: 1
 
 # Index that will be used to store data in Elasticsearch
@@ -245,11 +245,16 @@ query_handler: /opt/naemon/var/naemon.qh
 
 # Pass external commands to the external commands file.
 # Naemon and Nagios
-submit_method: cmd
+#submit_method: cmd
 
 # Pass external commands to the query handler
 # Naemon only at the moment, but i but i recommend to use this, with Naemon
 #submit_method: qh
+
+# Pass external commands through the Statusengine Broker using the statusngin_cmd queue
+# Requires to use the C++ Statusengine Broker: https://github.com/statusengine/broker
+# Supports Naemon and Nagios
+submit_method: broker
 
 ############
 # SYSLOG CONFIGURATION

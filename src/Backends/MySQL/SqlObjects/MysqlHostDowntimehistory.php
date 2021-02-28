@@ -30,17 +30,17 @@ class MySQLHostDowntimehistory extends Mysql\MysqlModel {
      * @var string
      */
     protected $baseQuery = "INSERT INTO statusengine_host_downtimehistory
-    (hostname, entry_time, author_name, comment_data, internal_downtime_id, triggered_by_id, is_fixed, duration, scheduled_start_time,
+    (hostname, entry_time, entry_time_usec, author_name, comment_data, internal_downtime_id, triggered_by_id, is_fixed, duration, scheduled_start_time,
     scheduled_end_time, node_name %s)
     VALUES%s
-    ON DUPLICATE KEY UPDATE entry_time=VALUES(entry_time), author_name=VALUES(author_name), comment_data=VALUES(comment_data),
+    ON DUPLICATE KEY UPDATE entry_time=VALUES(entry_time), entry_time_usec=VALUES(entry_time_usec), author_name=VALUES(author_name), comment_data=VALUES(comment_data),
     triggered_by_id=VALUES(triggered_by_id), is_fixed=VALUES(is_fixed), duration=VALUES(duration), scheduled_end_time=VALUES(scheduled_end_time) %s";
 
 
     /**
      * @var string
      */
-    protected $baseValue = '?,?,?,?,?,?,?,?,?,?,?';
+    protected $baseValue = '?,?,?,?,?,?,?,?,?,?,?,?';
 
     /**
      * @var \PDO
@@ -127,6 +127,7 @@ class MySQLHostDowntimehistory extends Mysql\MysqlModel {
         $i = 1;
         $query->bindValue($i++, $Downtime->getHostName());
         $query->bindValue($i++, $Downtime->getEntryTime());
+        $query->bindValue($i++, $Downtime->getTimestampUsec());
         $query->bindValue($i++, $Downtime->getAuthorName());
         $query->bindValue($i++, $Downtime->getCommentData());
         $query->bindValue($i++, $Downtime->getDowntimeId());

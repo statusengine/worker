@@ -102,7 +102,8 @@ $StatisticCollector = new Statusengine\Redis\StatisticCollector(
 
 $QueryHandler = new \Statusengine\QueryHandler($Config, $Syslog);
 $ExternalCommandFile = new \Statusengine\ExternalCommandFile($Config, $Syslog);
-$TaskManager = new \Statusengine\TaskManager($Config, $StorageBackend, $QueryHandler, $ExternalCommandFile, $Syslog);
+$QueueingEngine = new \Statusengine\QueueingEngines\QueueingEngine($Config, new \Statusengine\Config\Externalcommand(), $Syslog);
+$TaskManager = new \Statusengine\TaskManager($Config, $StorageBackend, $QueryHandler, $ExternalCommandFile, $Syslog, $QueueingEngine);
 $MonitoringRestartConfig = new Statusengine\Config\MonitoringRestart();
 $ParentProcess = new \Statusengine\ParentProcess(
     $StatisticCollector,

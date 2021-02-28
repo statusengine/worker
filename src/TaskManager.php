@@ -19,6 +19,7 @@
 namespace Statusengine;
 
 use Statusengine\Exception\UnknownTaskTypeException;
+use Statusengine\QueueingEngines\QueueingEngine;
 use Statusengine\ValueObjects\Statistic;
 use Statusengine\ValueObjects\Task;
 
@@ -60,6 +61,11 @@ class TaskManager {
     private $lastCheck = 0;
 
     /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
+
+    /**
      * TaskManager constructor.
      * @param Config $Config
      * @param StorageBackend $StorageBackend
@@ -71,13 +77,15 @@ class TaskManager {
         StorageBackend $StorageBackend,
         QueryHandler $QueryHandler,
         ExternalCommandFile $ExternalCommandFile,
-        Syslog $Syslog
+        Syslog $Syslog,
+        QueueingEngine $QueueingEngine
     ) {
         $this->Config = $Config;
         $this->StorageBackend = $StorageBackend;
         $this->QueryHandler = $QueryHandler;
         $this->ExternalCommandFile = $ExternalCommandFile;
         $this->Syslog = $Syslog;
+        $this->QueueingEngine = $QueueingEngine;
 
         $this->checkInterval = $Config->getCommandCheckInterval();
     }
@@ -114,13 +122,22 @@ class TaskManager {
         switch ($task->getType()) {
 
             case 'externalcommand':
-                if($this->Config->getSubmitMethod() === 'qh') {
+                if ($this->Config->getSubmitMethod() === 'broker') {
+                    $payload = [
+                        'Command' => 'raw',
+                        'Data'    => $task->getPayload()
+                    ];
+
+                    $this->QueueingEngine->sendExternalCommand(json_encode($payload));
+                }
+
+                if ($this->Config->getSubmitMethod() === 'qh') {
                     $this->QueryHandler->connect();
                     $this->QueryHandler->runCommand($task->getPayload());
                     $this->QueryHandler->disconnect();
                 }
 
-                if($this->Config->getSubmitMethod() === 'cmd') {
+                if ($this->Config->getSubmitMethod() === 'cmd') {
                     $this->ExternalCommandFile->connect();
                     $this->ExternalCommandFile->runCommand($task->getPayload());
                     $this->ExternalCommandFile->disconnect();

@@ -27,7 +27,7 @@ class Downtime implements DataStructInterface {
     const NEBTYPE_DOWNTIME_LOAD = 1102;
     const NEBTYPE_DOWNTIME_START = 1103;
     const NEBTYPE_DOWNTIME_STOP = 1104;
-    
+
     const NEBATTR_DOWNTIME_STOP_NORMAL = 1;
     const NEBATTR_DOWNTIME_STOP_CANCELLED = 2;
 
@@ -108,6 +108,10 @@ class Downtime implements DataStructInterface {
      */
     private $timestamp;
 
+    /**
+     * @var int
+     */
+    private $timestamp_usec;
 
     /**
      * Downtime constructor.
@@ -130,6 +134,7 @@ class Downtime implements DataStructInterface {
         $this->duration = (int)$downtime->downtime->duration;
 
         $this->timestamp = (int)$downtime->timestamp;
+        $this->timestamp_usec = isset($downtime->timestamp_usec) ? (int)$downtime->timestamp_usec : 0;
     }
 
     /**
@@ -149,35 +154,35 @@ class Downtime implements DataStructInterface {
     /**
      * @return bool
      */
-    public function wasDowntimeAdded(){
+    public function wasDowntimeAdded() {
         return $this->type === self::NEBTYPE_DOWNTIME_ADD;
     }
 
     /**
      * @return bool
      */
-    public function wasDowntimeDeleted(){
+    public function wasDowntimeDeleted() {
         return $this->type === self::NEBTYPE_DOWNTIME_DELETE;
     }
 
     /**
      * @return bool
      */
-    public function wasRestoredFromRetentionDat(){
+    public function wasRestoredFromRetentionDat() {
         return $this->type === self::NEBTYPE_DOWNTIME_LOAD;
     }
 
     /**
      * @return bool
      */
-    public function wasDowntimeStarted(){
+    public function wasDowntimeStarted() {
         return $this->type === self::NEBTYPE_DOWNTIME_START;
     }
 
     /**
      * @return bool
      */
-    public function wasDowntimeStopped(){
+    public function wasDowntimeStopped() {
         return $this->type === self::NEBTYPE_DOWNTIME_STOP;
     }
 
@@ -268,22 +273,22 @@ class Downtime implements DataStructInterface {
     /**
      * @return int
      */
-    public function getScheduledStartTime(){
+    public function getScheduledStartTime() {
         return $this->start_time;
     }
 
     /**
      * @return int
      */
-    public function getScheduledEndTime(){
+    public function getScheduledEndTime() {
         return $this->end_time;
     }
 
     /**
      * @return int
      */
-    public function getActualStartTime(){
-        if ($this->wasDowntimeStarted()){
+    public function getActualStartTime() {
+        if ($this->wasDowntimeStarted()) {
             return $this->timestamp;
         }
         return 0;
@@ -292,8 +297,8 @@ class Downtime implements DataStructInterface {
     /**
      * @return int
      */
-    public function getActualEndTime(){
-        if ($this->wasDowntimeStopped() || $this->wasDowntimeDeleted()){
+    public function getActualEndTime() {
+        if ($this->wasDowntimeStopped() || $this->wasDowntimeDeleted()) {
             return $this->timestamp;
         }
         return 0;
@@ -302,35 +307,42 @@ class Downtime implements DataStructInterface {
     /**
      * @return bool
      */
-    public function wasCancelled(){
+    public function wasCancelled() {
         return $this->attr === self::NEBATTR_DOWNTIME_STOP_CANCELLED;
     }
 
     /**
      * @return bool
      */
-    public function wasStarted(){
+    public function wasStarted() {
         return $this->wasDowntimeStarted();
     }
 
     /**
      * @return bool
      */
-    public function wasDowntimeNeverStarted(){
-        if(!$this->wasDowntimeDeleted()){
+    public function wasDowntimeNeverStarted() {
+        if (!$this->wasDowntimeDeleted()) {
             //We can only check this inside of DELETE events
             return false;
         }
         //This could happen, if you schedule a downtime for tomorrow
         //And delete it right away
         //In this case, the monitoring core will only give us a DELETE event. Not a Downtime STOP event.
-        
+
         //Compare scheduled start time with the timestamp of the delete event
         //If scheduled start time was not reached until the delete event was fired, the downtime never started
-        if($this->start_time > $this->timestamp){
+        if ($this->start_time > $this->timestamp) {
             return true;
         }
         return false;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestampUsec() {
+        return $this->timestamp_usec;
     }
 
     /**
@@ -338,18 +350,18 @@ class Downtime implements DataStructInterface {
      */
     public function serialize() {
         return [
-            'host_name' => $this->host_name,
+            'host_name'           => $this->host_name,
             'service_description' => $this->service_description,
-            'author_name' => $this->author_name,
-            'comment_data' => $this->comment_data,
-            'downtime_type' => $this->downtime_type,
-            'entry_time' => $this->entry_time,
-            'start_time' => $this->start_time,
-            'end_time' => $this->end_time,
-            'triggered_by' => $this->triggered_by,
-            'downtime_id' => $this->downtime_id,
-            'fixed' => $this->fixed,
-            'duration' => $this->duration
+            'author_name'         => $this->author_name,
+            'comment_data'        => $this->comment_data,
+            'downtime_type'       => $this->downtime_type,
+            'entry_time'          => $this->entry_time,
+            'start_time'          => $this->start_time,
+            'end_time'            => $this->end_time,
+            'triggered_by'        => $this->triggered_by,
+            'downtime_id'         => $this->downtime_id,
+            'fixed'               => $this->fixed,
+            'duration'            => $this->duration
         ];
     }
 

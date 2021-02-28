@@ -35,6 +35,11 @@ class Acknowledgement implements DataStructInterface {
     private $timestamp;
 
     /**
+     * @var int
+     */
+    private $timestamp_usec;
+
+    /**
      * @var string
      */
     private $host_name;
@@ -88,6 +93,7 @@ class Acknowledgement implements DataStructInterface {
      */
     public function __construct(\stdClass $acknowledgement) {
         $this->timestamp = (int)$acknowledgement->timestamp;
+        $this->timestamp_usec = isset($acknowledgement->timestamp_usec) ? (int)$acknowledgement->timestamp_usec : 0;
         $this->host_name = $acknowledgement->acknowledgement->host_name;
         $this->service_description = $acknowledgement->acknowledgement->service_description;
         $this->author_name = $acknowledgement->acknowledgement->author_name;
@@ -103,8 +109,8 @@ class Acknowledgement implements DataStructInterface {
     /**
      * @return bool
      */
-    public function isHostAcknowledgement(){
-        if($this->service_description === '' || $this->service_description === null){
+    public function isHostAcknowledgement() {
+        if ($this->service_description === '' || $this->service_description === null) {
             return true;
         }
         return false;
@@ -113,7 +119,7 @@ class Acknowledgement implements DataStructInterface {
     /**
      * @return bool
      */
-    public function isServiceAcknowledgement(){
+    public function isServiceAcknowledgement() {
         return !$this->isHostAcknowledgement();
     }
 
@@ -122,6 +128,13 @@ class Acknowledgement implements DataStructInterface {
      */
     public function getTimestamp() {
         return $this->timestamp;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestampUsec() {
+        return $this->timestamp_usec;
     }
 
     /**
@@ -192,15 +205,16 @@ class Acknowledgement implements DataStructInterface {
      */
     public function serialize() {
         return [
-            'timestamp' => $this->timestamp,
-            'host_name' => $this->host_name,
+            'timestamp'           => $this->timestamp,
+            'timestamp_usec'      => $this->timestamp_usec,
+            'host_name'           => $this->host_name,
             'service_description' => $this->service_description,
-            'author_name' => $this->author_name,
-            'comment_data' => $this->comment_data,
-            'state' => $this->state,
-            'is_sticky' => $this->is_sticky,
-            'persistent_comment' => $this->persistent_comment,
-            'notify_contacts' => $this->notify_contacts
+            'author_name'         => $this->author_name,
+            'comment_data'        => $this->comment_data,
+            'state'               => $this->state,
+            'is_sticky'           => $this->is_sticky,
+            'persistent_comment'  => $this->persistent_comment,
+            'notify_contacts'     => $this->notify_contacts
         ];
     }
 

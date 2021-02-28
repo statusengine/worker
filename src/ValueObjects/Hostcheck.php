@@ -117,6 +117,15 @@ class Hostcheck implements DataStructInterface {
      */
     const NEBTYPE_HOSTCHECK_RAW_END = 803;
 
+    /**
+     * @var
+     */
+    private $timestamp;
+
+    /**
+     * @var int
+     */
+    private $timestamp_usec;
 
     /**
      * Hostcheck constructor.
@@ -145,6 +154,9 @@ class Hostcheck implements DataStructInterface {
         $this->output = $hostcheck->hostcheck->output;
         $this->long_output = $hostcheck->hostcheck->long_output;
         $this->perfdata = $hostcheck->hostcheck->perf_data;
+
+        $this->timestamp = $hostcheck->timestamp;
+        $this->timestamp_usec = isset($hostcheck->timestamp_usec) ? (int)$hostcheck->timestamp_usec : 0;
     }
 
     public function getHostName() {
@@ -260,28 +272,44 @@ class Hostcheck implements DataStructInterface {
         return $this->perfdata;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getTimestamp() {
+        return $this->timestamp;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimestampUsec() {
+        return $this->timestamp_usec;
+    }
 
     /**
      * @return array
      */
     public function serialize() {
         return [
-            'host_name' => $this->host_name,
+            'host_name'    => $this->host_name,
             'is_raw_check' => $this->is_raw_check,
 
             'current_check_attempt' => $this->current_check_attempt,
-            'max_check_attempts' => $this->max_check_attempts,
-            'state' => $this->state,
-            'state_type' => $this->state_type,
-            'command' => $this->command,
-            'timeout' => $this->timeout,
-            'early_timeout' => $this->early_timeout,
-            'execution_time' => $this->execution_time,
-            'latency' => $this->latency,
-            'return_code' => $this->return_code,
-            'output' => $this->output,
-            'long_output' => $this->long_output,
-            'perfdata' => $this->perfdata
+            'max_check_attempts'    => $this->max_check_attempts,
+            'state'                 => $this->state,
+            'state_type'            => $this->state_type,
+            'command'               => $this->command,
+            'timeout'               => $this->timeout,
+            'early_timeout'         => $this->early_timeout,
+            'execution_time'        => $this->execution_time,
+            'latency'               => $this->latency,
+            'return_code'           => $this->return_code,
+            'output'                => $this->output,
+            'long_output'           => $this->long_output,
+            'perfdata'              => $this->perfdata,
+
+            'timestamp'      => $this->timestamp,
+            'timestamp_usec' => $this->timestamp_usec
         ];
     }
 

@@ -113,14 +113,14 @@ class Gauge {
     /**
      * @return mixed
      */
-    public function getHostName(){
+    public function getHostName() {
         return $this->host_name;
     }
 
     /**
      * @return string
      */
-    public function getServiceDescription(){
+    public function getServiceDescription() {
         return $this->service_desc;
     }
 
@@ -162,14 +162,14 @@ class Gauge {
     /**
      * @return string
      */
-    public function getUnit(){
+    public function getUnit() {
         return $this->unit;
     }
 
     /**
      * @return int
      */
-    public function getTimestamp(){
+    public function getTimestamp() {
         return $this->timestamp;
     }
 

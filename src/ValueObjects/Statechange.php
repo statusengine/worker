@@ -83,6 +83,11 @@ class Statechange implements DataStructInterface {
     private $long_output;
 
     /**
+     * @var int
+     */
+    private $timestamp_usec;
+
+    /**
      * Statechange constructor.
      * @param \stdClass $statechange
      */
@@ -91,6 +96,7 @@ class Statechange implements DataStructInterface {
         $this->service_description = $statechange->statechange->service_description;
 
         $this->state_time = (int)$statechange->timestamp;
+        $this->timestamp_usec = isset($statechange->timestamp_usec) ? (int)$statechange->timestamp_usec : 0;
 
         $this->state_change = (int)$statechange->statechange->statechange_type;
         $this->state = (int)$statechange->statechange->state;
@@ -206,22 +212,32 @@ class Statechange implements DataStructInterface {
     }
 
     /**
+     * @return int
+     */
+    public function getTimestampUsec() {
+        return $this->timestamp_usec;
+    }
+
+    /**
      * @return array
      */
     public function serialize() {
         return [
-            'host_name' => $this->host_name,
+            'host_name'           => $this->host_name,
             'service_description' => $this->service_description,
 
             'state_change' => $this->state_change,
-            'state' => $this->state,
-            'state_type' => $this->state_type,
+
+            'timestamp_usec' => $this->timestamp_usec,
+
+            'state'                 => $this->state,
+            'state_type'            => $this->state_type,
             'current_check_attempt' => $this->current_check_attempt,
-            'max_check_attempts' => $this->max_check_attempts,
-            'last_state' => $this->last_state,
-            'last_hard_state' => $this->last_hard_state,
-            'output' => $this->output,
-            'long_output' => $this->long_output
+            'max_check_attempts'    => $this->max_check_attempts,
+            'last_state'            => $this->last_state,
+            'last_hard_state'       => $this->last_hard_state,
+            'output'                => $this->output,
+            'long_output'           => $this->long_output
         ];
     }
 

@@ -31,26 +31,26 @@ class MysqlStatechange extends Mysql\MysqlModel {
      */
     protected $baseQueryHost = "
       INSERT INTO statusengine_host_statehistory
-      (hostname, state_time, state, state_change, is_hardstate, current_check_attempt, max_check_attempts, last_state, last_hard_state, output, long_output)
+      (hostname, state_time, state_time_usec, state, state_change, is_hardstate, current_check_attempt, max_check_attempts, last_state, last_hard_state, output, long_output)
       VALUES%s";
 
     /**
      * @var string
      */
-    protected $baseValueHost = '(?,?,?,?,?,?,?,?,?,?,?)';
+    protected $baseValueHost = '(?,?,?,?,?,?,?,?,?,?,?,?)';
 
     /**
      * @var string
      */
     protected $baseQueryService = "
       INSERT INTO statusengine_service_statehistory
-      (hostname, service_description, state_time, state, state_change, is_hardstate, current_check_attempt, max_check_attempts, last_state, last_hard_state, output, long_output)
+      (hostname, service_description, state_time, state_time_usec, state, state_change, is_hardstate, current_check_attempt, max_check_attempts, last_state, last_hard_state, output, long_output)
       VALUES%s";
 
     /**
      * @var string
      */
-    protected $baseValueService = '(?,?,?,?,?,?,?,?,?,?,?,?)';
+    protected $baseValueService = '(?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
     /**
      * @var Mysql\MySQL
@@ -116,6 +116,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
         foreach ($hostStatechangeCache as $Statechange) {
             $query->bindValue($i++, $Statechange->getHostname());
             $query->bindValue($i++, $Statechange->getStateTime());
+            $query->bindValue($i++, $Statechange->getTimestampUsec());
             $query->bindValue($i++, $Statechange->getState());
             $query->bindValue($i++, $Statechange->getStateChange());
             $query->bindValue($i++, $Statechange->getStateType());
@@ -155,6 +156,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
             $query->bindValue($i++, $Statechange->getHostname());
             $query->bindValue($i++, $Statechange->getServiceDescription());
             $query->bindValue($i++, $Statechange->getStateTime());
+            $query->bindValue($i++, $Statechange->getTimestampUsec());
             $query->bindValue($i++, $Statechange->getState());
             $query->bindValue($i++, $Statechange->getStateChange());
             $query->bindValue($i++, $Statechange->getStateType());

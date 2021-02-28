@@ -1,4 +1,3 @@
-#!/usr/bin/php
 <?php
 /**
  * Statusengine Worker
@@ -18,26 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once __DIR__ . '/../bootstrap.php';
+namespace Statusengine\Config;
+class Externalcommand implements WorkerConfig {
 
-use Symfony\Component\Console\Application;
-use Statusengine\Console\Statistics;
-use Statusengine\Console\Cleanup;
-use Statusengine\Console\Cluster;
-use Statusengine\Console\Database;
+    private $queueName = 'statusngin_cmd';
 
-$Config = new \Statusengine\Config();
-if($Config->getDisableHttpProxy()){
-    \Statusengine\ProxySettings::disableAllProxySettings();
+    public function getQueueName() {
+        return $this->queueName;
+    }
+
 }
-
-$application = new Application();
-
-
-$application->add(new Statistics());
-$application->add(new Cleanup());
-$application->add(new Cluster());
-$application->add(new Database());
-$application->run();
-
-
