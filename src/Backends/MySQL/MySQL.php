@@ -285,6 +285,10 @@ class MySQL implements \Statusengine\StorageBackend {
             $errorString = $Exception->errorInfo[2];
             $this->Syslog->error(sprintf('[%s] %s', $errorNo, $errorString));
             $this->Syslog->error($query->queryString);
+            $this->Syslog->error("Run the worker in foreground mode to see the full query: https://statusengine.org/worker/#debugging");
+
+            // This function has no return - so no log file -.-
+            $query->debugDumpParams();
 
             if ($errorString == 'MySQL server has gone away') {
                 $this->reconnect();

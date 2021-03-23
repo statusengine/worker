@@ -223,6 +223,9 @@ class Crate implements \Statusengine\StorageBackend {
             /*
              * PHP Fatal error:  Uncaught exception 'GuzzleHttp\Exception\ConnectException' with message 'No more servers available, exception from last server: cURL error 28: Operation timed out after 5001 milliseconds with 0 bytes received (see http://curl.haxx.se/libcurl/c/libcurl-errors.html)' in /opt/statusengine-redis-5dadaf382f3e66ff3cd66a63df9b9f01df659860/redis/vendor/crate/crate-pdo/src/Crate/PDO/Http/Client.php:225
              */
+
+            $this->Syslog->error("Run the worker in foreground mode to see the full query: https://statusengine.org/worker/#debugging");
+            $this->Syslog->error(var_export($query, true));
         }
         return $result;
     }
