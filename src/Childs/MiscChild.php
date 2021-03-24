@@ -152,9 +152,13 @@ class MiscChild extends Child {
                     if (property_exists($jobJson, 'downtime')) {
                         $this->handleDowntime($jobJson);
                     }
+
+                    // Dispatch for bulk messages from queue
+                    $this->StorageBackend->dispatch();
                 }
             }
 
+            // Dispatch for bulk messages from queue
             $this->StorageBackend->dispatch();
 
             $this->Statistics->dispatch();

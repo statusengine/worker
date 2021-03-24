@@ -123,10 +123,14 @@ class LogentryChild extends Child {
                     $this->StorageBackend->saveLogentry(
                         $Logentry
                     );
+
+                    // Dispatch for bulk messages from queue
+                    $this->StorageBackend->dispatch();
                     $this->Statistics->increase();
                 }
             }
 
+            // Dispatch for single messages and timeout checks
             $this->StorageBackend->dispatch();
 
             $this->Statistics->dispatch();

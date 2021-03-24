@@ -118,10 +118,14 @@ class StatechangeChild extends Child {
                     $this->StorageBackend->saveStatechange(
                         $Statechange
                     );
+
+                    // Dispatch for bulk messages from queue
+                    $this->StorageBackend->dispatch();
                     $this->Statistics->increase();
                 }
             }
 
+            // Dispatch for single messages and timeout checks
             $this->StorageBackend->dispatch();
 
             $this->Statistics->dispatch();

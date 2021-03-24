@@ -158,9 +158,16 @@ class PerfdataChild extends Child {
                         }
                         $this->Statistics->increase();
                     }
+
+                    // Dispatch for bulk messages from queue
+                    foreach ($perfdataStorageBackends as $key => $backend) {
+                        $perfdataStorageBackends[$key]->dispatch();
+                    }
+
                 }
             }
 
+            // Dispatch for single messages and timeout checks
             foreach ($perfdataStorageBackends as $key => $backend) {
                 $perfdataStorageBackends[$key]->dispatch();
             }
