@@ -40,7 +40,7 @@ Even if its possible, I don't recommend to use a mix of both.
 | SE_NUMBER_LOGENTRY_WORKER                    | int    | no       |                                                                                     |
 | SE_NUMBER_STATECHANGE_WORKER                 | int    | no       |                                                                                     |
 | SE_NUMBER_HOSTCHECK_WORKER                   | int    | no       |                                                                                     |
-| SE_NUMBER_HOSTCHECK_WORKER                   | int    | no       |                                                                                     |
+| SE_NUMBER_SERVICECHECK_WORKER                | int    | no       |                                                                                     |
 | SE_NUMBER_PERFDATA_WORKER                    | int    | no       |                                                                                     |
 | SE_NUMBER_MISC_WORKER                        | int    | no       |                                                                                     |
 | SE_NUMBER_OF_BULK_RECORDS                    | int    | no       | Batch size of rows getting insert in one statement                                  |

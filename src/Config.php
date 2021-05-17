@@ -356,8 +356,8 @@ class Config {
      * @return int
      */
     public function getNumberOfServicecheckWorkers() {
-        $default = Env::get('SE_NUMBER_HOSTCHECK_WORKER', 1, Env::VALUE_INT);
-        if (isset($this->config['SE_NUMBER_SERVICECHECK_WORKER'])) {
+        $default = Env::get('SE_NUMBER_SERVICECHECK_WORKER', 1, Env::VALUE_INT);
+        if (isset($this->config['number_servicecheck_worker'])) {
             if (is_numeric($this->config['number_servicecheck_worker'])) {
                 return (int)$this->config['number_servicecheck_worker'];
             }
