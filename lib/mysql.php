@@ -968,7 +968,7 @@ $table->addColumn("logentry_data", "string", array (
   'autoincrement' => false,
   'notnull' => false,
   'default' => NULL,
-  'length' => 255,
+  'length' => 2048,
 ));
 $table->addColumn("node_name", "string", array (
   'unsigned' => false,
@@ -981,14 +981,9 @@ $table->setPrimaryKey([
     "id"
 ]);
 $table->addIndex([
-    "entry_time", 
-    "logentry_data", 
+    "entry_time",
     "node_name"
-], "logentries");
-$table->addIndex([
-    "logentry_data", 
-    "entry_time"
-], "logentry_data_time");
+], "logentries_se");
 
 
 
