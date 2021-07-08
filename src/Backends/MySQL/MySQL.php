@@ -20,21 +20,21 @@
 namespace Statusengine\Mysql;
 
 use Statusengine\BulkInsertObjectStore;
+use Statusengine\Exception\StorageBackendUnavailableExceptions;
 use Statusengine\Exception\UnknownTypeException;
 use Statusengine\Mysql\SqlObjects\MysqlHostAcknowledgement;
+use Statusengine\Mysql\SqlObjects\MysqlHostcheck;
 use Statusengine\Mysql\SqlObjects\MySQLHostDowntimehistory;
 use Statusengine\Mysql\SqlObjects\MysqlHostScheduleddowntime;
 use Statusengine\Mysql\SqlObjects\MysqlHoststatus;
+use Statusengine\Mysql\SqlObjects\MysqlLogentry;
 use Statusengine\Mysql\SqlObjects\MysqlNotification;
 use Statusengine\Mysql\SqlObjects\MysqlPerfdata;
 use Statusengine\Mysql\SqlObjects\MysqlServiceAcknowledgement;
+use Statusengine\Mysql\SqlObjects\MysqlServicecheck;
 use Statusengine\Mysql\SqlObjects\MysqlServiceDowntimehistory;
 use Statusengine\Mysql\SqlObjects\MysqlServiceScheduleddowntime;
 use Statusengine\Mysql\SqlObjects\MysqlServicestatus;
-use Statusengine\Exception\StorageBackendUnavailableExceptions;
-use Statusengine\Mysql\SqlObjects\MysqlLogentry;
-use Statusengine\Mysql\SqlObjects\MysqlHostcheck;
-use Statusengine\Mysql\SqlObjects\MysqlServicecheck;
 use Statusengine\Mysql\SqlObjects\MysqlStatechange;
 use Statusengine\Mysql\SqlObjects\MysqlTask;
 use Statusengine\Syslog;
@@ -69,6 +69,11 @@ class MySQL implements \Statusengine\StorageBackend {
     private $nodeName;
 
     /**
+     * @var bool
+     */
+    private $isDumpOfMysqlQueryParametersEnabled = false;
+
+    /**
      * MySQL constructor.
      * @param \Statusengine\Config $Config
      * @param BulkInsertObjectStore $BulkInsertObjectStore
@@ -79,6 +84,7 @@ class MySQL implements \Statusengine\StorageBackend {
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
         $this->Syslog = $Syslog;
         $this->nodeName = $Config->getNodeName();
+        $this->isDumpOfMysqlQueryParametersEnabled = $Config->isDumpOfMysqlQueryParametersEnabled();
     }
 
 
@@ -116,10 +122,10 @@ class MySQL implements \Statusengine\StorageBackend {
 
         //Enable UTF-8 / utf8 / encoding value
         try {
-            
+
             $config = $this->Config->getMysqlConfig();
-            
-            $query = $this->Connection->prepare('SET NAMES '.$config['encoding']);
+
+            $query = $this->Connection->prepare('SET NAMES ' . $config['encoding']);
             $query->execute();
         } catch (\Exception $e) {
             $this->Syslog->error($e->getMessage());
@@ -288,7 +294,10 @@ class MySQL implements \Statusengine\StorageBackend {
             $this->Syslog->error("Run the worker in foreground mode to see the full query: https://statusengine.org/worker/#debugging");
 
             // This function has no return - so no log file -.-
-            $query->debugDumpParams();
+            // If Statusengine is running via systemd systemd will write the messages to syslog
+            if ($this->isDumpOfMysqlQueryParametersEnabled) {
+                $query->debugDumpParams();
+            }
 
             if ($errorString == 'MySQL server has gone away') {
                 $this->reconnect();

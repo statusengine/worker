@@ -28,6 +28,7 @@ Even if its possible, I don't recommend to use a mix of both.
 | SE_MYSQL_PASSWORD                            | string | depends  | Required if `SE_USE_MYSQL` is enabled                                               |
 | SE_MYSQL_DATABASE                            | string | depends  | Required if `SE_USE_MYSQL` is enabled                                               |
 | SE_MYSQL_ENCODING                            | string | depends  | Required if `SE_USE_MYSQL` is enabled, Example: utf8 or utf8mb4                     |
+| SE_DUMP_MYSQL_QUERY_PARAMETERS               | bool   | no       | If enabled will print the MySQL Query Parameters to stdout in case of an SQL error  |
 | SE_CRATE_NODES                               | array  | depends  | `export SE_CRATE_NODES="127.0.0.1:4200,192.168.1.1:4200,192.168.10.1:4200"`         |
 | SE_GEARMAN_ADDRESS                           | string | depends  | Required if `SE_USE_GEARMAN` is enabled                                             |
 | SE_GEARMAN_PORT                              | string | no       |                                                                                     |

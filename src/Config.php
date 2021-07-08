@@ -20,8 +20,6 @@
 namespace Statusengine;
 
 use Statusengine\Config\Env;
-use Statusengine\Exception\FileNotFoundException;
-
 use Symfony\Component\Yaml\Parser;
 
 class Config {
@@ -902,5 +900,16 @@ class Config {
         return $config;
     }
 
+    /**
+     * @return bool
+     */
+    public function isDumpOfMysqlQueryParametersEnabled() {
+        $default = false;
+        $default = Env::get('SE_DUMP_MYSQL_QUERY_PARAMETERS', $default, Env::VALUE_BOOL);
+        if (isset($this->config['dump_mysql_query_parameters'])) {
+            return (bool)$this->config['dump_mysql_query_parameters'];
+        }
+        return $default;
+    }
 
 }
