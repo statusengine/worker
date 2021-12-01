@@ -78,8 +78,16 @@ class TcpSocket {
     }
 
     public function disconnect(){
-        if(is_resource($this->socket)){
+        try {
+            $linger = [
+                'l_linger' => 0,
+                'l_onoff' => 1
+            ];
+            socket_set_option($this->socket, SOL_SOCKET, SO_LINGER, $linger);
+            //socket_shutdown($this->socket, 2);
             socket_close($this->socket);
+        } catch (\Exception $e) {
+            // Ignore for now
         }
         $this->socket = null;
     }

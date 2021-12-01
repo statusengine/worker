@@ -52,7 +52,7 @@ use Symfony\Component\Console\Input\InputArgument;
  */
 class Database extends Command {
 
-    const DB_VERSION = '3.7.3';
+    const DB_VERSION = '3.7.4';
 
     /**
      * @var Config
