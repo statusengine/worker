@@ -300,11 +300,11 @@ class MySQL implements \Statusengine\StorageBackend {
                 if ($i <= $retries && $sqlstateErrorCode == 40001 && $errorNo == 1213) {
                     // This is a InnoDB deadlock - retry
                     $sleep = 50000 + rand(0, 450000);
-                    $this->Syslog->info('Encountered MySQL Deadlock during transaction on ' . get_class($this) . '. Retry transaction in ' . floor($sleep / 1000) . 'ms (try ' . ($i) . '/' . $retries . ')');
+                    $this->Syslog->info('Encountered MySQL Deadlock during transaction on. Retry transaction in ' . floor($sleep / 1000) . 'ms (try ' . ($i) . '/' . $retries . ')');
                     usleep($sleep);
                 } else if ($sqlstateErrorCode == 40001 && $errorNo == 1213) {
                     // too many deadlocks
-                    $this->Syslog->info('Couldn\'t solve deadlock for ' . get_class($this) . '. Ignore for now to prevent crash: Exception: ' . $Exception->getMessage());
+                    $this->Syslog->info('Couldn\'t solve deadlock. Ignore for now to prevent crash: Exception: ' . $Exception->getMessage());
                 } else {
                     // Any other error
                     $this->Syslog->error($query->queryString);
