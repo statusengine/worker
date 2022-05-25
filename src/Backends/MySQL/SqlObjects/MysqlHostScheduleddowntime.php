@@ -88,7 +88,7 @@ class MysqlHostScheduleddowntime extends Mysql\MysqlModel {
         }
 
         try {
-            return $this->MySQL->executeQuery($query);
+            return $this->MySQL->executeQuery($query, 'MysqlHostScheduleddowntime');
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {
@@ -113,7 +113,7 @@ class MysqlHostScheduleddowntime extends Mysql\MysqlModel {
         $query->bindValue(4, $Downtime->getDowntimeId());
 
         try {
-            return $this->MySQL->executeQuery($query);
+            return $this->MySQL->executeQuery($query, 'MysqlHostScheduleddowntime');
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {

@@ -79,7 +79,7 @@ class MysqlServiceAcknowledgement extends Mysql\MysqlModel {
         $query->bindValue($i++, (int)$this->Acknowledgement->isNotifyContacts());
 
         try {
-            return $this->MySQL->executeQuery($query);
+            return $this->MySQL->executeQuery($query, 'MysqlServiceAcknowledgement');
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {

@@ -83,7 +83,7 @@ class MySQLHostDowntimehistory extends Mysql\MysqlModel {
         }
 
         try {
-            return $this->MySQL->executeQuery($query);
+            return $this->MySQL->executeQuery($query, 'MySQLHostDowntimehistory');
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {
@@ -108,7 +108,7 @@ class MySQLHostDowntimehistory extends Mysql\MysqlModel {
         $query->bindValue(4, $Downtime->getDowntimeId());
 
         try {
-            return $this->MySQL->executeQuery($query);
+            return $this->MySQL->executeQuery($query, 'MySQLHostDowntimehistory');
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {
