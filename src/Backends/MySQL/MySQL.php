@@ -282,29 +282,48 @@ class MySQL implements \Statusengine\StorageBackend {
      * @throws StorageBackendUnavailableExceptions
      */
     public function executeQuery(\PDOStatement $query) {
-        $result = false;
-        try {
-            $result = $query->execute();
+        // https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks.html
+        // https://dev.mysql.com/doc/refman/8.0/en/innodb-deadlocks-handling.html
+        // The deadlock logic is ported from Statusengine 2
+        // https://github.com/nook24/statusengine/blame/b5c86f0e02fd69a7045eb652f49dad20ee4d2b67/cakephp/app/src/BulkRepository.php#L185
+        $retries = 10;
+        for ($i = 1; $i < $retries; $i++) {
+            try {
+                return $query->execute();
 
-        } catch (\Exception $Exception) {
-            $errorNo = $Exception->errorInfo[1];
-            $errorString = $Exception->errorInfo[2];
-            $this->Syslog->error(sprintf('[%s] %s', $errorNo, $errorString));
-            $this->Syslog->error($query->queryString);
-            $this->Syslog->error("Run the worker in foreground mode to see the full query: https://statusengine.org/worker/#debugging");
+            } catch (\Exception $Exception) {
+                $sqlstateErrorCode = $Exception->errorInfo[0]; // SQLSTATE error code (a five characters alphanumeric identifier defined in the ANSI SQL standard).
+                $errorNo = $Exception->errorInfo[1]; //  Driver-specific error code.
+                $errorString = $Exception->errorInfo[2]; //  Driver-specific error message.
+                $this->Syslog->error(sprintf('[%s] %s', $errorNo, $errorString));
 
-            // This function has no return - so no log file -.-
-            // If Statusengine is running via systemd systemd will write the messages to syslog
-            if ($this->isDumpOfMysqlQueryParametersEnabled) {
-                $query->debugDumpParams();
-            }
+                if ($i <= $retries && $sqlstateErrorCode == 40001 && $errorNo == 1213) {
+                    // This is a InnoDB deadlock - retry
+                    $sleep = 50000 + rand(0, 450000);
+                    $this->Syslog->info('Encountered MySQL Deadlock during transaction on ' . get_class($this) . '. Retry transaction in ' . floor($sleep / 1000) . 'ms (try ' . ($i) . '/' . $retries . ')');
+                    usleep($sleep);
+                } else if ($sqlstateErrorCode == 40001 && $errorNo == 1213) {
+                    // too many deadlocks
+                    $this->Syslog->info('Couldn\'t solve deadlock for ' . get_class($this) . '. Ignore for now to prevent crash: Exception: ' . $Exception->getMessage());
+                } else {
+                    // Any other error
+                    $this->Syslog->error($query->queryString);
+                    $this->Syslog->error("Run the worker in foreground mode to see the full query: https://statusengine.org/worker/#debugging");
 
-            if ($errorString == 'MySQL server has gone away') {
-                $this->reconnect();
-                throw new StorageBackendUnavailableExceptions($errorString);
+                    // This function has no return - so no log file -.-
+                    // If Statusengine is running via systemd systemd will write the messages to syslog
+                    if ($this->isDumpOfMysqlQueryParametersEnabled) {
+                        $query->debugDumpParams();
+                    }
+
+                    if ($errorString == 'MySQL server has gone away') {
+                        $this->reconnect();
+                        throw new StorageBackendUnavailableExceptions($errorString);
+                    }
+                }
             }
         }
-        return $result;
+        return false;
     }
 
     /**
