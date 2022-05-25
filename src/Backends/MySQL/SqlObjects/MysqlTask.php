@@ -90,7 +90,7 @@ class MysqlTask extends MysqlModel {
             $query->bindValue($i++, $uuid);
         }
 
-        return $this->MySQL->executeQuery($query);
+        return $this->MySQL->executeQuery($query, 'MysqlTask');
     }
 
 }

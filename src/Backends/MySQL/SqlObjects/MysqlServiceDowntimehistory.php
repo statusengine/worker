@@ -83,7 +83,7 @@ class MysqlServiceDowntimehistory extends Mysql\MysqlModel {
         }
 
         try {
-            return $this->MySQL->executeQuery($query);
+            return $this->MySQL->executeQuery($query, 'MysqlServiceDowntimehistory');
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {
@@ -109,7 +109,7 @@ class MysqlServiceDowntimehistory extends Mysql\MysqlModel {
         $query->bindValue(5, $Downtime->getDowntimeId());
 
         try {
-            return $this->MySQL->executeQuery($query);
+            return $this->MySQL->executeQuery($query, 'MysqlServiceDowntimehistory');
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {

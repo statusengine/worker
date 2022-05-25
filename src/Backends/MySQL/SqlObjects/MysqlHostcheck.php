@@ -93,7 +93,7 @@ class MysqlHostcheck extends Mysql\MysqlModel {
         }
 
         try {
-            return $this->MySQL->executeQuery($query);
+            return $this->MySQL->executeQuery($query, 'MysqlHostcheck');
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {

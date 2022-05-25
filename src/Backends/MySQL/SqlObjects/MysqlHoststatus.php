@@ -126,7 +126,7 @@ class MysqlHoststatus extends MysqlModel {
         }
 
         try {
-            return $this->MySQL->executeQuery($query);
+            return $this->MySQL->executeQuery($query, 'MysqlHoststatus');
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {
@@ -143,7 +143,7 @@ class MysqlHoststatus extends MysqlModel {
         $query = $this->MySQL->prepare('DELETE FROM statusengine_hoststatus WHERE node_name=?');
         $query->bindValue(1, $this->nodeName);
         try {
-            return $this->MySQL->executeQuery($query);
+            return $this->MySQL->executeQuery($query, 'MysqlHoststatus');
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {
