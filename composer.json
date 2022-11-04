@@ -16,7 +16,7 @@
   },
 
   "require": {
-    "php": ">=5.5.9",
+    "php": ">=7.2.0",
     "ext-redis": "*",
     "ext-gearman": "*",
     "ext-mbstring": "*",
@@ -26,7 +26,7 @@
     "ext-pdo": "*",
     "symfony/yaml": "^3.4",
     "symfony/console": "^3.4",
-    "php-amqplib/php-amqplib": "^2.7",
+    "php-amqplib/php-amqplib": "^3.4",
     "doctrine/dbal": "^2.9",
     "doctrine/migrations": "^2.1"
   },
