@@ -161,6 +161,7 @@ class Database extends Command {
             );
         }
 
+        return 0;
     }
 
     /**

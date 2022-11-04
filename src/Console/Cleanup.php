@@ -124,6 +124,8 @@ class Cleanup extends Command {
 
         $output->writeln(sprintf('Cleanup took: <info>%s</info> seconds...', time() - $startTime));
         $output->writeln(sprintf('Startusengine Cleanup finished at: <info>%s</info>', date('Y-m-d H:i:s')));
+
+        return 0;
     }
 
     private function cleanupHostchecks(InputInterface $input, OutputInterface $output) {
