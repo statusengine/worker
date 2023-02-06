@@ -24,6 +24,9 @@ class Notification implements DataStructInterface {
 
     const NEBTYPE_CONTACTNOTIFICATIONMETHOD_END = 605;
 
+    const HOST_NOTIFICATION = 0;
+    const SERVICE_NOTIFICATION = 1;
+
     /**
      * @var int
      */
@@ -100,6 +103,11 @@ class Notification implements DataStructInterface {
     private $end_time;
 
     /**
+     * @var int
+     */
+    private $notification_type;
+
+    /**
      * Notification constructor.
      * @param \stdClass $notification
      */
@@ -119,6 +127,7 @@ class Notification implements DataStructInterface {
         $this->state = (int)$notification->contactnotificationmethod->state;
         $this->start_time = (int)$notification->contactnotificationmethod->start_time;
         $this->end_time = (int)$notification->contactnotificationmethod->end_time;
+        $this->notification_type = (int)$notification->contactnotificationmethod->notification_type;
     }
 
     /**
@@ -133,10 +142,7 @@ class Notification implements DataStructInterface {
      * @return bool
      */
     public function isHostNotification() {
-        if ($this->service_description === '' || $this->service_description === null) {
-            return true;
-        }
-        return false;
+        return $this->notification_type === self::HOST_NOTIFICATION;
     }
 
     /**

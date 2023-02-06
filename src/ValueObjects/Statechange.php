@@ -22,6 +22,9 @@ namespace Statusengine\ValueObjects;
 
 class Statechange implements DataStructInterface {
 
+    const HOST_STATECHANGE = 0;
+    const SERVICE_STATECHANGE = 1;
+
     /**
      * @var string
      */
@@ -126,10 +129,7 @@ class Statechange implements DataStructInterface {
      * @return boolean
      */
     public function isHostRecord() {
-        if ($this->service_description === null || $this->service_description === '') {
-            return true;
-        }
-        return false;
+        return $this->state_change === self::HOST_STATECHANGE;
     }
 
     /**

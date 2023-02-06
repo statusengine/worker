@@ -31,6 +31,10 @@ class Downtime implements DataStructInterface {
     const NEBATTR_DOWNTIME_STOP_NORMAL = 1;
     const NEBATTR_DOWNTIME_STOP_CANCELLED = 2;
 
+    const SERVICE_DOWNTIME = 1; //service downtime
+    const HOST_DOWNTIME = 2;   //host downtime
+    const ANY_DOWNTIME = 3;    //host or service downtime
+
     /**
      * @var int
      */
@@ -141,7 +145,7 @@ class Downtime implements DataStructInterface {
      * @return bool
      */
     public function isHostDowntime() {
-        return $this->downtime_type === 2;
+        return $this->downtime_type === self::HOST_DOWNTIME;
     }
 
     /**

@@ -29,6 +29,9 @@ class Acknowledgement implements DataStructInterface {
     const ACKNOWLEDGEMENT_NORMAL = 1;
     const ACKNOWLEDGEMENT_STICKY = 2;
 
+    const HOST_ACKNOWLEDGEMENT = 0;
+    const SERVICE_ACKNOWLEDGEMENT = 1;
+
     /**
      * @var int
      */
@@ -110,10 +113,7 @@ class Acknowledgement implements DataStructInterface {
      * @return bool
      */
     public function isHostAcknowledgement() {
-        if ($this->service_description === '' || $this->service_description === null) {
-            return true;
-        }
-        return false;
+        return $this->acknowledgement_type === self::HOST_ACKNOWLEDGEMENT;
     }
 
     /**
