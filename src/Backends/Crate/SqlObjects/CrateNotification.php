@@ -172,7 +172,7 @@ class CrateNotification extends CrateModel {
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {
-                $this->getHostQuery($serviceNotificationCache, true);
+                $this->getServiceQuery($serviceNotificationCache, true);
             }
         }
     }

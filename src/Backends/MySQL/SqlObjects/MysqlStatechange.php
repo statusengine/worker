@@ -173,7 +173,7 @@ class MysqlStatechange extends Mysql\MysqlModel {
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {
-                $this->getHostQuery($serviceStatechangeCache, true);
+                $this->getServiceQuery($serviceStatechangeCache, true);
             }
         }
     }

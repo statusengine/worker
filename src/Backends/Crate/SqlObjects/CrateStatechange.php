@@ -131,7 +131,7 @@ class CrateStatechange extends Crate\CrateModel {
         } catch (StorageBackendUnavailableExceptions $Exceptions) {
             //Retry
             if ($isRecursion === false) {
-                $this->getServiceQuery($hostStatechangeCache, true);
+                $this->getHostQuery($hostStatechangeCache, true);
             }
         }
     }
