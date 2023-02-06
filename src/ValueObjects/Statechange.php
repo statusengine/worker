@@ -98,7 +98,19 @@ class Statechange implements DataStructInterface {
         $this->state_time = (int)$statechange->timestamp;
         $this->timestamp_usec = isset($statechange->timestamp_usec) ? (int)$statechange->timestamp_usec : 0;
 
+        // This is not the "if a strange change has occurred"
+        // Thies field is 0 for Host and 1 for Services
+        // Other than in NDOUtils !!!
+        // Within NDOUtils the state_change is used to indicate that a state change has occurred
+        // However, in NDO this field is hardcoededo to TRUE
+        // https://github.com/NagiosEnterprises/ndoutils/blob/2a7171e36e67c5476b2825fffa7bf6a52042a1f5/src/ndomod.c#L3435
+        // https://github.com/NagiosEnterprises/ndoutils/blob/2a7171e36e67c5476b2825fffa7bf6a52042a1f5/src/dbhandlers.c#L2940
+        // and therefore not very helpful when it comes to hard and soft states
+        // https://assets.nagios.com/downloads/nagioscore/docs/ndoutils/NDOUtils_DB_Model.pdf
         $this->state_change = (int)$statechange->statechange->statechange_type;
+
+
+
         $this->state = (int)$statechange->statechange->state;
         $this->state_type = (int)$statechange->statechange->state_type;
         $this->current_check_attempt = (int)$statechange->statechange->current_attempt;
