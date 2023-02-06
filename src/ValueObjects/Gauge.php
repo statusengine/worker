@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Statusengine Worker
  * Copyright (C) 2016-2018  Daniel Ziegler
@@ -87,16 +88,16 @@ class Gauge {
      * @param null $max
      */
     public function __construct(
-        $host_name,
-        $service_desc,
-        $label = '',
-        $value = 0.0,
-        $timestamp,
-        $unit = '',
-        $warning = null,
-        $critical = null,
-        $min = null,
-        $max = null
+        string $host_name,
+        string $service_desc,
+        string $label = '',
+        float $value = 0.0,
+        int $timestamp = 0,
+        ?string $unit = '',
+        ?float $warning = null,
+        ?float $critical = null,
+        ?float $min = null,
+        ?float $max = null
     ) {
         $this->host_name = $host_name;
         $this->service_desc = $service_desc;
@@ -179,6 +180,4 @@ class Gauge {
     public function getMax() {
         return $this->max;
     }
-
-
 }

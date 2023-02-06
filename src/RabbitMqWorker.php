@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Statusengine Worker
  * Copyright (C) 2016-2018  Daniel Ziegler
@@ -22,6 +23,7 @@ namespace Statusengine;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPSocketConnection;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage;
 use Statusengine\Config\WorkerConfig;
 use Statusengine\QueueingEngines\QueueInterface;
@@ -155,17 +157,14 @@ class RabbitMqWorker implements QueueInterface {
             return null;
         }
 
-        $read = [$this->connection->getSocket()];
-        $write = null;
-        $except = null;
-
-        //Hide Warning Interrupted system call on SIGINT/SIGTERM
-        if (($changeStreamsCount = @stream_select($read, $write, $except, 1)) === false) {
-            return null;
-        } else if ($changeStreamsCount > 0 || $this->channel->hasPendingMethods()) {
-            $this->channel->wait();
+        // https://github.com/php-amqplib/php-amqplib/blob/master/demo/amqp_consumer_non_blocking.php
+        try {
+            $this->channel->wait(null, false, 1);
+        } catch (AMQPTimeoutException $e) {
+            // Catch the timeout exception
+            // Timeout of 1 second is here to save CPU time
+            // Basically the same as sleep(1);
         }
-
 
         $jobData = $this->lastJobData;
         $this->lastJobData = null;
@@ -183,7 +182,7 @@ class RabbitMqWorker implements QueueInterface {
             $this->lastJobData = $data;
         }
 
-        $message->delivery_info['channel']->basic_ack($message->delivery_info['delivery_tag']);
+        $ch = $message->getChannel();
+        $ch->basic_ack($message->getDeliveryTag());
     }
-
 }

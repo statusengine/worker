@@ -71,7 +71,7 @@ class Statistics extends Command {
         if ($printNaemonOutput === true) {
             $NaemonPerfdata = new NaemonPerfdata($stats);
             $output->writeln(sprintf('Statusengine statistics%s', $NaemonPerfdata->getPerfdataOutput()));
-            return true;
+            return 0;
         }
 
         if ($watch) {
@@ -86,7 +86,7 @@ class Statistics extends Command {
 
         $this->printHumanOutput($stats, $output);
 
-
+        return 0;
     }
 
     /**

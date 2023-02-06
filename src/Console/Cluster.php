@@ -133,6 +133,7 @@ class Cluster extends Command {
         }
         usleep(500000);
         $this->showClusterOverview($output);
+        return 0;
     }
 
     /**
