@@ -101,6 +101,11 @@ class Acknowledgement implements DataStructInterface {
         $this->service_description = $acknowledgement->acknowledgement->service_description;
         $this->author_name = $acknowledgement->acknowledgement->author_name;
         $this->comment_data = $acknowledgement->acknowledgement->comment_data;
+
+        // In the broker_acknowledgement_data callback, acknowledgement type is used to determine if it is a host or service acknowledgement
+        // This is a differente behavior than the broker_host_status and broker_service_status callbacks have -.-
+        // 0 = HOST_ACKNOWLEDGEMENT
+        // 1 = SERVICE_ACKNOWLEDGEMENT
         $this->acknowledgement_type = (int)$acknowledgement->acknowledgement->acknowledgement_type;
         $this->state = (int)$acknowledgement->acknowledgement->state;
         $this->is_sticky = (bool)$acknowledgement->acknowledgement->is_sticky;
@@ -166,6 +171,10 @@ class Acknowledgement implements DataStructInterface {
     }
 
     /**
+     * In the broker_acknowledgement_data callback, acknowledgement type is used to determine if it is a host or service acknowledgement
+     * This is a differente behavior than the broker_host_status and broker_service_status callbacks have -.-
+     * 0 = HOST_ACKNOWLEDGEMENT
+     * 1 = SERVICE_ACKNOWLEDGEMENT
      * @return int
      */
     public function getAcknowledgementType() {
