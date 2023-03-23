@@ -243,6 +243,10 @@ class Hoststatus implements StatusInterface {
         $this->last_hard_state = (int)$hoststatus->hoststatus->last_hard_state;
         $this->notifications_enabled = (bool)$hoststatus->hoststatus->notifications_enabled;
         $this->problem_has_been_acknowledged = (bool)$hoststatus->hoststatus->problem_has_been_acknowledged;
+
+        // 0 = ACKNOWLEDGEMENT_NONE
+        // 1 = ACKNOWLEDGEMENT_NORMAL
+        // 2 = ACKNOWLEDGEMENT_STICKY
         $this->acknowledgement_type = (int)$hoststatus->hoststatus->acknowledgement_type;
         $this->accept_passive_checks = (bool)$hoststatus->hoststatus->accept_passive_checks;
         $this->event_handler_enabled = (bool)$hoststatus->hoststatus->event_handler_enabled;
@@ -387,6 +391,9 @@ class Hoststatus implements StatusInterface {
     }
 
     /**
+     * 0 = ACKNOWLEDGEMENT_NONE
+     * 1 = ACKNOWLEDGEMENT_NORMAL
+     * 2 = ACKNOWLEDGEMENT_STICKY
      * @return int
      */
     public function getAcknowledgementType() {
