@@ -127,7 +127,9 @@ class Notification implements DataStructInterface {
         $this->state = (int)$notification->contactnotificationmethod->state;
         $this->start_time = (int)$notification->contactnotificationmethod->start_time;
         $this->end_time = (int)$notification->contactnotificationmethod->end_time;
-        $this->notification_type = (int)$notification->contactnotificationmethod->notification_type;
+        
+        // notification_type field is missing in the C++ Broker :(
+        //$this->notification_type = (int)$notification->contactnotificationmethod->notification_type;
     }
 
     /**
@@ -142,7 +144,10 @@ class Notification implements DataStructInterface {
      * @return bool
      */
     public function isHostNotification() {
-        return $this->notification_type === self::HOST_NOTIFICATION;
+        if ($this->service_description === '' || $this->service_description === null) {
+            return true;
+        }
+        return false;
     }
 
     /**
