@@ -40,6 +40,11 @@ class Redis {
     private $Redis;
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * Redis constructor.
      * @param Config $Config
      */

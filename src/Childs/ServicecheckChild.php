@@ -69,6 +69,11 @@ class ServicecheckChild extends Child {
     protected $childName = 'ServicecheckChild';
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * ServicecheckChild constructor.
      * @param Config $Config
      * @param Pid $Pid

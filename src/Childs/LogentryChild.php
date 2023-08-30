@@ -69,6 +69,11 @@ class LogentryChild extends Child {
     protected $childName = 'LogentryChild';
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * LogentryChild constructor.
      * @param Config $Config
      * @param Pid $Pid

@@ -69,6 +69,11 @@ class HostcheckChild extends Child {
     protected $childName = 'HostcheckChild';
 
     /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
      * HostcheckChild constructor.
      * @param Config $Config
      * @param Pid $Pid

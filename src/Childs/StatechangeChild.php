@@ -63,6 +63,15 @@ class StatechangeChild extends Child {
      */
     protected $childName = 'StatechangeChild';
 
+    /**
+     * @var Syslog
+     */
+    private $Syslog;
+
+    /**
+     * @var QueueingEngine
+     */
+    private $QueueingEngine;
 
     /**
      * StatechangeChild constructor.

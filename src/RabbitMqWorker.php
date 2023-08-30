@@ -31,6 +31,11 @@ use Statusengine\QueueingEngines\QueueInterface;
 class RabbitMqWorker implements QueueInterface {
 
     /**
+     * @var WorkerConfig
+     */
+    private $WorkerConfig;
+
+    /**
      * @var Config
      */
     private $Config;
