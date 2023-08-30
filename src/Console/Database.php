@@ -401,7 +401,7 @@ class Database extends Command {
             $output->writeln('<comment>' . $query . '</comment>');
             if ($dryrun === false) {
                 try {
-                    //$stmt = $connection->executeQuery($query);
+                    $stmt = $connection->executeQuery($query);
                 } catch (\Exception $e) {
                     $output->writeln('<error>' . $e->getMessage() . '</error>');
                 }
