@@ -27,9 +27,24 @@ require_once __DIR__ . DS . 'vendor' . DS . 'autoload.php';
  * @param mixed $param
  */
 function debug($param) {
-    if($param === true || $param === false || $param === null || $param === ''){
+    if ($param === true || $param === false || $param === null || $param === '') {
         var_dump($param);
     }
     print_r($param);
+}
+
+/**
+ * Same as echo but it will add a timestamp and new line
+ *
+ * @param string $str
+ * @return void
+ */
+function echot(string $str) {
+    printf(
+        '[%s] %s%s',
+        date('d.m.Y H:i:s'),
+        $str,
+        PHP_EOL
+    );
 }
 
