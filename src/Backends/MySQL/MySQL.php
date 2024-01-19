@@ -230,6 +230,17 @@ class MySQL implements \Statusengine\StorageBackend {
     }
 
     public function dispatch() {
+            /*$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+
+            if($bt[3]['function'] === 'forkServicestatusChild'){
+              // echo "============ START ========== \n";
+              // foreach($bt as $line){
+              //     printf("File: %s Line: %s function: %s\n", $line['file'], $line['line'], $line['function']);
+              // }
+              // echo "============ END ========== \n\n";
+            }*/
+
+
         if ($this->BulkInsertObjectStore->hasRaisedTimeout()) {
             try {
                 $type = $this->BulkInsertObjectStore->getStoredType();

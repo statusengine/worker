@@ -38,7 +38,7 @@ class BulkInsertObjectStore {
     /**
      * @var int
      */
-    private $lastAction;
+    private $lastFlush;
 
     /**
      * @var int
@@ -66,13 +66,12 @@ class BulkInsertObjectStore {
 
         $this->maxObjects = $maxObjects;
         $this->maxDelay = $maxDelay;
-        $this->lastAction = 0;
+        $this->lastFlush = 0;
     }
 
     public function addObject($object) {
         $this->objects[] = $object;
         $this->objectCount++;
-        $this->lastAction = time();
     }
 
     /**
@@ -89,7 +88,7 @@ class BulkInsertObjectStore {
     public function reset() {
         $this->objects = [];
         $this->objectCount = 0;
-        $this->lastAction = time();
+        $this->lastFlush = time();
     }
 
     /**
@@ -107,11 +106,12 @@ class BulkInsertObjectStore {
      * @return bool
      */
     public function hasRaisedTimeout() {
-        if ($this->objectCount >= $this->maxObjects || time() - $this->lastAction > $this->maxDelay) {
-            if ($this->objectCount > 0) {
+        if ($this->objectCount > 0) {
+            if ($this->objectCount >= $this->maxObjects || (time() - $this->lastFlush) > $this->maxDelay) {
                 return true;
             }
         }
+
         return false;
     }
 

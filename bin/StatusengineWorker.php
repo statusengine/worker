@@ -52,14 +52,7 @@ if ($Config->isRedisEnabled() || $Config->storeLiveDateInArchive()) {
 
 if ($Config->isRedisEnabled() || $Config->storeLiveDateInArchive()) {
     for ($i = 0; $i < $Config->getNumberOfServicestatusWorkers(); $i++) {
-        $Syslog->info('Fork new service status worker');
-        $ServicestatusChild = new Statusengine\ServicestatusChild(
-            $Config,
-            $ParentPid,
-            $Syslog
-        );
-        $servicestatusChildPid = $ServicestatusChild->fork();
-        $pids[] = $servicestatusChildPid;
+        $pids[] = $ChildFactory->forkServicestatusChild();
     }
 }
 
