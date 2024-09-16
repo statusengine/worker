@@ -19,7 +19,7 @@
 
 namespace Statusengine\Crate\SqlObjects;
 
-use Crate\PDO\PDO;
+use Crate\PDO\PDOCrateDB;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Crate;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
@@ -76,12 +76,12 @@ class CrateServicecheck extends Crate\CrateModel {
             $query->bindValue($i++, $Servicecheck->getHostName());
             $query->bindValue($i++, $Servicecheck->getServiceDescription());
             $query->bindValue($i++, $Servicecheck->getState());
-            $query->bindValue($i++, (bool)$Servicecheck->getStateType(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, (bool)$Servicecheck->getStateType(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Servicecheck->getStartTime());
             $query->bindValue($i++, $Servicecheck->getEndTime());
             $query->bindValue($i++, $Servicecheck->getOutput());
             $query->bindValue($i++, $Servicecheck->getTimeout());
-            $query->bindValue($i++, (bool)$Servicecheck->getEarlyTimeout(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, (bool)$Servicecheck->getEarlyTimeout(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Servicecheck->getLatency());
             $query->bindValue($i++, $Servicecheck->getExecutionTime());
             $query->bindValue($i++, $Servicecheck->getPerfdata());

@@ -19,7 +19,6 @@
 
 namespace Statusengine\Crate\SqlObjects;
 
-use Crate\PDO\PDO;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Crate;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;

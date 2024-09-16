@@ -70,10 +70,12 @@ Even if its possible, I don't recommend to use a mix of both.
 | SE_AGE_HOSTCHECKS                            | int    | no       |                                                                                     |
 | SE_AGE_HOST_ACKNOWLEDGEMENTS                 | int    | no       |                                                                                     |
 | SE_AGE_HOST_NOTIFICATIONS                    | int    | no       |                                                                                     |
+| SE_AGE_HOST_NOTIFICATIONS_LOG                | int    | no       |                                                                                     |
 | SE_AGE_HOST_STATEHISTORY                     | int    | no       |                                                                                     |
 | SE_AGE_SERVICECHECKS                         | int    | no       |                                                                                     |
 | SE_AGE_SERVICE_ACKNOWLEDGEMENTS              | int    | no       |                                                                                     |
 | SE_AGE_SERVICE_NOTIFICATIONS                 | int    | no       |                                                                                     |
+| SE_AGE_SERVICE_NOTIFICATIONS_LOG             | int    | no       |                                                                                     |
 | SE_AGE_SERVICE_STATEHISTORY                  | int    | no       |                                                                                     |
 | SE_AGE_LOGENTRIES                            | int    | no       |                                                                                     |
 | SE_AGE_TASKS                                 | int    | no       |                                                                                     |

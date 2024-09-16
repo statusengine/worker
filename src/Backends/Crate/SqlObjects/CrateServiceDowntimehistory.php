@@ -19,7 +19,7 @@
 
 namespace Statusengine\Crate\SqlObjects;
 
-use Crate\PDO\PDO;
+use Crate\PDO\PDOCrateDB;
 use Statusengine\Crate;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
 use Statusengine\Exception\UnknownTypeException;
@@ -138,19 +138,19 @@ class CrateServiceDowntimehistory extends Crate\CrateModel {
         $query->bindValue($i++, $Downtime->getEntryTime());
         $query->bindValue($i++, $Downtime->getAuthorName());
         $query->bindValue($i++, $Downtime->getCommentData());
-        $query->bindValue($i++, $Downtime->getDowntimeId(), PDO::PARAM_INT);
-        $query->bindValue($i++, $Downtime->getTriggeredBy(), PDO::PARAM_INT);
-        $query->bindValue($i++, $Downtime->isFixed(), PDO::PARAM_BOOL);
-        $query->bindValue($i++, $Downtime->getDuration(), PDO::PARAM_INT);
+        $query->bindValue($i++, $Downtime->getDowntimeId(), PDOCrateDB::PARAM_INT);
+        $query->bindValue($i++, $Downtime->getTriggeredBy(), PDOCrateDB::PARAM_INT);
+        $query->bindValue($i++, $Downtime->isFixed(), PDOCrateDB::PARAM_BOOL);
+        $query->bindValue($i++, $Downtime->getDuration(), PDOCrateDB::PARAM_INT);
         $query->bindValue($i++, $Downtime->getScheduledStartTime());
         $query->bindValue($i++, $Downtime->getScheduledEndTime());
         $query->bindValue($i++, $this->nodeName);
 
         //Add dynamic fields
-        $query->bindValue($i++, $Downtime->wasStarted(), PDO::PARAM_BOOL);
-        $query->bindValue($i++, $Downtime->getActualStartTime(), PDO::PARAM_INT);
-        $query->bindValue($i++, $Downtime->getActualEndTime(), PDO::PARAM_INT);
-        $query->bindValue($i++, $Downtime->wasCancelled(), PDO::PARAM_BOOL);
+        $query->bindValue($i++, $Downtime->wasStarted(), PDOCrateDB::PARAM_BOOL);
+        $query->bindValue($i++, $Downtime->getActualStartTime(), PDOCrateDB::PARAM_INT);
+        $query->bindValue($i++, $Downtime->getActualEndTime(), PDOCrateDB::PARAM_INT);
+        $query->bindValue($i++, $Downtime->wasCancelled(), PDOCrateDB::PARAM_BOOL);
 
         return $query;
     }
@@ -167,15 +167,15 @@ class CrateServiceDowntimehistory extends Crate\CrateModel {
 
         $query = $this->CrateDB->prepare($sql);
         //SET
-        $query->bindValue(1, $Downtime->wasStarted(), PDO::PARAM_BOOL);
-        $query->bindValue(2, $Downtime->getActualStartTime(), PDO::PARAM_INT);
+        $query->bindValue(1, $Downtime->wasStarted(), PDOCrateDB::PARAM_BOOL);
+        $query->bindValue(2, $Downtime->getActualStartTime(), PDOCrateDB::PARAM_INT);
 
         //WHERE
         $query->bindValue(3, $Downtime->getHostName());
         $query->bindValue(4, $Downtime->getServiceDescription());
         $query->bindValue(5, $this->nodeName);
         $query->bindValue(6, $Downtime->getScheduledStartTime());
-        $query->bindValue(7, $Downtime->getDowntimeId(), PDO::PARAM_INT);
+        $query->bindValue(7, $Downtime->getDowntimeId(), PDOCrateDB::PARAM_INT);
 
         return $query;
     }
@@ -192,15 +192,15 @@ class CrateServiceDowntimehistory extends Crate\CrateModel {
 
         $query = $this->CrateDB->prepare($sql);
         //SET
-        $query->bindValue(1, $Downtime->getActualEndTime(), PDO::PARAM_INT);
-        $query->bindValue(2, (int)$Downtime->wasCancelled(), PDO::PARAM_BOOL);
+        $query->bindValue(1, $Downtime->getActualEndTime(), PDOCrateDB::PARAM_INT);
+        $query->bindValue(2, (int)$Downtime->wasCancelled(), PDOCrateDB::PARAM_BOOL);
 
         //WHERE
         $query->bindValue(3, $Downtime->getHostName());
         $query->bindValue(4, $Downtime->getServiceDescription());
         $query->bindValue(5, $this->nodeName);
         $query->bindValue(6, $Downtime->getScheduledStartTime());
-        $query->bindValue(7, $Downtime->getDowntimeId(), PDO::PARAM_INT);
+        $query->bindValue(7, $Downtime->getDowntimeId(), PDOCrateDB::PARAM_INT);
 
         return $query;
     }

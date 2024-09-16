@@ -19,7 +19,7 @@
 
 namespace Statusengine\Crate\SqlObjects;
 
-use Crate\PDO\PDO;
+use Crate\PDO\PDOCrateDB;
 use Statusengine\Crate\CrateModel;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
 use Statusengine\Crate\Crate;
@@ -75,9 +75,9 @@ class CrateServiceAcknowledgement extends CrateModel {
         $query->bindValue($i++, $this->Acknowledgement->getCommentData());
         $query->bindValue($i++, $this->Acknowledgement->getTimestamp());
         $query->bindValue($i++, $this->Acknowledgement->getAcknowledgementType());
-        $query->bindValue($i++, (int)$this->Acknowledgement->isSticky(), PDO::PARAM_BOOL);
-        $query->bindValue($i++, (int)$this->Acknowledgement->isPersistentComment(), PDO::PARAM_BOOL);
-        $query->bindValue($i++, (int)$this->Acknowledgement->isNotifyContacts(), PDO::PARAM_BOOL);
+        $query->bindValue($i++, (int)$this->Acknowledgement->isSticky(), PDOCrateDB::PARAM_BOOL);
+        $query->bindValue($i++, (int)$this->Acknowledgement->isPersistentComment(), PDOCrateDB::PARAM_BOOL);
+        $query->bindValue($i++, (int)$this->Acknowledgement->isNotifyContacts(), PDOCrateDB::PARAM_BOOL);
 
         try {
             return $this->CrateDB->executeQuery($query);

@@ -1,7 +1,7 @@
 <?php
 /**
  * Statusengine Worker
- * Copyright (C) 2016-2019  Daniel Ziegler
+ * Copyright (C) 2016-2024  Daniel Ziegler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -686,10 +686,22 @@ class Config {
      * @return int
      */
     public function getAgeHostNotifications() {
-        $default = 5;
+        $default = 60;
         $default = Env::get('SE_AGE_HOST_NOTIFICATIONS', $default, Env::VALUE_INT);
         if (isset($this->config['age_host_notifications'])) {
             return (int)$this->config['age_host_notifications'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeHostNotificationsLog() {
+        $default = 60;
+        $default = Env::get('SE_AGE_HOST_NOTIFICATIONS_LOG', $default, Env::VALUE_INT);
+        if (isset($this->config['age_host_notifications_log'])) {
+            return (int)$this->config['age_host_notifications_log'];
         }
         return $default;
     }
@@ -738,6 +750,18 @@ class Config {
         $default = Env::get('SE_AGE_SERVICE_NOTIFICATIONS', $default, Env::VALUE_INT);
         if (isset($this->config['age_service_notifications'])) {
             return (int)$this->config['age_service_notifications'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAgeServiceNotificationsLog() {
+        $default = 60;
+        $default = Env::get('SE_AGE_SERVICE_NOTIFICATIONS_LOG', $default, Env::VALUE_INT);
+        if (isset($this->config['age_service_notifications_log'])) {
+            return (int)$this->config['age_service_notifications_log'];
         }
         return $default;
     }

@@ -19,10 +19,9 @@
 
 namespace Statusengine\Crate;
 
+use Crate\PDO\PDOCrateDB;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Config;
-use Crate\PDO\PDO as PDO;
-use Crate\PDO\PDOStatement;
 use Statusengine\Crate\SqlObjects\CrateHostAcknowledgement;
 use Statusengine\Crate\SqlObjects\CrateHostcheck;
 use Statusengine\Crate\SqlObjects\CrateHostDowntimehistory;
@@ -39,6 +38,7 @@ use Statusengine\Crate\SqlObjects\CrateTask;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
 use Statusengine\Exception\UnknownTypeException;
 use Statusengine\Mysql\SqlObjects\CrateNotification;
+use Statusengine\Mysql\SqlObjects\CrateNotificationLog;
 use Statusengine\Syslog;
 use Statusengine\ValueObjects\Gauge;
 use Statusengine\ValueObjects\NodeName;
@@ -52,7 +52,7 @@ class Crate implements \Statusengine\StorageBackend {
     private $Config;
 
     /**
-     * @var PDO
+     * @var PDOCrateDB
      */
     protected $Connection;
 
@@ -124,7 +124,7 @@ class Crate implements \Statusengine\StorageBackend {
         $query = $this->Connection->prepare('SELECT * FROM statusengine_nodes ORDER BY node_name ASC');
 
         try {
-            $result = $query->fetchAll(PDO::FETCH_ASSOC);
+            $result = $query->fetchAll(PDOCrateDB::FETCH_ASSOC);
         } catch (\Exception $e) {
             $this->Syslog->emergency($e->getMessage());
             exit(1);
@@ -164,12 +164,12 @@ class Crate implements \Statusengine\StorageBackend {
     }
 
     /**
-     * @return \Crate\PDO\PDO
+     * @return PDOCrateDB
      */
     public function connect() {
         try {
-            $this->Connection = new PDO($this->getDsn(), null, null, [PDO::ATTR_TIMEOUT => 1]);
-            $this->Connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->Connection = new PDOCrateDB($this->getDsn(), null, null, [PDOCrateDB::ATTR_TIMEOUT => 1]);
+            $this->Connection->setAttribute(PDOCrateDB::ATTR_ERRMODE, PDOCrateDB::ERRMODE_EXCEPTION);
         } catch (\Exception $e) {
             $this->Syslog->error($e->getMessage());
 
@@ -183,7 +183,7 @@ class Crate implements \Statusengine\StorageBackend {
      * @param int $timeout in seconds
      */
     public function setTimeout($timeout) {
-        $this->Connection->setAttribute(PDO::ATTR_TIMEOUT, $timeout);
+        $this->Connection->setAttribute(PDOCrateDB::ATTR_TIMEOUT, $timeout);
     }
 
     public function disconnect() {
@@ -191,7 +191,7 @@ class Crate implements \Statusengine\StorageBackend {
     }
 
     /**
-     * @return PDO
+     * @return PDOCrateDB
      * @throws \Exception
      */
     public function reconnect() {
@@ -200,7 +200,7 @@ class Crate implements \Statusengine\StorageBackend {
     }
 
     /**
-     * @return \Crate\PDO\PDO
+     * @return PDOCrateDB
      */
     public function getConnection() {
         return $this->Connection;
@@ -235,7 +235,7 @@ class Crate implements \Statusengine\StorageBackend {
      * @return array
      */
     public function fetchAll(PDOStatement $query) {
-        return $query->fetchAll(PDO::FETCH_ASSOC);
+        return $query->fetchAll(PDOCrateDB::FETCH_ASSOC);
     }
 
     /**
@@ -282,6 +282,10 @@ class Crate implements \Statusengine\StorageBackend {
 
                     case 'Statusengine\ValueObjects\Notification':
                         $CrateSqlObject = new  CrateNotification($this, $this->BulkInsertObjectStore);
+                        break;
+
+                    case 'Statusengine\ValueObjects\NotificationLog':
+                        $CrateSqlObject = new  CrateNotificationLog($this, $this->BulkInsertObjectStore);
                         break;
                 }
                 $CrateSqlObject->insert();
@@ -339,6 +343,10 @@ class Crate implements \Statusengine\StorageBackend {
 
     public function saveNotification(\Statusengine\ValueObjects\Notification $Notification) {
         $this->BulkInsertObjectStore->addObject($Notification);
+    }
+
+    public function saveNotificationLog(\Statusengine\ValueObjects\NotificationLog $NotificationLog) {
+        $this->BulkInsertObjectStore->addObject($NotificationLog);
     }
 
     public function saveAcknowledgement(\Statusengine\ValueObjects\Acknowledgement $Acknowledgement) {
@@ -429,6 +437,23 @@ class Crate implements \Statusengine\StorageBackend {
     /**
      * @param int $timestamp
      */
+    public function deleteServiceNotificationsLogOlderThan($timestamp) {
+        $partitions = $this->getPartitionsByTableName('statusengine_host_notifications_log');
+        $daysToDelete = [];
+        foreach ($partitions as $record) {
+            if (isset($record['values']['day']) && $record['values']['day'] < $timestamp) {
+                $daysToDelete[] = $record['values']['day'];
+            }
+        }
+
+        foreach ($daysToDelete as $partition) {
+            $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_host_notifications_log', $partition);
+        }
+    }
+
+    /**
+     * @param int $timestamp
+     */
     public function deleteHostStatehistoryOlderThan($timestamp) {
         $partitions = $this->getPartitionsByTableName('statusengine_host_statehistory');
         $daysToDelete = [];
@@ -498,6 +523,23 @@ class Crate implements \Statusengine\StorageBackend {
 
         foreach ($daysToDelete as $partition) {
             $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_service_notifications', $partition);
+        }
+    }
+
+    /**
+     * @param int $timestamp
+     */
+    public function deleteHostNotificationsLogOlderThan($timestamp) {
+        $partitions = $this->getPartitionsByTableName('statusengine_service_notifications_log');
+        $daysToDelete = [];
+        foreach ($partitions as $record) {
+            if (isset($record['values']['day']) && $record['values']['day'] < $timestamp) {
+                $daysToDelete[] = $record['values']['day'];
+            }
+        }
+
+        foreach ($daysToDelete as $partition) {
+            $this->dropPartitionsFromTableByTableNameAndDayValue('statusengine_service_notifications_log', $partition);
         }
     }
 

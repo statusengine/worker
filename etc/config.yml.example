@@ -301,6 +301,9 @@ age_host_acknowledgements: 60
 # How long should host notifications be stored
 age_host_notifications: 60
 
+# How long should host notifications log records be stored
+age_host_notifications_log: 60
+
 # How long should host state change records be stored
 age_host_statehistory: 365
 
@@ -316,6 +319,9 @@ age_service_acknowledgements: 60
 
 # How long should service notifications be stored
 age_service_notifications: 60
+
+# How long should service notifications log records be stored
+age_service_notifications_log: 60
 
 # How long should service state change records be stored
 age_service_statehistory: 365

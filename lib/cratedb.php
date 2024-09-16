@@ -366,6 +366,64 @@ $table->addColumn("day", "timestamp", array (
 ));
 
 
+/****************************************
+ * Define: statusengine_service_notifications_log
+ ***************************************/
+$table = $schema->createTable("statusengine_service_notifications_log");
+$table->addOption("table_options", ["number_of_replicas" => "0"]);
+$table->addOption("sharding_num_shards" , 4);
+$table->addOption("partition_columns" , "array (
+  0 => 'day',
+)");
+$table->addColumn("hostname", "string", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("service_description", "string", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("start_time", "timestamp", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("end_time", "timestamp", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("state", "integer", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("reason_type", "integer", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("is_escalated", "boolean", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("contacts_notified_count", "integer", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("output", "string", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("ack_author", "string", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("ack_data", "string", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("day", "timestamp", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+
 
 /****************************************
  * Define: statusengine_hoststatus
@@ -741,7 +799,59 @@ $table->addColumn("day", "timestamp", array (
   'default' => NULL,
 ));
 
-
+/****************************************
+ * Define: statusengine_host_notifications_log
+ ***************************************/
+$table = $schema->createTable("statusengine_host_notifications_log");
+$table->addOption("table_options", ["number_of_replicas" => "0"]);
+$table->addOption("sharding_num_shards" , 4);
+$table->addOption("partition_columns" , "array (
+  0 => 'day',
+)");
+$table->addColumn("hostname", "string", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("start_time", "timestamp", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("end_time", "timestamp", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("state", "integer", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("reason_type", "integer", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("is_escalated", "boolean", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("contacts_notified_count", "integer", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("output", "string", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("ack_author", "string", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("ack_data", "string", array (
+    'notnull' => false,
+    'default' => NULL,
+));
+$table->addColumn("day", "timestamp", array (
+    'notnull' => false,
+    'default' => NULL,
+));
 
 /****************************************
  * Define: statusengine_service_acknowledgements

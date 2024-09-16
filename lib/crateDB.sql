@@ -216,6 +216,20 @@ create table statusengine_host_notifications (
     day as date_trunc('day', start_time * 1000)
 ) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
 
+create table statusengine_host_notifications_log (
+    hostname string,
+    start_time timestamp,
+    end_time timestamp,
+    state int,
+    reason_type int,
+    is_escalated boolean,
+    contacts_notified_count int,
+    output string,
+    ack_author string,
+    ack_data string,
+    day as date_trunc('day', start_time * 1000)
+) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
+
 create table statusengine_service_notifications (
     hostname string,
     service_description string,
@@ -232,6 +246,20 @@ create table statusengine_service_notifications (
     day as date_trunc('day', start_time * 1000)
 ) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
 
+create table statusengine_service_notifications_log (
+    hostname string,
+    service_description string,
+    start_time timestamp,
+    end_time timestamp,
+    state int,
+    reason_type int,
+    is_escalated boolean,
+    contacts_notified_count int,
+    output string,
+    ack_author string,
+    ack_data string,
+    day as date_trunc('day', start_time * 1000)
+) CLUSTERED INTO 4 shards partitioned by (day) with (number_of_replicas = '0');
 
 create table statusengine_host_acknowledgements (
     hostname string,
@@ -344,4 +372,4 @@ create table statusengine_dbversion (
 ) CLUSTERED INTO 1 shards with (number_of_replicas = '1-all');
 
 
-INSERT INTO statusengine_dbversion (id, dbversion)VALUES(1, '3.1.0');
+INSERT INTO statusengine_dbversion (id, dbversion)VALUES(1, '3.8.0');

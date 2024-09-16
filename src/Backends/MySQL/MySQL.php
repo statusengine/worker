@@ -1,7 +1,7 @@
 <?php
 /**
  * Statusengine Worker
- * Copyright (C) 2016-2018  Daniel Ziegler
+ * Copyright (C) 2016-2024  Daniel Ziegler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ use Statusengine\Mysql\SqlObjects\MysqlHostScheduleddowntime;
 use Statusengine\Mysql\SqlObjects\MysqlHoststatus;
 use Statusengine\Mysql\SqlObjects\MysqlLogentry;
 use Statusengine\Mysql\SqlObjects\MysqlNotification;
+use Statusengine\Mysql\SqlObjects\MysqlNotificationLog;
 use Statusengine\Mysql\SqlObjects\MysqlPerfdata;
 use Statusengine\Mysql\SqlObjects\MysqlServiceAcknowledgement;
 use Statusengine\Mysql\SqlObjects\MysqlServicecheck;
@@ -274,6 +275,10 @@ class MySQL implements \Statusengine\StorageBackend {
                         $MySQLSqlObject = new  MysqlNotification($this, $this->BulkInsertObjectStore);
                         break;
 
+                    case 'Statusengine\ValueObjects\NotificationLog':
+                        $MySQLSqlObject = new  MysqlNotificationLog($this, $this->BulkInsertObjectStore);
+                        break;
+
                     case 'Statusengine\ValueObjects\Gauge':
                         $MySQLSqlObject = new  MysqlPerfdata($this, $this->BulkInsertObjectStore);
                         break;
@@ -450,6 +455,14 @@ class MySQL implements \Statusengine\StorageBackend {
     }
 
     /**
+     * @param \Statusengine\ValueObjects\NotificationLog $NotificationLog
+     */
+    public function saveNotificationLog(\Statusengine\ValueObjects\NotificationLog $NotificationLog) {
+        $this->BulkInsertObjectStore->addObject($NotificationLog);
+    }
+
+
+    /**
      * @param \Statusengine\ValueObjects\Acknowledgement $Acknowledgement
      */
     public function saveAcknowledgement(\Statusengine\ValueObjects\Acknowledgement $Acknowledgement) {
@@ -508,6 +521,18 @@ class MySQL implements \Statusengine\StorageBackend {
      * @param int $timestamp
      * @return bool
      */
+    public function deleteHostNotificationsLogOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_host_notifications_log WHERE start_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
     public function deleteHostStatehistoryOlderThan($timestamp) {
         $query = $this->prepare(
             'DELETE FROM statusengine_host_statehistory WHERE state_time < ?'
@@ -555,6 +580,18 @@ class MySQL implements \Statusengine\StorageBackend {
     public function deleteServiceNotificationsOlderThan($timestamp) {
         $query = $this->prepare(
             'DELETE FROM statusengine_service_notifications WHERE start_time < ?'
+        );
+        $query->bindValue(1, $timestamp);
+        return $query->execute();
+    }
+
+    /**
+     * @param int $timestamp
+     * @return bool
+     */
+    public function deleteServiceNotificationsLogOlderThan($timestamp) {
+        $query = $this->prepare(
+            'DELETE FROM statusengine_service_notifications_log WHERE start_time < ?'
         );
         $query->bindValue(1, $timestamp);
         return $query->execute();
