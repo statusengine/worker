@@ -19,7 +19,7 @@
 
 namespace Statusengine\Crate\SqlObjects;
 
-use Crate\PDO\PDO;
+use Crate\PDO\PDOCrateDB;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Crate;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
@@ -117,8 +117,8 @@ class CrateStatechange extends Crate\CrateModel {
             $query->bindValue($i++, $Statechange->getHostname());
             $query->bindValue($i++, $Statechange->getStateTime());
             $query->bindValue($i++, $Statechange->getState());
-            $query->bindValue($i++, (bool)$Statechange->getStateChange(), PDO::PARAM_BOOL);
-            $query->bindValue($i++, (bool)$Statechange->getStateType(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, (bool)$Statechange->getStateChange(), PDOCrateDB::PARAM_BOOL);
+            $query->bindValue($i++, (bool)$Statechange->getStateType(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Statechange->getCurrentCheckAttempt());
             $query->bindValue($i++, $Statechange->getMaxCheckAttempt());
             $query->bindValue($i++, $Statechange->getLastState());
@@ -155,8 +155,8 @@ class CrateStatechange extends Crate\CrateModel {
             $query->bindValue($i++, $Statechange->getServiceDescription());
             $query->bindValue($i++, $Statechange->getStateTime());
             $query->bindValue($i++, $Statechange->getState());
-            $query->bindValue($i++, (bool)$Statechange->getStateChange(), PDO::PARAM_BOOL);
-            $query->bindValue($i++, (bool)$Statechange->getStateType(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, (bool)$Statechange->getStateChange(), PDOCrateDB::PARAM_BOOL);
+            $query->bindValue($i++, (bool)$Statechange->getStateType(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Statechange->getCurrentCheckAttempt());
             $query->bindValue($i++, $Statechange->getMaxCheckAttempt());
             $query->bindValue($i++, $Statechange->getLastState());

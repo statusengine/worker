@@ -19,7 +19,7 @@
 
 namespace Statusengine\Crate\SqlObjects;
 
-use Crate\PDO\PDO;
+use Crate\PDO\PDOCrateDB;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Crate;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
@@ -91,26 +91,26 @@ class CrateHoststatus extends Crate\CrateModel {
             $query->bindValue($i++, $Hoststatus->getMaxAttempts());
             $query->bindValue($i++, $Hoststatus->getLastCheck());
             $query->bindValue($i++, $Hoststatus->getNextCheck());
-            $query->bindValue($i++, $Hoststatus->getIsActiveCheckResult(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->getIsActiveCheckResult(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Hoststatus->getLastStateChange());
             $query->bindValue($i++, $Hoststatus->getLastHardStateChange());
             $query->bindValue($i++, $Hoststatus->getLastHardState());
-            $query->bindValue($i++, $Hoststatus->isHardState(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->isHardState(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Hoststatus->getLastNotification());
             $query->bindValue($i++, $Hoststatus->getNextNotification());
-            $query->bindValue($i++, $Hoststatus->isNotificationsEnabled(), PDO::PARAM_BOOL);
-            $query->bindValue($i++, $Hoststatus->isProblemHasBeenAcknowledged(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->isNotificationsEnabled(), PDOCrateDB::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->isProblemHasBeenAcknowledged(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Hoststatus->getAcknowledgementType());
-            $query->bindValue($i++, $Hoststatus->getAcceptPassiveChecks(), PDO::PARAM_BOOL);
-            $query->bindValue($i++, $Hoststatus->getChecksEnabled(), PDO::PARAM_BOOL);
-            $query->bindValue($i++, $Hoststatus->getEventHandlerEnabled(), PDO::PARAM_BOOL);
-            $query->bindValue($i++, $Hoststatus->getFlapDetectionEnabled(), PDO::PARAM_BOOL);
-            $query->bindValue($i++, $Hoststatus->getIsFlapping(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->getAcceptPassiveChecks(), PDOCrateDB::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->getChecksEnabled(), PDOCrateDB::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->getEventHandlerEnabled(), PDOCrateDB::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->getFlapDetectionEnabled(), PDOCrateDB::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->getIsFlapping(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Hoststatus->getLatency());
             $query->bindValue($i++, $Hoststatus->getExecutionTime());
             $query->bindValue($i++, $Hoststatus->getScheduledDowntimeDepth());
-            $query->bindValue($i++, $Hoststatus->isProcessPerformanceData(), PDO::PARAM_BOOL);
-            $query->bindValue($i++, $Hoststatus->isObsess(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->isProcessPerformanceData(), PDOCrateDB::PARAM_BOOL);
+            $query->bindValue($i++, $Hoststatus->isObsess(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Hoststatus->getCheckInterval());
             $query->bindValue($i++, $Hoststatus->getRetryInterval());
             $query->bindValue($i++, $Hoststatus->getCheckPeriod());

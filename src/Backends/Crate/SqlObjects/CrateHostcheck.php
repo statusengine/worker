@@ -19,7 +19,7 @@
 
 namespace Statusengine\Crate\SqlObjects;
 
-use Crate\PDO\PDO;
+use Crate\PDO\PDOCrateDB;
 use Statusengine\BulkInsertObjectStore;
 use Statusengine\Crate;
 use Statusengine\Exception\StorageBackendUnavailableExceptions;
@@ -40,7 +40,7 @@ class CrateHostcheck extends Crate\CrateModel {
     protected $baseValue = '(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
     /**
-     * @var \Crate\PDO\PDO
+     * @var PDOCrateDB
      */
     protected $CrateDB;
 
@@ -75,12 +75,12 @@ class CrateHostcheck extends Crate\CrateModel {
         foreach ($this->BulkInsertObjectStore->getObjects() as $key => $Hostcheck) {
             $query->bindValue($i++, $Hostcheck->getHostName());
             $query->bindValue($i++, $Hostcheck->getState());
-            $query->bindValue($i++, (bool)$Hostcheck->getStateType(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, (bool)$Hostcheck->getStateType(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Hostcheck->getStartTime());
             $query->bindValue($i++, $Hostcheck->getEndTime());
             $query->bindValue($i++, $Hostcheck->getOutput());
             $query->bindValue($i++, $Hostcheck->getTimeout());
-            $query->bindValue($i++, (bool)$Hostcheck->getEarlyTimeout(), PDO::PARAM_BOOL);
+            $query->bindValue($i++, (bool)$Hostcheck->getEarlyTimeout(), PDOCrateDB::PARAM_BOOL);
             $query->bindValue($i++, $Hostcheck->getLatency());
             $query->bindValue($i++, $Hostcheck->getExecutionTime());
             $query->bindValue($i++, $Hostcheck->getPerfdata());

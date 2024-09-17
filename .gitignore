@@ -1,5 +1,6 @@
 phpunit.phar
 etc/config.yml
+etc/config.yml.oitc
 tests/StatusengineTest/Results/*.html
 tests/StatusengineTest/Results/css
 tests/StatusengineTest/Results/img

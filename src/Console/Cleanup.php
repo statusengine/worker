@@ -1,7 +1,7 @@
 <?php
 /**
  * Statusengine Worker
- * Copyright (C) 2016-2018  Daniel Ziegler
+ * Copyright (C) 2016-2024  Daniel Ziegler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,6 +104,7 @@ class Cleanup extends Command {
         $this->cleanupHostchecks($input, $output);
         $this->cleanupHostAcknowledgements($input, $output);
         $this->cleanupHostNotifications($input, $output);
+        $this->cleanupHostNotificationsLog($input, $output);
         $this->cleanupHostStatehistory($input, $output);
         $this->cleanupHostDowntimes($input, $output);
 
@@ -111,6 +112,7 @@ class Cleanup extends Command {
         $this->cleanupServicechecks($input, $output);
         $this->cleanupServiceAcknowledgements($input, $output);
         $this->cleanupServiceNotifications($input, $output);
+        $this->cleanupServiceNotificationsLog($input, $output);
         $this->cleanupServiceStatehistory($input, $output);
         $this->cleanupServiceDowntimes($input, $output);
 
@@ -160,6 +162,18 @@ class Cleanup extends Command {
         $output->write('Delete old <comment>host notification</comment> records...');
         $this->StorageBackend->deleteHostNotificationsOlderThan(
             $this->getTimestampByInterval($this->Config->getAgeHostNotifications())
+        );
+        $output->writeln('<info> done</info>');
+    }
+
+    private function cleanupHostNotificationsLog(InputInterface $input, OutputInterface $output) {
+        if ($this->Config->getAgeHostNotificationsLog() === 0) {
+            $output->writeln('<cyan>Skipping host notification log records</cyan>');
+            return;
+        }
+        $output->write('Delete old <comment>host notification log</comment> records...');
+        $this->StorageBackend->deleteHostNotificationsLogOlderThan(
+            $this->getTimestampByInterval($this->Config->getAgeHostNotificationsLog())
         );
         $output->writeln('<info> done</info>');
     }
@@ -220,6 +234,18 @@ class Cleanup extends Command {
         $output->write('Delete old <comment>service notification</comment> records...');
         $this->StorageBackend->deleteServiceNotificationsOlderThan(
             $this->getTimestampByInterval($this->Config->getAgeServiceNotifications())
+        );
+        $output->writeln('<info> done</info>');
+    }
+
+    private function cleanupServiceNotificationsLog(InputInterface $input, OutputInterface $output) {
+        if ($this->Config->getAgeServiceNotificationsLog() === 0) {
+            $output->writeln('<cyan>Skipping service notifications log records</cyan>');
+            return;
+        }
+        $output->write('Delete old <comment>service notification log</comment> records...');
+        $this->StorageBackend->deleteServiceNotificationsLogOlderThan(
+            $this->getTimestampByInterval($this->Config->getAgeServiceNotificationsLog())
         );
         $output->writeln('<info> done</info>');
     }

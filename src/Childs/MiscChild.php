@@ -1,7 +1,7 @@
 <?php
 /**
  * Statusengine Worker
- * Copyright (C) 2016-2018  Daniel Ziegler
+ * Copyright (C) 2016-2024  Daniel Ziegler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ use Statusengine\Config\WorkerConfig;
 use Statusengine\QueueingEngines\QueueingEngine;
 use Statusengine\ValueObjects\Acknowledgement;
 use Statusengine\ValueObjects\Notification;
+use Statusengine\ValueObjects\NotificationLog;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
 
@@ -39,6 +40,11 @@ class MiscChild extends Child {
      * @var WorkerConfig
      */
     private $NotificationConfig;
+
+    /**
+     * @var WorkerConfig
+     */
+    private $NotificationLogConfig;
 
     /**
      * @var WorkerConfig
@@ -105,6 +111,7 @@ class MiscChild extends Child {
         $this->SignalHandler = new ChildSignalHandler();
 
         $this->NotificationConfig = new \Statusengine\Config\Notification();
+        $this->NotificationLogConfig = new \Statusengine\Config\NotificationLog();
         $this->AcknowledgementConfig = new \Statusengine\Config\Acknowledgement();
         $this->DowntimeConfig = new Downtime();
 
@@ -125,6 +132,7 @@ class MiscChild extends Child {
         $this->Queue = $this->QueueingEngine->getQueue();
         $this->Queue->addQueue($this->AcknowledgementConfig);
         $this->Queue->addQueue($this->DowntimeConfig);
+        $this->Queue->addQueue($this->NotificationLogConfig);
         $this->Queue->connect();
     }
 
@@ -145,6 +153,9 @@ class MiscChild extends Child {
                 foreach ($jobData->messages as $jobJson) {
                     if (property_exists($jobJson, 'contactnotificationmethod')) {
                         $this->handleNotifications($jobJson);
+                    }
+                    if (property_exists($jobJson, 'notification_data')) {
+                        $this->handleNotificationLog($jobJson);
                     }
                     if (property_exists($jobJson, 'acknowledgement')) {
                         $this->handleAcknowledgements($jobJson);
@@ -180,6 +191,20 @@ class MiscChild extends Child {
         if ($Notification->isValidNotification()) {
             $this->StorageBackend->saveNotification(
                 $Notification
+            );
+            $this->Statistics->increase();
+        }
+
+    }
+
+    /**
+     * @param \stdClass $jobData
+     */
+    private function handleNotificationLog($jobData) {
+        $NotificationLog = new NotificationLog($jobData);
+        if ($NotificationLog->isValidNotification()) {
+            $this->StorageBackend->saveNotificationLog(
+                $NotificationLog
             );
             $this->Statistics->increase();
         }

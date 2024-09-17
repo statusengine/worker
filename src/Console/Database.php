@@ -115,13 +115,13 @@ class Database extends Command {
 
         if ($this->Config->isCrateEnabled()) {
             $crateConfig = $this->Config->getCrateConfig();
-            $firstHost = $crateConfig[0];
+            $firstHost = $crateConfig['nodes'][0];
 
             $config = explode(':', $firstHost);
 
             $connectionParams = [
-                'user'        => null,
-                'password'    => null,
+                'user'        => $crateConfig['username'] ?? null,
+                'password'    => $crateConfig['password'] ?? null,
                 'host'        => $config[0],
                 'port'        => $config[1],
                 'driverClass' => 'Crate\DBAL\Driver\PDOCrate\Driver',

@@ -349,6 +349,102 @@ $table->addIndex([
 ], "start_time");
 
 
+/****************************************
+ * Define: statusengine_host_notifications_log
+ ***************************************/
+$table = $schema->createTable("statusengine_host_notifications_log");
+$table->addOption("engine" , "InnoDB");
+$table->addOption("collate" , "utf8_general_ci");
+$table->addOption("charset" , "utf8");
+$table->addOption("comment" , "");
+$table->addColumn("hostname", "string", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => true,
+    'default' => NULL,
+    'length' => 255,
+));
+$table->addColumn("start_time", "bigint", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => true,
+    'default' => NULL,
+));
+$table->addColumn("start_time_usec", "integer", array (
+    'unsigned' => true,
+    'autoincrement' => false,
+    'notnull' => true,
+    'default' => '0',
+));
+$table->addColumn("end_time", "bigint", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => true,
+    'default' => NULL,
+));
+$table->addColumn("state", "smallint", array (
+    'unsigned' => true,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => '0',
+));
+$table->addColumn("reason_type", "smallint", array (
+    'unsigned' => true,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => '0',
+));
+$table->addColumn("is_escalated", "boolean", array (
+    'unsigned' => true,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => '0',
+));
+$table->addColumn("contacts_notified_count", "smallint", array (
+    'unsigned' => true,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => '0',
+));
+$table->addColumn("output", "string", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => NULL,
+    'length' => 1024,
+));
+$table->addColumn("ack_author", "string", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => NULL,
+    'length' => 255,
+));
+$table->addColumn("ack_data", "string", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => NULL,
+    'length' => 1024,
+));
+$table->setPrimaryKey([
+    "hostname",
+    "start_time",
+    "start_time_usec"
+]);
+$table->addIndex([
+    "hostname"
+], "hostname");
+$table->addIndex([
+    "start_time"
+], "start_time");
+$table->addIndex([
+    "start_time",
+    "end_time",
+    "reason_type",
+    "state"
+], "filter");
+
 
 /****************************************
  * Define: statusengine_host_scheduleddowntimes
@@ -1432,6 +1528,115 @@ $table->addIndex([
     "start_time"
 ], "start_time");
 
+
+
+/****************************************
+ * Define: statusengine_service_notifications_log
+ ***************************************/
+$table = $schema->createTable("statusengine_service_notifications_log");
+$table->addOption("engine" , "InnoDB");
+$table->addOption("collate" , "utf8_general_ci");
+$table->addOption("charset" , "utf8");
+$table->addOption("comment" , "");
+$table->addColumn("hostname", "string", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => true,
+    'default' => NULL,
+    'length' => 255,
+));
+$table->addColumn("service_description", "string", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => true,
+    'default' => NULL,
+    'length' => 255,
+));
+$table->addColumn("start_time", "bigint", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => true,
+    'default' => NULL,
+));
+$table->addColumn("start_time_usec", "integer", array (
+    'unsigned' => true,
+    'autoincrement' => false,
+    'notnull' => true,
+    'default' => '0',
+));
+$table->addColumn("end_time", "bigint", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => true,
+    'default' => NULL,
+));
+$table->addColumn("state", "smallint", array (
+    'unsigned' => true,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => '0',
+));
+$table->addColumn("reason_type", "smallint", array (
+    'unsigned' => true,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => '0',
+));
+$table->addColumn("is_escalated", "boolean", array (
+    'unsigned' => true,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => '0',
+));
+$table->addColumn("contacts_notified_count", "smallint", array (
+    'unsigned' => true,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => '0',
+));
+$table->addColumn("output", "string", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => NULL,
+    'length' => 1024,
+));
+$table->addColumn("ack_author", "string", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => NULL,
+    'length' => 255,
+));
+$table->addColumn("ack_data", "string", array (
+    'unsigned' => false,
+    'autoincrement' => false,
+    'notnull' => false,
+    'default' => NULL,
+    'length' => 1024,
+));
+$table->setPrimaryKey([
+    "hostname",
+    "service_description",
+    "start_time",
+    "start_time_usec"
+]);
+$table->addIndex([
+    "hostname"
+], "hostname");
+$table->addIndex([
+    "hostname",
+    "service_description"
+], "servicename");
+$table->addIndex([
+    "start_time"
+], "start_time");
+$table->addIndex([
+    "start_time",
+    "end_time",
+    "reason_type",
+    "state"
+], "filter");
 
 
 /****************************************

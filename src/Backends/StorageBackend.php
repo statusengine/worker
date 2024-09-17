@@ -1,7 +1,7 @@
 <?php
 /**
  * Statusengine Worker
- * Copyright (C) 2016-2018  Daniel Ziegler
+ * Copyright (C) 2016-2024  Daniel Ziegler
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,6 +59,8 @@ interface StorageBackend {
 
     public function saveNotification(\Statusengine\ValueObjects\Notification $Notification);
 
+    public function saveNotificationLog(\Statusengine\ValueObjects\NotificationLog $NotificationLog);
+
     public function saveAcknowledgement(\Statusengine\ValueObjects\Acknowledgement $Acknowledgement);
 
     public function deleteHostchecksOlderThan($timestamp);
@@ -66,6 +68,8 @@ interface StorageBackend {
     public function deleteHostAcknowledgementsOlderThan($timestamp);
 
     public function deleteHostNotificationsOlderThan($timestamp);
+
+    public function deleteHostNotificationsLogOlderThan($timestamp);
 
     public function deleteHostStatehistoryOlderThan($timestamp);
 
@@ -76,6 +80,8 @@ interface StorageBackend {
     public function deleteServiceAcknowledgementsOlderThan($timestamp);
 
     public function deleteServiceNotificationsOlderThan($timestamp);
+
+    public function deleteServiceNotificationsLogOlderThan($timestamp);
 
     public function deleteServiceStatehistoryOlderThan($timestamp);
 
