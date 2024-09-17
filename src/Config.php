@@ -224,15 +224,25 @@ class Config {
      * @return array
      */
     public function getCrateConfig() {
-        $default = Env::get('SE_CRATE_NODES', ['127.0.0.1:4200'], Env::VALUE_ARRAY);
+        $config = [
+            'nodes'    => Env::get('SE_CRATE_NODES', ['127.0.0.1:4200'], Env::VALUE_ARRAY),
+            'username' => Env::get('SE_CRATE_USERNAME', 'crate', Env::VALUE_STRING),
+            'password' => Env::get('SE_CRATE_PASSWORD', '', Env::VALUE_STRING)
+        ];
 
-        if (isset($this->config['crate']['nodes'])) {
-            if (is_array($this->config['crate']['nodes']) && !empty($this->config['crate']['nodes'])) {
-                return $this->config['crate']['nodes'];
-            }
+        if (is_array($this->config['crate']['nodes']) && !empty($this->config['crate']['nodes'])) {
+            $config['nodes'] = $this->config['crate']['nodes'];
         }
 
-        return $default;
+        if (isset($this->config['crate']['username'])) {
+            $config['username'] = $this->config['crate']['username'];
+        }
+
+        if (isset($this->config['crate']['password'])) {
+            $config['password'] = $this->config['crate']['password'];
+        }
+
+        return $config;
     }
 
     /**

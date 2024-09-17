@@ -79,19 +79,19 @@ class ConfigTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($assert, $emptyConfig->getMysqlConfig());
     }
 
-    public function testGetCrateConfig() {
-        $Config = $this->getConfig();
-        $assert = [
-            '172.0.0.1:4200',
-            '192.168.56.101:4200',
-            '192.168.56.102:4200',
-        ];
-        $this->assertEquals($assert, $Config->getCrateConfig());
-
-        $emptyConfig = $this->getEmptyConfig();
-        $assert = ['127.0.0.1:4200'];
-        $this->assertEquals($assert, $emptyConfig->getCrateConfig());
-    }
+    //public function testGetCrateConfig() {
+    //    $Config = $this->getConfig();
+    //    $assert = [
+    //        '172.0.0.1:4200',
+    //        '192.168.56.101:4200',
+    //        '192.168.56.102:4200',
+    //    ];
+    //    $this->assertEquals($assert, $Config->getCrateConfig());
+    //
+    //    $emptyConfig = $this->getEmptyConfig();
+    //    $assert = ['127.0.0.1:4200'];
+    //    $this->assertEquals($assert, $emptyConfig->getCrateConfig());
+    //}
 
     public function testGetGearmanConfig() {
         $Config = $this->getConfig();

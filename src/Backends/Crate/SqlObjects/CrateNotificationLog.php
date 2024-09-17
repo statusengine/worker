@@ -32,7 +32,7 @@ class CrateNotificationLog extends CrateModel {
      * @var string
      */
     protected $baseQueryHost = "
-      INSERT INTO statusengine_host_notifications
+      INSERT INTO statusengine_host_notifications_log
       (hostname, start_time, end_time, state, reason_type, is_escalated, contacts_notified_count, output, ack_author, ack_data )
       VALUES%s";
 
@@ -45,7 +45,7 @@ class CrateNotificationLog extends CrateModel {
      * @var string
      */
     protected $baseQueryService = "
-      INSERT INTO statusengine_service_notifications
+      INSERT INTO statusengine_service_notifications_log
       (hostname, service_description, start_time, end_time, state, reason_type, is_escalated, contacts_notified_count, output, ack_author, ack_data )
       VALUES%s";
 

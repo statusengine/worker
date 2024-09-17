@@ -160,7 +160,7 @@ class Crate implements \Statusengine\StorageBackend {
      */
     public function getDsn() {
         $config = $this->Config->getCrateConfig();
-        return sprintf('crate:%s', implode(',', $config));
+        return sprintf('crate:%s', implode(',', $config['nodes']));
     }
 
     /**
@@ -168,7 +168,8 @@ class Crate implements \Statusengine\StorageBackend {
      */
     public function connect() {
         try {
-            $this->Connection = new PDOCrateDB($this->getDsn(), null, null, [PDOCrateDB::ATTR_TIMEOUT => 1]);
+            $config = $this->Config->getCrateConfig();
+            $this->Connection = new PDOCrateDB($this->getDsn(), $config['username'], $config['password'], [PDOCrateDB::ATTR_TIMEOUT => 5]);
             $this->Connection->setAttribute(PDOCrateDB::ATTR_ERRMODE, PDOCrateDB::ERRMODE_EXCEPTION);
         } catch (\Exception $e) {
             $this->Syslog->error($e->getMessage());
@@ -207,11 +208,11 @@ class Crate implements \Statusengine\StorageBackend {
     }
 
     /**
-     * @param \PDOStatement $query
+     * @param \Crate\PDO\PDOStatement $query
      * @return bool
      * @throws \Exception
      */
-    public function executeQuery(\PDOStatement $query) {
+    public function executeQuery(\Crate\PDO\PDOStatement $query) {
         $result = false;
         try {
             $result = $query->execute();
@@ -231,10 +232,10 @@ class Crate implements \Statusengine\StorageBackend {
     }
 
     /**
-     * @param PDOStatement $query
+     * @param \Crate\PDO\PDOStatement $query
      * @return array
      */
-    public function fetchAll(PDOStatement $query) {
+    public function fetchAll(\Crate\PDO\PDOStatement $query) {
         return $query->fetchAll(PDOCrateDB::FETCH_ASSOC);
     }
 
