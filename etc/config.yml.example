@@ -101,8 +101,10 @@ use_crate: 1
 # It is recommended to you a load balancer in front of your CrateDB cluster!
 # So you will have a single ip address where Statusengine is going to connect to
 crate:
+  username: crate
+  password:
   nodes:
-    - 127.0.0.1:4200
+  - 127.0.0.1:4200
 #    - 192.168.56.101:4200
 #    - 192.168.56.102:4200
 
