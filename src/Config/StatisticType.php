@@ -101,6 +101,11 @@ class StatisticType {
         return $this->type;
     }
 
+    public function isNotificationLogStatistic() {
+        $this->type = 1 << 9;
+        return $this->type;
+    }
+
     /**
      * @return int
      */

@@ -19,6 +19,16 @@
 
 namespace Statusengine;
 
+/**
+ * Do not mix different object types into one instance of StorageBackend
+ * The primary goal of this call is to provide a unified interface for all storage backends and to enable bulk inserts
+ * For performance reasons, only the first element of the BulkInsertObjectStore gets verified and then all elements are inserted
+ * based in the first one.
+ * So if the first element is a Hoststatus, all other elements will be inserted as Hoststatus objects
+ *
+ * DO NOT MIX DIFFERENT OBJECT TYPES INTO ONE INSTANCE OF StorageBackend
+ *
+ */
 interface StorageBackend {
 
     public function connect();

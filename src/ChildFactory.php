@@ -132,6 +132,20 @@ class ChildFactory {
     /**
      * @return Pid
      */
+    public function forkNotificationChild() {
+        $this->Syslog->info('Fork new notification log worker');
+        $NotificationChild = new NotificationChild(
+            $this->Config,
+            $this->ParentPid,
+            $this->Syslog
+        );
+        $Pid = $NotificationChild->fork();
+        return $Pid;
+    }
+
+    /**
+     * @return Pid
+     */
     public function forkMiscChild() {
         $this->Syslog->info('Fork new misc worker');
         $MiscChild = new MiscChild(

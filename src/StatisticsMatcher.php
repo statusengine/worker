@@ -49,6 +49,8 @@ class StatisticsMatcher {
         'total_processed_perfdata_records_last_minute' => 'Total processed performance data records last minute',
         'total_processed_misc_records' => 'Total processed Notifications, Downtimes, Acknowledgements, etc',
         'total_processed_misc_records_last_minute' => 'Total processed Notifications, Downtimes, Acknowledgements, etc last minute',
+        'total_processed_notificationlog_records' => 'Total processed Notification Events',
+        'total_processed_notificationlog_records_last_minute' => 'Total processed Notification Events last minute',
         'number_of_workers' => 'Number of workers',
         'total_number_of_processes' => 'Total number of running Statusengine processes',
         'last_update' => 'Last update of this statistics',
@@ -299,6 +301,36 @@ class StatisticsMatcher {
         return new Statistic(
             'total_processed_misc_records_last_minute',
             $this->keys['total_processed_misc_records_last_minute'],
+            $value
+        );
+    }
+
+    /**
+     * @return Statistic
+     */
+    public function getProcessedNotificationLogRecords() {
+        $value = 0;
+        if (isset($this->statistics['total_processed_notificationlog_records'])) {
+            $value = $this->statistics['total_processed_notificationlog_records'];
+        }
+        return new Statistic(
+            'total_processed_notificationlog_records',
+            $this->keys['total_processed_notificationlog_records'],
+            $value
+        );
+    }
+
+    /**
+     * @return Statistic
+     */
+    public function getProcessedNotificationLogRecordsLastMinute() {
+        $value = 0;
+        if (isset($this->statistics['total_processed_notificationlog_records_last_minute'])) {
+            $value = $this->statistics['total_processed_notificationlog_records_last_minute'];
+        }
+        return new Statistic(
+            'total_processed_notificationlog_records_last_minute',
+            $this->keys['total_processed_notificationlog_records_last_minute'],
             $value
         );
     }

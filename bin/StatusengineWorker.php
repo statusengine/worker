@@ -73,6 +73,10 @@ if ($Config->isCrateEnabled() || $Config->isMysqlEnabled()) {
         $pids[] = $ChildFactory->forkServicecheckChild();
     }
 
+    for ($i = 0; $i < $Config->getNumberOfNotificationLogWorkers(); $i++) {
+        $pids[] = $ChildFactory->forkNotificationChild();
+    }
+
     for ($i = 0; $i < $Config->getNumberOfMiscWorkers(); $i++) {
         $pids[] = $ChildFactory->forkMiscChild();
     }

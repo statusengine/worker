@@ -24,11 +24,18 @@ use Statusengine\Config\WorkerConfig;
 use Statusengine\QueueingEngines\QueueingEngine;
 use Statusengine\ValueObjects\Acknowledgement;
 use Statusengine\ValueObjects\Notification;
-use Statusengine\ValueObjects\NotificationLog;
 use Statusengine\ValueObjects\Pid;
 use Statusengine\Redis\Statistics;
 
 
+/**
+ * This child will handle the contactnotificationmethod queue and save records into the
+ * statusengine_host_notifications and statusengine_service_notifications tables
+ * It also handled acknowledgements and downtimes
+ *
+ * If you are looking for statusengine_host_notifications_log and statusengine_service_notifications_log they are processed
+ * by the NotificationChild.
+ */
 class MiscChild extends Child {
 
     /**
@@ -40,11 +47,6 @@ class MiscChild extends Child {
      * @var WorkerConfig
      */
     private $NotificationConfig;
-
-    /**
-     * @var WorkerConfig
-     */
-    private $NotificationLogConfig;
 
     /**
      * @var WorkerConfig
@@ -99,7 +101,7 @@ class MiscChild extends Child {
      */
     public function __construct(
         Config $Config,
-        Pid $Pid,
+        Pid    $Pid,
         Syslog $Syslog
     ) {
         $this->Config = $Config;
@@ -111,7 +113,6 @@ class MiscChild extends Child {
         $this->SignalHandler = new ChildSignalHandler();
 
         $this->NotificationConfig = new \Statusengine\Config\Notification();
-        $this->NotificationLogConfig = new \Statusengine\Config\NotificationLog();
         $this->AcknowledgementConfig = new \Statusengine\Config\Acknowledgement();
         $this->DowntimeConfig = new Downtime();
 
@@ -132,7 +133,6 @@ class MiscChild extends Child {
         $this->Queue = $this->QueueingEngine->getQueue();
         $this->Queue->addQueue($this->AcknowledgementConfig);
         $this->Queue->addQueue($this->DowntimeConfig);
-        $this->Queue->addQueue($this->NotificationLogConfig);
         $this->Queue->connect();
     }
 
@@ -150,17 +150,20 @@ class MiscChild extends Child {
             $jobData = $this->Queue->getJob();
             if ($jobData !== null) {
                 $jobData = $this->convertJobToBulkJobObject($jobData);
+                /*
+                 * $this->StorageBackend can only handle ONE type ob objects (such as Notification or Hoststatus)
+                 * Do NOT mix different types of objects in one $this->StorageBackend
+                 */
                 foreach ($jobData->messages as $jobJson) {
                     if (property_exists($jobJson, 'contactnotificationmethod')) {
                         $this->handleNotifications($jobJson);
                     }
-                    if (property_exists($jobJson, 'notification_data')) {
-                        $this->handleNotificationLog($jobJson);
-                    }
                     if (property_exists($jobJson, 'acknowledgement')) {
+                        // acknowledgement are not using $this->StorageBackend
                         $this->handleAcknowledgements($jobJson);
                     }
                     if (property_exists($jobJson, 'downtime')) {
+                        // downtimes are not using $this->StorageBackend
                         $this->handleDowntime($jobJson);
                     }
 
@@ -191,20 +194,6 @@ class MiscChild extends Child {
         if ($Notification->isValidNotification()) {
             $this->StorageBackend->saveNotification(
                 $Notification
-            );
-            $this->Statistics->increase();
-        }
-
-    }
-
-    /**
-     * @param \stdClass $jobData
-     */
-    private function handleNotificationLog($jobData) {
-        $NotificationLog = new NotificationLog($jobData);
-        if ($NotificationLog->isValidNotification()) {
-            $this->StorageBackend->saveNotificationLog(
-                $NotificationLog
             );
             $this->Statistics->increase();
         }

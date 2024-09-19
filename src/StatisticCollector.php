@@ -93,6 +93,8 @@ class StatisticCollector {
         $totalProcessedPerfdataRecordsLastMinute = 0;
         $totalProcessedMiscRecords = 0;
         $totalProcessedMiscRecordsLastMinute = 0;
+        $totalProcessedNotificationLogRecords = 0;
+        $totalProcessedNotificationLogRecordsLastMinute = 0;
 
         foreach ($this->pids as $pid) {
             $result = $this->Redis->getHash(
@@ -178,6 +180,16 @@ class StatisticCollector {
                         $totalProcessedMiscRecordsLastMinute += (int)$result['total_processed_records_last_minute'];
                     }
                 }
+
+                if ($result['statistic_type'] == $this->StatisticType->isNotificationLogStatistic()) {
+                    if (isset($result['total_processed_records_last_minute'])) {
+                        $totalProcessedNotificationLogRecords += (int)$result['total_processed_records_last_minute'];
+                    }
+
+                    if (isset($result['total_processed_records_last_minute'])) {
+                        $totalProcessedNotificationLogRecordsLastMinute += (int)$result['total_processed_records_last_minute'];
+                    }
+                }
             }
 
             /**
@@ -207,6 +219,9 @@ class StatisticCollector {
 
                 'total_processed_misc_records' => $totalProcessedMiscRecords,
                 'total_processed_misc_records_last_minute' => $totalProcessedMiscRecordsLastMinute,
+
+                'total_processed_notificationlog_records' => $totalProcessedNotificationLogRecords,
+                'total_processed_notificationlog_records_last_minute' => $totalProcessedNotificationLogRecordsLastMinute,
 
                 'number_of_workers' => sizeof($this->pids),
                 'total_number_of_processes' => sizeof($this->pids) + 1, //+1 is the parent itself

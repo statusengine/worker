@@ -109,7 +109,8 @@ class Statistics extends Command {
             $StatisticsMatcher->getProcessedHostcheckRecords()->getValue() +
             $StatisticsMatcher->getProcessedServicecheckRecords()->getValue() +
             $StatisticsMatcher->getProcessedLogentryRecords()->getValue() +
-            $StatisticsMatcher->getProcessedMiscRecords()->getValue();
+            $StatisticsMatcher->getProcessedMiscRecords()->getValue() +
+            $StatisticsMatcher->getProcessedNotificationLogRecords()->getValue();
     }
 
     /**
@@ -124,7 +125,8 @@ class Statistics extends Command {
             $StatisticsMatcher->getProcessedHostcheckRecordsLastMinute()->getValue() +
             $StatisticsMatcher->getProcessedServicecheckRecordsLastMinute()->getValue() +
             $StatisticsMatcher->getProcessedLogentryRecordsLastMinute()->getValue() +
-            $StatisticsMatcher->getProcessedMiscRecordsLastMinute()->getValue();
+            $StatisticsMatcher->getProcessedMiscRecordsLastMinute()->getValue() +
+            $StatisticsMatcher->getProcessedNotificationLogRecordsLastMinute()->getValue();
     }
 
     /**
@@ -182,6 +184,11 @@ class Statistics extends Command {
         $output->writeln(sprintf(': <comment>%s</comment>', $this->format($StatisticsMatcher->getProcessedPerfdataRecords()->getValue())));
         $output->write($StatisticsMatcher->getProcessedPerfdataRecordsLastMinute()->getDescription());
         $output->writeln(sprintf(': <comment>%s</comment>', $this->format($StatisticsMatcher->getProcessedPerfdataRecordsLastMinute()->getValue())));
+
+        $output->write($StatisticsMatcher->getProcessedNotificationLogRecords()->getDescription());
+        $output->writeln(sprintf(': <comment>%s</comment>', $this->format($StatisticsMatcher->getProcessedNotificationLogRecords()->getValue())));
+        $output->write($StatisticsMatcher->getProcessedNotificationLogRecordsLastMinute()->getDescription());
+        $output->writeln(sprintf(': <comment>%s</comment>', $this->format($StatisticsMatcher->getProcessedNotificationLogRecordsLastMinute()->getValue())));
 
         $output->writeln([
             '',

@@ -389,6 +389,19 @@ class Config {
     /**
      * @return int
      */
+    public function getNumberOfNotificationLogWorkers() {
+        $default = Env::get('SE_NUMBER_NOTIFICATION_LOG_WORKER', 1, Env::VALUE_INT);
+        if (isset($this->config['number_notification_log_worker'])) {
+            if (is_numeric($this->config['number_notification_log_worker'])) {
+                return (int)$this->config['number_notification_log_worker'];
+            }
+        }
+        return $default;
+    }
+
+    /**
+     * @return int
+     */
     public function getNumberOfMiscWorkers() {
         $default = Env::get('SE_NUMBER_MISC_WORKER', 1, Env::VALUE_INT);
         if (isset($this->config['number_misc_worker'])) {
