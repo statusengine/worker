@@ -959,4 +959,12 @@ class Config {
         return $default;
     }
 
+    public function isOpenITCOCKPIT() {
+        $default = false;
+        $default = Env::get('SE_IS_OPENITCOCKPIT', $default, Env::VALUE_BOOL);
+        if (isset($this->config['is_openitcockpit'])) {
+            return (bool)$this->config['is_openitcockpit'];
+        }
+        return $default;
+    }
 }

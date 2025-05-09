@@ -152,4 +152,20 @@ class MysqlHoststatus extends MysqlModel {
         }
     }
 
+    /**
+     * @param bool $isRecursion
+     * @return bool
+     */
+    public function truncateForOpenITCOCKPIT($isRecursion = false){
+        $query = $this->MySQL->prepare('DELETE FROM statusengine_hoststatus WHERE NOT EXISTS (SELECT hosts.uuid FROM hosts WHERE statusengine_hoststatus.hostname = hosts.uuid AND hosts.disabled=0)');
+        try {
+            return $this->MySQL->executeQuery($query, 'MysqlHoststatus');
+        } catch (StorageBackendUnavailableExceptions $Exceptions) {
+            //Retry
+            if ($isRecursion === false) {
+                $this->insert(true);
+            }
+        }
+    }
+
 }

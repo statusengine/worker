@@ -231,15 +231,15 @@ class MySQL implements \Statusengine\StorageBackend {
     }
 
     public function dispatch() {
-            /*$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        /*$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 
-            if($bt[3]['function'] === 'forkServicestatusChild'){
-              // echo "============ START ========== \n";
-              // foreach($bt as $line){
-              //     printf("File: %s Line: %s function: %s\n", $line['file'], $line['line'], $line['function']);
-              // }
-              // echo "============ END ========== \n\n";
-            }*/
+        if($bt[3]['function'] === 'forkServicestatusChild'){
+          // echo "============ START ========== \n";
+          // foreach($bt as $line){
+          //     printf("File: %s Line: %s function: %s\n", $line['file'], $line['line'], $line['function']);
+          // }
+          // echo "============ END ========== \n\n";
+        }*/
 
 
         if ($this->BulkInsertObjectStore->hasRaisedTimeout()) {
@@ -672,10 +672,18 @@ class MySQL implements \Statusengine\StorageBackend {
     public function monitoringengineWasRestarted() {
         $this->connect();
         $Hoststatus = new MysqlHoststatus($this, $this->BulkInsertObjectStore, $this->nodeName);
-        $Hoststatus->truncate();
+        if ($this->Config->isOpenITCOCKPIT() === true) {
+            $Hoststatus->truncateForOpenITCOCKPIT();
+        } else {
+            $Hoststatus->truncate();
+        }
 
         $Servicestatus = new MysqlServicestatus($this, $this->BulkInsertObjectStore, $this->nodeName);
-        $Servicestatus->truncate();
+        if ($this->Config->isOpenITCOCKPIT() === true) {
+            $Servicestatus->truncateForOpenITCOCKPIT();
+        } else {
+            $Servicestatus->truncate();
+        }
         $this->disconnect();
     }
 

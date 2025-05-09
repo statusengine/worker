@@ -61,7 +61,7 @@ class MysqlServicestatus extends MysqlModel {
      * @param BulkInsertObjectStore $BulkInsertObjectStore
      * @param string $nodeName
      */
-    public function __construct(MySQL $MySQL, BulkInsertObjectStore $BulkInsertObjectStore, $nodeName){
+    public function __construct(MySQL $MySQL, BulkInsertObjectStore $BulkInsertObjectStore, $nodeName) {
         $this->MySQL = $MySQL;
         $this->BulkInsertObjectStore = $BulkInsertObjectStore;
         $this->nodeName = $nodeName;
@@ -71,7 +71,7 @@ class MysqlServicestatus extends MysqlModel {
      * @param bool $isRecursion
      * @return bool
      */
-    public function insert($isRecursion = false){
+    public function insert($isRecursion = false) {
         /**
          * @var Servicestatus $Servicestatus
          */
@@ -142,7 +142,7 @@ class MysqlServicestatus extends MysqlModel {
      * @param bool $isRecursion
      * @return bool
      */
-    public function truncate($isRecursion = false){
+    public function truncate($isRecursion = false) {
         $query = $this->MySQL->prepare('DELETE FROM statusengine_servicestatus WHERE node_name=?');
         $query->bindValue(1, $this->nodeName);
         try {
@@ -154,5 +154,18 @@ class MysqlServicestatus extends MysqlModel {
             }
         }
     }
+
+    public function truncateForOpenITCOCKPIT($isRecursion = false) {
+        $query = $this->MySQL->prepare('DELETE FROM statusengine_servicestatus WHERE NOT EXISTS (SELECT services.uuid FROM services WHERE statusengine_servicestatus.service_description = services.uuid AND services.disabled=0)');
+        try {
+            return $this->MySQL->executeQuery($query, 'MysqlServicestatus');
+        } catch (StorageBackendUnavailableExceptions $Exceptions) {
+            //Retry
+            if ($isRecursion === false) {
+                $this->insert(true);
+            }
+        }
+    }
+
 
 }
