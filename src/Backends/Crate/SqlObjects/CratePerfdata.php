@@ -76,7 +76,7 @@ class CratePerfdata extends Crate\CrateModel {
             $query->bindValue($i++, $Gauge->getLabel());
             $query->bindValue($i++, ($Gauge->getTimestamp() * 1000));
             $query->bindValue($i++, $Gauge->getTimestamp());
-            $query->bindValue($i++, (double)$Gauge->getValue());
+            $query->bindValue($i++, (float)$Gauge->getValue());
             $query->bindValue($i++, $Gauge->getUnit());
         }
 

@@ -270,7 +270,7 @@ class Hoststatus implements StatusInterface {
         $this->last_time_down = (int)$hoststatus->hoststatus->last_time_down;
         $this->last_time_unreachable = (int)$hoststatus->hoststatus->last_time_unreachable;
         $this->current_notification_number = (int)$hoststatus->hoststatus->current_notification_number;
-        $this->percent_state_change = (double)$hoststatus->hoststatus->percent_state_change;
+        $this->percent_state_change = (float)$hoststatus->hoststatus->percent_state_change;
         $this->event_handler = $hoststatus->hoststatus->event_handler;
         $this->check_command = $hoststatus->hoststatus->check_command;
     }

@@ -283,7 +283,7 @@ class Servicestatus implements StatusInterface {
         $this->last_time_critical = (int)$servicestatus->servicestatus->last_time_critical;
         $this->last_time_unknown = (int)$servicestatus->servicestatus->last_time_unknown;
         $this->current_notification_number = (int)$servicestatus->servicestatus->current_notification_number;
-        $this->percent_state_change = (double)$servicestatus->servicestatus->percent_state_change;
+        $this->percent_state_change = (float)$servicestatus->servicestatus->percent_state_change;
         $this->event_handler = $servicestatus->servicestatus->event_handler;
         $this->check_command = $servicestatus->servicestatus->check_command;
     }
