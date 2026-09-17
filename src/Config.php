@@ -117,6 +117,18 @@ class Config {
     /**
      * @return bool
      */
+    public function isStoreNotificationStartEnabled() {
+        $default = false;
+        $default = Env::get('SE_STORE_NOTIFICATION_START', $default, Env::VALUE_BOOL);
+        if (isset($this->config['store_notification_start'])) {
+            return (bool)$this->config['store_notification_start'];
+        }
+        return $default;
+    }
+
+    /**
+     * @return bool
+     */
     public function isProcessPerfdataEnabled() {
         $default = false;
         $default = Env::get('SE_PROCESS_PERFDATA', $default, Env::VALUE_BOOL);
