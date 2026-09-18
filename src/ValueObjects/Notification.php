@@ -22,6 +22,8 @@ namespace Statusengine\ValueObjects;
 
 class Notification implements DataStructInterface {
 
+    const NEBTYPE_CONTACTNOTIFICATIONMETHOD_START = 604;
+
     const NEBTYPE_CONTACTNOTIFICATIONMETHOD_END = 605;
 
     const HOST_NOTIFICATION = 0;
@@ -135,9 +137,30 @@ class Notification implements DataStructInterface {
     /**
      * @return bool
      */
-    public function isValidNotification() {
+    public function isValidNotification($acceptStartEvent = false) {
+        if ($acceptStartEvent === true) {
+            //Where a broker module distributes notifications it answers the START event with
+            //NEBERROR_CALLBACKOVERRIDE. Naemon then continues with the next notification command
+            //and never brokers the END event, so the START is all there is to store.
+            return $this->type === self::NEBTYPE_CONTACTNOTIFICATIONMETHOD_START;
+        }
+
         //Only process to avoid end_time = 0
         return $this->type === self::NEBTYPE_CONTACTNOTIFICATIONMETHOD_END;
+    }
+
+    /**
+     * Fill the end time with the start time.
+     *
+     * Only for a notification stored from its START event, where there is no end to record: the
+     * module that took the notification over does the sending and never reports back. This is a
+     * placeholder, not a measurement. A duration of exactly zero reads as one; a zero end_time
+     * would be rendered as 1970 by everything that formats the column.
+     *
+     * @return void
+     */
+    public function useStartTimeAsEndTime() {
+        $this->end_time = $this->start_time;
     }
 
     /**

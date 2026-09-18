@@ -191,7 +191,14 @@ class MiscChild extends Child {
      */
     private function handleNotifications($jobData) {
         $Notification = new Notification($jobData);
-        if ($Notification->isValidNotification()) {
+        $storeStartEvent = $this->Config->isStoreNotificationStartEnabled();
+        if ($Notification->isValidNotification($storeStartEvent)) {
+            if ($storeStartEvent === true) {
+                //There is no end event to wait for here, and the column is NOT NULL with no
+                //sub-second part, so a zero would show as 1970. The start time makes the
+                //duration exactly zero, which reads as a placeholder rather than a measurement.
+                $Notification->useStartTimeAsEndTime();
+            }
             $this->StorageBackend->saveNotification(
                 $Notification
             );
