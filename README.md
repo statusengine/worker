@@ -1,4 +1,9 @@
 # Statusengine Worker
+
+> [!NOTE]  
+> The Statusengine PHP Worker is End of Life.
+> Please use the new [Go based Worker](https://github.com/statusengine/statusengine-worker).
+
 Statusengine Worker is a PHP application that will consume the events provided by the Statusengine Broker Module. 
 All status data are save in a database (CrateDB, MySQL or Redis) 
 In addition, the Worker is able to parse and process performance data to store them in a time series databases like Graphite. 
